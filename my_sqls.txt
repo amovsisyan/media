@@ -1,0 +1,5 @@
+/*Categories*/
+INSERT INTO `categories` (`id`, `alias`, `name`, `created_at`, `updated_at`) VALUES (NULL, 'famous_people', 'знаменитости', NULL, NULL), (NULL, 'life', 'жизнь', NULL, NULL), (NULL, 'clothes', 'одежда', NULL, NULL)
+
+/*SubCategories*/
+INSERT INTO `subcategories` (`id`, `alias`, `name`, `categ_id`, `created_at`, `updated_at`) VALUES (NULL, 'british_famous', 'британские знаменитости', '1', NULL, NULL), (NULL, 'actors', 'актеры', '1', NULL, NULL), (NULL, 'singers', 'певцы', '1', NULL, NULL), (NULL, 'priroda', 'природа', '2', NULL, NULL), (NULL, 'interesting', 'интересное', '2', NULL, NULL), (NULL, 'sport', 'спортивная', '3', NULL, NULL), (NULL, 'woman', 'женская', '3', NULL, NULL), (NULL, 'baby', 'детская', '3', NULL, NULL)
