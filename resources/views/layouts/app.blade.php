@@ -30,10 +30,10 @@
 </head>
 <body>
 <header>
-	@foreach ($response as $res)
-		<ul id="{{$res['category']['alias']}}" class="dropdown-content">
-			@foreach ($res['subcategory'] as $subcat)
-				<li><a href="{{ url('/' . $res['category']['alias'] . '/' . $subcat['alias']) }}">{{$subcat['name']}}</a></li>
+	@foreach ($response['navbar'] as $navbar)
+		<ul id="{{$navbar['category']['alias']}}" class="dropdown-content">
+			@foreach ($navbar['subcategory'] as $subcat)
+				<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
 			@endforeach
 		</ul>
 	@endforeach
@@ -59,8 +59,8 @@
 		<div class="nav-wrapper">
 			<a href="{{ url('/')}}" class="brand-logo left_5">logo</a>
 			<ul class="right margin_5">
-				@foreach ($response as $res)
-					<li><a class="dropdown-button" href="" data-activates="{{$res['category']['alias']}}">{{$res['category']['name']}}<i class="material-icons right">arrow_drop_down</i></a></li>
+				@foreach ($response['navbar'] as $navbar)
+					<li><a class="dropdown-button" href="" data-activates="{{$navbar['category']['alias']}}">{{$navbar['category']['name']}}<i class="material-icons right">arrow_drop_down</i></a></li>
 				@endforeach
 			</ul>
 		</div>

@@ -7,7 +7,19 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    protected function index (Request $request)
+    public function __construct()
+    {
+    }
+
+    protected function category (Request $request)
+    {
+        $response['navbar'] = $this->getNavbar();
+
+        return response()
+            -> view('welcome', ['response' => $response]);
+    }
+
+    public function getNavbar ()
     {
         $categories = Category::select('id', 'alias', 'name')->get();
 
@@ -20,13 +32,13 @@ class CategoryController extends Controller
             $subcategories = $category->subcategories()->get();
             foreach ($subcategories as $subcategory) {
                 $response[$key]['subcategory'][] = [
+                    'id'        => $subcategory->id,
                     'alias'     => $subcategory->alias,
                     'name'      => $subcategory->name,
                 ];
             }
         }
 
-        return response()
-            -> view('welcome', ['response' => $response]);
+        return  $response;
     }
 }
