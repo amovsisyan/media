@@ -11,6 +11,8 @@
 |
 */
 
-Route::get('/', ['uses'=>'CategoryController@category','as'=>'category']);
+Route::get('/', ['uses'=>'CategoryController@getCategory','as'=>'category']);
 
-Route::get('/{category}/{subcategory}', ['uses'=>'SubcategoryController@subCategory','as'=>'subcategory']);
+Route::get('/{category}/{subcategory}', ['uses'=>'SubcategoryController@getSubCategory','as'=>'subcategory']);
+
+Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost','as'=>'getPost']);

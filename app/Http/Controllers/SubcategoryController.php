@@ -12,7 +12,7 @@ class SubcategoryController extends CategoryController
         parent::__construct();
     }
 
-    protected function subCategory (Request $request, $category, $subcategory)
+    protected function getSubCategory (Request $request, $category, $subcategory)
     {
         $expl_subcat = explode('_', $subcategory);
         $sub_cat_id = $expl_subcat[count($expl_subcat)-1];

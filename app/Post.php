@@ -11,4 +11,8 @@ class Post extends Model
     public function subcategory(){
         return $this->belongsTo('App\Subcategory');
     }
+
+    public function postParts(){
+        return $this->hasMany('App\PostParts', 'post_id', 'id');
+    }
 }

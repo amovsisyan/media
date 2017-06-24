@@ -11,7 +11,7 @@ class CategoryController extends Controller
     {
     }
 
-    protected function category (Request $request)
+    protected function getCategory (Request $request)
     {
         $response['navbar'] = $this->getNavbar();
 
