@@ -19,12 +19,15 @@ class PostController extends SubcategoryController
         $post_id = $expl_post[count($expl_post)-1];
 
         $post = Post::findOrFail($post_id);
+
         $post_parts = $post->postParts()->get();
+        $hashtags = $post->hashtags()->get();
 
         $response = [
             'navbar'      => $this->getNavbar(),
             'post_header' => $post->header,
-            'post_parts'  => $post_parts
+            'post_parts'  => $post_parts,
+            'hashtags'    => $hashtags
         ];
 
         return response()

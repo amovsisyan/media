@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTablePostParts extends Migration
+class CreateTablePostHashtag extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class CreateTablePostParts extends Migration
      */
     public function up()
     {
-        Schema::create('post_parts', function (Blueprint $table) {
+        Schema::create('post_hashtag', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('head', 300)->nullable();
-            $table->string('body', 200)->nullable();
-            $table->string('foot', 300)->nullable();
             $table->integer('post_id')->unsigned();
             $table->foreign('post_id')->references('id')->on('posts');
+            $table->integer('hashtag_id')->unsigned();
+            $table->foreign('hashtag_id')->references('id')->on('hashtags');
         });
     }
 
@@ -30,6 +29,6 @@ class CreateTablePostParts extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('post_parts');
+        Schema::dropIfExists('post_hashtag');
     }
 }

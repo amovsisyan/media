@@ -9,7 +9,7 @@
                         <a href="{{url(Request::url() . '/' . $post['alias'] . '_' . $post['id'])}}">
                             <div class="category-post">
                                 <div class="category-post-img">
-                                    <img src="/img/cat/{{Request::segment(1)}}/{{Request::segment(2)}}/{{$post['alias']}}/{{$post['image']}}" alt="">
+                                    <img src="/img/cat/{{Request::segment(2)}}/{{$post['alias']}}_{{$post['id']}}/{{$post['image']}}" alt="">
                                 </div>
                                 <h5>{{$post['header']}}</h5>
                                 <h6>{{$post['text']}}</h6>

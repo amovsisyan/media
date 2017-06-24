@@ -9,7 +9,7 @@ class Subcategory extends Model
     protected $table = 'subcategories';
 
     public function category(){
-        return $this->belongsTo('App\Category');
+        return $this->belongsTo('App\Category', 'categ_id');
     }
 
     public function posts(){

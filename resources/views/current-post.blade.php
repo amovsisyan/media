@@ -15,15 +15,30 @@
                             <h5 class="head">
                                 {{$post_part['head']}}
                             </h5>
-                            <div class="body">
-                                {{$post_part['body']}}
-                            </div>
+                            @if(!is_null($post_part['body']))
+                                <div class="body">
+                                    <img src="/img/cat/{{Request::segment(2)}}/{{Request::segment(3)}}/parts/{{$post_part['body']}}" alt="">
+                                </div>
+                            @endif
                             <h6 class="foot">
                                 {{$post_part['foot']}}
                             </h6>
                         </div>
                     </div>
                 @endforeach
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <div class="hashtags">
+                        @foreach ($response['hashtags'] as $hashtag)
+                            <a href="{{url('/hashtag/' . $hashtag['alias'])}}">
+                                <div class="chip">
+                                    #{{$hashtag['hashtag']}}
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
     </section>
