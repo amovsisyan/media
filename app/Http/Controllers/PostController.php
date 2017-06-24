@@ -26,7 +26,6 @@ class PostController extends SubcategoryController
             'post_header' => $post->header,
             'post_parts'  => $post_parts
         ];
-        dd($this->getNavbar());
 
         return response()
             -> view('current-post', ['response' => $response]);
