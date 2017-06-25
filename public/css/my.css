@@ -9,7 +9,15 @@ body{
 	color: #5e5e5e;
 	min-width: 600px;
 }
-
+h4{
+	margin: 0 0 .912rem 0;
+}
+.row{
+	margin: 20px 0;
+}
+.row .col{
+	margin: 15px 0;
+}
 /*		HELPERS		*/
 .abs_center{
 	position: absolute;
@@ -61,9 +69,6 @@ body{
 	bottom: 10px;
 	text-align: center;
 	width: 100%;
-}
-#posts .container{
-	padding:20px 0;
 }
 
 /*		NAV		*/

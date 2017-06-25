@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Post;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -13,7 +14,19 @@ class CategoryController extends Controller
 
     protected function getCategory (Request $request)
     {
-        $response['navbar'] = $this->getNavbar();
+        $posts = Post::orderBy('created_at', 'desc')->take(5)->get();
+
+        foreach($posts as $key => $post){
+            $sub_category = $post->subcategory()->select('id', 'alias', 'categ_id')->first();
+            $posts[$key]['sub_alias'] = $sub_category->alias;
+            $posts[$key]['sub_id'] = $sub_category->id;
+            $posts[$key]['cat_alias'] = $sub_category->category()->select('alias')->first()->alias;
+        }
+
+        $response = [
+            'navbar'    => $this->getNavbar(),
+            'posts'     => $posts,
+        ];
 
         return response()
             -> view('welcome', ['response' => $response]);

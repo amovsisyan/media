@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <section id="posts">
+    <section id="hashtag-posts">
         <div class="container">
             @if(!empty($response['hashtag']))
                 <div class="row">
