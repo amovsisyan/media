@@ -68,7 +68,18 @@
 </header>
     @yield('content')
 <footer class="page-footer">
-
+	<div class="container footer-navbar">
+		<div class="row">
+			@foreach ($response['navbar'] as $navbar)
+				<ul class="col s4">
+					<li>{{$navbar['category']['name']}}</li>
+					@foreach ($navbar['subcategory'] as $subcat)
+						<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
+					@endforeach
+				</ul>
+			@endforeach
+		</div>
+	</div>
 	<div class="footer-copyright">
 		<div class="container">
 			© 2017 Copyright NoCoffee Solutions
