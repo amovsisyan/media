@@ -30,56 +30,74 @@
 </head>
 <body>
 <header>
-	@foreach ($response['navbar'] as $navbar)
-		<ul id="{{$navbar['category']['alias']}}" class="dropdown-content">
-			@foreach ($navbar['subcategory'] as $subcat)
-				<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
-			@endforeach
-		</ul>
-	@endforeach
-	{{--<ul id="dropdown1" class="dropdown-content">--}}
-		{{--<li><a href="#!">one</a></li>--}}
-		{{--<li><a href="#!">two</a></li>--}}
-		{{--<li class="divider"></li>--}}
-		{{--<li><a href="#!">three</a></li>--}}
-	{{--</ul>--}}
-	{{--<ul id="dropdown2" class="dropdown-content">--}}
-		{{--<li><a href="#!">one</a></li>--}}
-		{{--<li><a href="#!">two</a></li>--}}
-		{{--<li class="divider"></li>--}}
-		{{--<li><a href="#!">three</a></li>--}}
-	{{--</ul>--}}
-	{{--<ul id="dropdown3" class="dropdown-content">--}}
-		{{--<li><a href="#!">one</a></li>--}}
-		{{--<li><a href="#!">two</a></li>--}}
-		{{--<li class="divider"></li>--}}
-		{{--<li><a href="#!">three</a></li>--}}
-	{{--</ul>--}}
-	<nav>
-		<div class="nav-wrapper">
-			<a href="{{ url('/')}}" class="brand-logo left_5">logo</a>
-			<ul class="right margin_5">
-				@foreach ($response['navbar'] as $navbar)
-					<li><a class="dropdown-button" href="" data-activates="{{$navbar['category']['alias']}}">{{$navbar['category']['name']}}<i class="material-icons right">arrow_drop_down</i></a></li>
+	@if (!empty($response))
+		@foreach ($response['navbar'] as $navbar)
+			<ul id="{{$navbar['category']['alias']}}" class="dropdown-content">
+				@foreach ($navbar['subcategory'] as $subcat)
+					<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
 				@endforeach
 			</ul>
-		</div>
-	</nav>
-</header>
-    @yield('content')
-<footer class="page-footer">
-	<div class="container footer-navbar">
-		<div class="row">
-			@foreach ($response['navbar'] as $navbar)
-				<ul class="col s4">
-					<li>{{$navbar['category']['name']}}</li>
-					@foreach ($navbar['subcategory'] as $subcat)
-						<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
-					@endforeach
+		@endforeach
+	@endif
+		@if (Auth::guest())
+			@if (false)
+				{{--delete false when you need user login--}}
+				<ul id="guest-login" class="dropdown-content">
+					<li><a href="{{ url("/login") }}">Login</a></li>
+					<li><a href="{{ url("/register") }}">Register</a></li>
 				</ul>
-			@endforeach
+			@endif
+		@else
+			<ul id="loged-logout" class="dropdown-content">
+				<li>
+					<a href="{{ url('/logout') }}"
+					   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+						Logout
+					</a>
+					<form id="logout-form" action="{{ url('/logout') }}" method="POST"
+						  style="display: none;">
+						{{ csrf_field() }}
+					</form>
+				</li>
+			</ul>
+		@endif
+		<nav>
+			<div class="nav-wrapper">
+				<a href="{{ url('/')}}" class="brand-logo left_5">logo</a>
+				<ul class="right margin_5">
+					@if (!empty($response))
+						@foreach ($response['navbar'] as $navbar)
+							<li><a class="dropdown-button" href="" data-activates="{{$navbar['category']['alias']}}">{{$navbar['category']['name']}}<i class="material-icons right">arrow_drop_down</i></a></li>
+						@endforeach
+					@endif
+						@if (Auth::guest())
+							@if (false)
+								{{--delete false when you need user login--}}
+								<li><a class="dropdown-button" href="" data-activates="guest-login">Login<i class="material-icons right">arrow_drop_down</i></a></li>
+							@endif
+						@else
+							<li><a class="dropdown-button" href="" data-activates="loged-logout">{{ Auth::user()->name }}<i class="material-icons right">arrow_drop_down</i></a></li>
+						@endif
+				</ul>
+			</div>
+		</nav>
+</header>
+	@yield('content')
+<footer class="page-footer">
+	@if (!empty($response))
+		<div class="container footer-navbar">
+			<div class="row">
+				@foreach ($response['navbar'] as $navbar)
+					<ul class="col s4">
+						<li>{{$navbar['category']['name']}}</li>
+						@foreach ($navbar['subcategory'] as $subcat)
+							<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
+						@endforeach
+					</ul>
+				@endforeach
+			</div>
 		</div>
-	</div>
+	@endif
 	<div class="footer-copyright">
 		<div class="container">
 			© 2017 Copyright NoCoffee Solutions

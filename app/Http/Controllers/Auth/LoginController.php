@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -25,7 +26,25 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
+
+
+    // Need to be overwritten, cause in my app redirect from login goes to '/', not to '/home'
+    protected function sendLoginResponse(Request $request)
+    {
+        $request->session()->regenerate();
+
+        $this->clearLoginAttempts($request);
+
+        if (method_exists($this, 'redirectTo')) {
+            return $this->redirectTo();
+        }
+
+        $redirectTo = property_exists($this, 'redirectTo') ? $this->redirectTo : '/';
+
+        return $this->authenticated($request, $this->guard()->user())
+            ?: redirect()->intended($redirectTo);
+    }
 
     /**
      * Create a new controller instance.
