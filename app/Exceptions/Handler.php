@@ -64,7 +64,7 @@ class Handler extends ExceptionHandler
         $route = 'login';
         $guard = array_get($exception->guards(), 0);
         if ($guard === 'admin') {
-            $route = '/admn/admin/login';
+            $route = '/qwentin/login';
         }
 
         return redirect()->guest($route);

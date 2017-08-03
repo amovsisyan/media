@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="row">
-        <form class="form-horizontal col s8 push-s2" role="form" method="POST" action="{{ url('/admn/admin/login') }}">
+        <form class="form-horizontal col s8 push-s2" role="form" method="POST" action="{{ url('/qwentin/login') }}">
             <h1>Admin Login</h1>
             {{ csrf_field() }}
             <div class="row">

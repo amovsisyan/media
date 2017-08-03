@@ -1,0 +1,12 @@
+/*      Left    Navbar      */
+#lefnavbar {
+    position: absolute;
+    padding: 10px;
+}
+#slide-out a {
+    text-transform: uppercase;
+}
+#lefnavbar .button-collapse i {
+    font-size: 38px;
+    color: #000;
+}
