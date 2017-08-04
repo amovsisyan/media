@@ -1,7 +1,28 @@
 <?php
-// ToDo make groups and prefix
-
 Route::group(['prefix' => 'qwentin'], function () {
+
+    // IMPORTANT
+    // All Prefixs Inside Admin Route Part Are Closely Connected With Table Aliases
+    Route::group(['prefix' => 'posts'], function () {
+        Route::group(['prefix' => 'crud'], function () {
+            Route::get('/create', ['uses'=>'Admin\Posts\CrudController@create','as'=>'crudCreate']);
+            Route::get('/delete', ['uses'=>'Admin\Posts\CrudController@delete','as'=>'crudDelete']);
+            Route::get('/update', ['uses'=>'Admin\Posts\CrudController@update','as'=>'crudUpdate']);
+        });
+        Route::group(['prefix' => 'hashtag'], function () {
+            Route::get('/edit', ['uses'=>'Admin\Posts\HashtagController@edit','as'=>'hashtagEdit']);
+            Route::get('/attach', ['uses'=>'Admin\Posts\HashtagController@attach','as'=>'hashtagAttach']);
+            Route::get('/remove', ['uses'=>'Admin\Posts\HashtagController@remove','as'=>'hashtagRemove']);
+        });
+    });
+    Route::group(['prefix' => 'categories'], function () {
+        Route::group(['prefix' => 'categories'], function () {
+            Route::get('/change', ['uses'=>'Admin\Categories\CategoriesController@change','as'=>'categoriesChange']);
+        });
+        Route::group(['prefix' => 'subcategories'], function () {
+            Route::get('/change', ['uses'=>'Admin\Categories\SubcategoriesController@change','as'=>'subcategoriesChange']);
+        });
+    });
     Route::get('/{navbar}/{part}', ['uses'=>'AdminController@part','as'=>'adminNavbarPart']);
     Route::get('/login', ['uses'=>'Auth\AdminLoginController@showLoginForm','as'=>'adminLoginForm']);
     Route::post('/login', ['uses'=>'Auth\AdminLoginController@login','as'=>'adminLoginPost']);
