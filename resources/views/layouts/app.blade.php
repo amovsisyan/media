@@ -32,11 +32,13 @@
 <header>
 	@if (!empty($response))
 		@foreach ($response['navbar'] as $navbar)
-			<ul id="{{$navbar['category']['alias']}}" class="dropdown-content">
-				@foreach ($navbar['subcategory'] as $subcat)
-					<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
-				@endforeach
-			</ul>
+			@if(!empty($navbar['subcategory']))
+				<ul id="{{$navbar['category']['alias']}}" class="dropdown-content">
+					@foreach ($navbar['subcategory'] as $subcat)
+						<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
+					@endforeach
+				</ul>
+			@endif
 		@endforeach
 	@endif
 		@if (Auth::guest())
@@ -67,7 +69,9 @@
 				<ul class="right margin_5">
 					@if (!empty($response))
 						@foreach ($response['navbar'] as $navbar)
-							<li><a class="dropdown-button" href="" data-activates="{{$navbar['category']['alias']}}">{{$navbar['category']['name']}}<i class="material-icons right">arrow_drop_down</i></a></li>
+							@if(!empty($navbar['subcategory']))
+								<li><a class="dropdown-button" href="" data-activates="{{$navbar['category']['alias']}}">{{$navbar['category']['name']}}<i class="material-icons right">arrow_drop_down</i></a></li>
+							@endif
 						@endforeach
 					@endif
 						@if (Auth::guest())
@@ -88,12 +92,14 @@
 		<div class="container footer-navbar">
 			<div class="row">
 				@foreach ($response['navbar'] as $navbar)
-					<ul class="col s4">
-						<li>{{$navbar['category']['name']}}</li>
-						@foreach ($navbar['subcategory'] as $subcat)
-							<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
-						@endforeach
-					</ul>
+					@if(!empty($navbar['subcategory']))
+						<ul class="col s4">
+							<li>{{$navbar['category']['name']}}</li>
+							@foreach ($navbar['subcategory'] as $subcat)
+								<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
+							@endforeach
+						</ul>
+					@endif
 				@endforeach
 			</div>
 		</div>

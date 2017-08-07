@@ -36,7 +36,7 @@ class AdminController extends Controller
             -> view('admin.index', ['response' => $response]);
     }
 
-    protected function getLeftNavbar()
+    public function getLeftNavbar()
     {
         $navbar = AdminNavbar::select('id', 'alias', 'name')->get();
 
@@ -60,7 +60,7 @@ class AdminController extends Controller
         return $res;
     }
 
-    protected function getPanelNavbar($part = null)
+    public function getPanelNavbar($part = null)
     {
         $res = [];
         if ($part !== null) {

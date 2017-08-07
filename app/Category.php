@@ -8,6 +8,10 @@ class Category extends Model
 {
     protected $table = 'categories';
 
+    protected $fillable = [
+        'name', 'alias'
+    ];
+
     public function subcategories(){
         return $this->hasMany('App\Subcategory', 'categ_id', 'id');
     }

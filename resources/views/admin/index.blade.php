@@ -22,4 +22,5 @@
             </div>
         </div>
     </section>
+    @yield('content-body')
 @endsection

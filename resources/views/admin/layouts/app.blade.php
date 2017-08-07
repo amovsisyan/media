@@ -16,6 +16,7 @@
 	<link href="/css/materialize.min.css" rel="stylesheet">
 	<link href="/css/admin/leftnav.css" rel="stylesheet">
 	<link href="/css/admin/admin-control-panel.css" rel="stylesheet">
+	<link href="/css/admin/helpers.css" rel="stylesheet">
 
     <!-- Scripts -->
 	{{--<script src="/js/app.js"></script>--}}
@@ -61,4 +62,6 @@
 	@yield('content')
 </body>
 <script src="/js/admin/leftnav.js"></script>
+<script src="/js/admin/helpers.js"></script>
+	@yield('script')
 </html>
