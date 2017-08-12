@@ -1,7 +1,7 @@
 @extends('admin.index')
 
 @section('content-body')
-    <section id="admin-control-panel">
+    <section id="create-subcategory-panel">
         <div class="container">
             <div class="row">
                 <h4 class="center-align">Create Subcategory</h4>
@@ -67,6 +67,8 @@
 
             confirmCategory: function(){
                 this.addButton.classList.add('disabled');
+                this.confirmButton.classList.add('disabled');
+
                 var self = this,
                     data = 'subcategory_name=' + this.subcategoryName.value
                         + '&subcategory_alias=' + this.subcategoryAlias.value
@@ -79,15 +81,23 @@
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
-                        self.handleResponseToast(xhr.status, 'Added New Subcategory', 'status_ok')
+                        self.handleResponseToast(xhr.status, 'Added New Subcategory', 'status_ok');
+                        if (xhr.status === 200) {
+                            self.subcategoryName.value = '';
+                            self.subcategoryAlias.value = '';
+                        }
                     }
                     else if (xhr.status !== 200 || response.error === true) {
-                        var errors = response.response,
-                            _html = '';
-                        errors.forEach(function (element, index, array) {
-                            _html += element;
-                        });
-                        self.handleResponseToast(xhr.status, _html, 'status_warning')
+                        if (response.response && response.validate_error === true) {
+                            var errors = response.response,
+                                _html = '';
+                            errors.forEach(function (element, index, array) {
+                                _html += element;
+                            });
+                        } else {
+                            _html = 'Something Was Wrong'
+                        }
+                        self.handleResponseToast(xhr.status, _html, 'status_warning');
                     }
                 };
                 xhr.send(encodeURI(data));
@@ -109,10 +119,7 @@
 
                 toast.classList.add(style);
                 this.addButton.classList.remove('disabled');
-                if (status === 200) {
-                    this.subcategoryName.value = '';
-                    this.subcategoryAlias.value = '';
-                }
+                this.confirmButton.classList.remove('disabled');
             }
         };
         SubcategoryCreate.addButton.addEventListener('click', SubcategoryCreate.createModalContent.bind(SubcategoryCreate));

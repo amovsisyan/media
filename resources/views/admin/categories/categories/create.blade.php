@@ -1,7 +1,7 @@
 @extends('admin.index')
 
 @section('content-body')
-    <section id="admin-control-panel">
+    <section id="create-category-panel">
         <div class="container">
             <div class="row center-align">
                 <h4>Create Category</h4>
@@ -55,6 +55,7 @@
 
             confirmCategory: function(){
                 this.addButton.classList.add('disabled');
+                this.confirmButton.classList.add('disabled');
 
                 var self = this,
                     data = 'category_name=' + this.categoryName.value + '&category_alias=' + this.categoryAlias.value,
@@ -66,15 +67,23 @@
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
-                        self.handleResponseToast(xhr.status, 'Added New Category', 'status_ok')
+                        self.handleResponseToast(xhr.status, 'Added New Category', 'status_ok');
+                        if (xhr.status === 200) {
+                            self.categoryName.value = '';
+                            self.categoryAlias.value = '';
+                        }
                     }
                     else if (xhr.status !== 200 || response.error === true) {
-                        var errors = response.response,
-                            _html = '';
-                        errors.forEach(function (element, index, array) {
-                            _html += element;
-                        });
-                        self.handleResponseToast(xhr.status, _html, 'status_warning')
+                        if (response.response && response.validate_error === true) {
+                            var errors = response.response,
+                                _html = '';
+                            errors.forEach(function (element, index, array) {
+                                _html += element;
+                            });
+                        } else {
+                            _html = 'Something Was Wrong'
+                        }
+                        self.handleResponseToast(xhr.status, _html, 'status_warning');
                     }
                 };
                 xhr.send(encodeURI(data));
@@ -94,10 +103,7 @@
 
                 toast.classList.add(style);
                 this.addButton.classList.remove('disabled');
-                if (status === 200) {
-                    this.categoryName.value = '';
-                    this.categoryAlias.value = '';
-                }
+                this.confirmButton.classList.add('disabled');
             }
         };
         CategoryCreate.confirmButton.addEventListener('click', CategoryCreate.confirmCategory.bind(CategoryCreate));

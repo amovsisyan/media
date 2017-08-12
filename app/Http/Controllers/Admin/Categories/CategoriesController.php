@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Categories;
 use App\Category;
 use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
+use Mockery\Exception;
 use Validator;
 use App\Http\Controllers\Controller;
 
@@ -38,8 +39,10 @@ class CategoriesController extends MainCategoriesController
                 $response[] = $message;
             }
             return response(
-                ['error' => true,
-                 'response' => $response
+                [
+                    'error' => true,
+                    'validate_error' => true,
+                    'response' => $response
                 ], 404
             );
         }
@@ -53,6 +56,49 @@ class CategoriesController extends MainCategoriesController
 
         if ($category) {
             return response(['error' => false]);
+        }
+
+        return response(
+            [
+                'error' => true,
+            ], 404
+        );
+    }
+
+    protected function deleteCategory_get()
+    {
+        $response = $this->prepareNavbars(request()->segment(3));
+        $response['categories'] = Category::select('id', 'name')->get();
+
+        return response()
+            -> view('admin.categories.categories.delete', ['response' => $response]);
+    }
+
+    protected function deleteCategory_post(Request $request)
+    {
+        try {
+            if ($request->data) {
+                $ids = [];
+                foreach (json_decode($request->data) as $category) {
+                    $exp_cat = explode('_', $category);
+                    $ids[] = $exp_cat[count($exp_cat)-1];
+                }
+            }
+            if (Category::whereIn('id', $ids)->delete()) {
+                return response(
+                    [
+                        'error' => false,
+                        'ids' => $ids
+                    ]
+                );
+            }
+        } catch(Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'response' => $e->getMessage()
+                ], 404
+            );
         }
     }
 

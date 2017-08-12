@@ -40,7 +40,9 @@ class SubcategoriesController extends MainCategoriesController
                 $response[] = $message;
             }
             return response(
-                ['error' => true,
+                [
+                    'error' => true,
+                    'validate_error' => true,
                     'response' => $response
                 ], 404
             );
