@@ -21,13 +21,13 @@
                 <div class="col m4 s12">
                     <div class="input-field col s10">
                         <input id="subcategory_alias" name="alias" type="text" class="validate">
-                        <label for="last_name">Alias(English)</label>
+                        <label for="alias">Alias(English)</label>
                     </div>
                 </div>
                 <div class="col m4 s12">
                     <div class="input-field col s10">
                         <input id="subcategory_name" name="name" type="text" class="validate">
-                        <label for="last_name">Name(Russian)</label>
+                        <label for="name">Name(Russian)</label>
                     </div>
                 </div>
             </div>

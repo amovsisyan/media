@@ -1,37 +1,35 @@
 @extends('admin.index')
 
 @section('content-body')
-    <section id="create-category-panel">
+    <section id="create-hashtag-panel">
         <div class="container">
             <div class="row center-align">
-                <h4>Create Category</h4>
-                <h6>(After creating Category, make sure You have also created Subcategory to see it in user side)</h6>
+                <h4>Create Hashtag</h4>
             </div>
             <div class="row">
                 <div class="col m6 s12">
                     <div class="input-field col s8">
-                        <input id="category_alias" name="alias" type="text" class="validate">
+                        <input id="hashtag_alias" name="alias" type="text" class="validate">
                         <label for="alias">Alias(English)</label>
                     </div>
                 </div>
                 <div class="col m6 s12">
                     <div class="input-field col s8">
-                        <input id="category_name" name="name" type="text" class="validate">
+                        <input id="hashtag_name" name="name" type="text" class="validate">
                         <label for="name">Name(Russian)</label>
                     </div>
                 </div>
             </div>
             <div class="row right-align m_t_50">
-                <a class="waves-effect waves-light btn">test it</a>
                 <!-- Modal -->
-                <a id='add_category' class="waves-effect waves-light btn modal-trigger" href="#modal_add_category">Add</a>
-                <div id="modal_add_category" class="modal">
+                <a id='add_hashtag' class="waves-effect waves-light btn modal-trigger" href="#modal_add_hashtag">Add</a>
+                <div id="modal_add_hashtag" class="modal">
                     <div class="modal-content left-align">
-                        <h4>Are You Sure You Want Create Category?</h4>
+                        <h4>Are You Sure You Want Create Hashtag?</h4>
                         <p></p>
                     </div>
                     <div class="modal-footer">
-                        <a id='confirm_category' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+                        <a id='confirm_hashtag' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
                         <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
                     </div>
                 </div>
@@ -46,19 +44,19 @@
             $('.modal').modal();
         });
 
-        CategoryCreate = {
-            addButton: document.getElementById('add_category'),
-            confirmButton: document.getElementById('confirm_category'),
-            categoryName: document.getElementById('category_name'),
-            categoryAlias: document.getElementById('category_alias'),
-            modalAddCategory: document.getElementById('modal_add_category'),
+        HashtagCreate = {
+            addButton: document.getElementById('add_hashtag'),
+            confirmButton: document.getElementById('confirm_hashtag'),
+            hashtagName: document.getElementById('hashtag_name'),
+            hashtagAlias: document.getElementById('hashtag_alias'),
+            modalAddHashtag: document.getElementById('modal_add_hashtag'),
 
-            confirmCategory: function(){
+            confirmHashtag: function(){
                 this.addButton.classList.add('disabled');
                 this.confirmButton.classList.add('disabled');
 
                 var self = this,
-                    data = 'category_name=' + this.categoryName.value + '&category_alias=' + this.categoryAlias.value,
+                    data = 'hashtag_name=' + this.hashtagName.value + '&hashtag_alias=' + this.hashtagAlias.value,
                     xhr = new XMLHttpRequest();
 
                 xhr.open('POST', window.location.href);
@@ -67,10 +65,10 @@
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
-                        self.handleResponseToast(xhr.status, 'Added New Category', 'status_ok');
+                        self.handleResponseToast(xhr.status, 'Added New Hashtag', 'status_ok');
                         if (xhr.status === 200) {
-                            self.categoryName.value = '';
-                            self.categoryAlias.value = '';
+                            self.hashtagName.value = '';
+                            self.hashtagAlias.value = '';
                         }
                     }
                     else if (xhr.status !== 200 || response.error === true) {
@@ -90,9 +88,9 @@
             },
 
             createModalContent: function() {
-                var content = this.modalAddCategory.getElementsByClassName('modal-content'),
+                var content = this.modalAddHashtag.getElementsByClassName('modal-content'),
                     paragraph = content[0].getElementsByTagName('p')[0],
-                    _html = '<p>Name: ' + this.categoryName.value + '</p><p>Alias: ' + this.categoryAlias.value + '</p>';
+                    _html = '<p>Name: ' + this.hashtagName.value + '</p><p>Alias: ' + this.hashtagAlias.value + '</p>';
                 paragraph.innerHTML = _html;
             },
 
@@ -106,7 +104,7 @@
                 this.confirmButton.classList.add('disabled');
             }
         };
-        CategoryCreate.confirmButton.addEventListener('click', CategoryCreate.confirmCategory.bind(CategoryCreate));
-        CategoryCreate.addButton.addEventListener('click', CategoryCreate.createModalContent.bind(CategoryCreate));
+        HashtagCreate.confirmButton.addEventListener('click', HashtagCreate.confirmHashtag.bind(HashtagCreate));
+        HashtagCreate.addButton.addEventListener('click', HashtagCreate.createModalContent.bind(HashtagCreate));
     </script>
 @endsection
