@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Helpers;
 use Illuminate\Http\Request;
 use Mockery\Exception;
 use Validator;
@@ -19,7 +20,7 @@ class CategoriesController extends MainCategoriesController
 
     protected function createCategory_get()
     {
-        $response = $this->prepareNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars(request()->segment(3));
 
         return response()
             -> view('admin.categories.categories.create', ['response' => $response]);
@@ -67,7 +68,7 @@ class CategoriesController extends MainCategoriesController
 
     protected function deleteCategory_get()
     {
-        $response = $this->prepareNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars(request()->segment(3));
         $response['categories'] = Category::select('id', 'name')->get();
 
         return response()
@@ -100,18 +101,5 @@ class CategoriesController extends MainCategoriesController
                 ], 404
             );
         }
-    }
-
-    // Prepare Left and Panel Navbar response
-    // Must be like helper as for now it also the same logic used in SubCategories
-    // think will be used everywhere,
-    // ToDo Should here add CACHE part logic
-    protected function prepareNavbars($part)
-    {
-        $response = [];
-        $adminController = new AdminController();
-        $response['leftNav'] = $adminController->getLeftNavbar();
-        $response['panel'] = $adminController->getPanelNavbar($part);
-        return $response;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Helpers;
 use Illuminate\Http\Request;
 use Validator;
 use App\Http\Controllers\Controller;
@@ -19,6 +20,7 @@ class SubcategoriesController extends MainCategoriesController
     protected function createSubcategory_get()
     {
         $response = $this->prepareNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars(request()->segment(3));
         $response['categories'] = Category::select('id', 'name')->get();
 
         return response()
@@ -58,18 +60,5 @@ class SubcategoriesController extends MainCategoriesController
         if ($subcategory) {
             return response(['error' => false]);
         }
-    }
-
-    // Prepare Left and Panel Navbar response
-    // Must be like helper as for now it also the same logic used in SubCategories
-    // think will be used everywhere,
-    // ToDo Should here add CACHE part logic
-    protected function prepareNavbars($part)
-    {
-        $response = [];
-        $adminController = new AdminController();
-        $response['leftNav'] = $adminController->getLeftNavbar();
-        $response['panel'] = $adminController->getPanelNavbar($part);
-        return $response;
     }
 }

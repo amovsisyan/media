@@ -48,14 +48,14 @@ Route::group(['prefix' => 'qwentin'], function () {
 
 
 Route::get('/', ['uses'=>'CategoryController@getCategory','as'=>'category']);
-Route::get('/home', ['uses'=>'CategoryController@getCategory','as'=>'category']);
+Route::get('/home', ['uses'=>'CategoryController@getCategory','as'=>'category'])->where('home', 'home');
 
-// ToDo all should be in where a-z 0-9
 Route::get('/hashtag/{alias}', ['uses'=>'SubcategoryController@getByHashtag','as'=>'byHashtag']);
 
-Route::get('/{category}/{subcategory}', ['uses'=>'SubcategoryController@getSubCategory','as'=>'subcategory']);
+Route::get('/{category}/{subcategory}', ['uses'=>'SubcategoryController@getSubCategory','as'=>'subcategory'])
+        ->where(['category' => '^[a-zA-Z0-9_]*$', 'subcategory' => '^[a-zA-Z0-9_]*$']);
 
-Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost','as'=>'post']);
-
+Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost','as'=>'post'])
+        ->where(['category' => '^[a-zA-Z0-9_]*$', 'subcategory' => '^[a-zA-Z0-9_]*$', 'post' => '^[a-zA-Z0-9_]*$']);
 
 Auth::routes();
