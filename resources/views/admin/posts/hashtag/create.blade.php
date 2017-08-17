@@ -59,7 +59,7 @@
                     data = 'hashtag_name=' + this.hashtagName.value + '&hashtag_alias=' + this.hashtagAlias.value,
                     xhr = new XMLHttpRequest();
 
-                xhr.open('POST', window.location.href);
+                xhr.open('POST', location.pathname);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.setRequestHeader('X-CSRF-TOKEN', getCSRFToken());
                 xhr.onload = function() {
@@ -101,7 +101,7 @@
 
                 toast.classList.add(style);
                 this.addButton.classList.remove('disabled');
-                this.confirmButton.classList.add('disabled');
+                this.confirmButton.classList.remove('disabled');
             }
         };
         HashtagCreate.confirmButton.addEventListener('click', HashtagCreate.confirmHashtag.bind(HashtagCreate));

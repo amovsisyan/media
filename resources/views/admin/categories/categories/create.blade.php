@@ -61,7 +61,7 @@
                     data = 'category_name=' + this.categoryName.value + '&category_alias=' + this.categoryAlias.value,
                     xhr = new XMLHttpRequest();
 
-                xhr.open('POST', window.location.href);
+                xhr.open('POST', location.pathname);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.setRequestHeader('X-CSRF-TOKEN', getCSRFToken());
                 xhr.onload = function() {

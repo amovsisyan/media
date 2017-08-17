@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Helpers;
 use Illuminate\Http\Request;
 use Validator;
-use App\Http\Controllers\Controller;
 
 class SubcategoriesController extends MainCategoriesController
 {
@@ -19,7 +17,6 @@ class SubcategoriesController extends MainCategoriesController
 
     protected function createSubcategory_get()
     {
-        $response = $this->prepareNavbars(request()->segment(3));
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
         $response['categories'] = Category::select('id', 'name')->get();
 

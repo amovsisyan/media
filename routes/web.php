@@ -6,7 +6,9 @@ Route::group(['prefix' => 'qwentin'], function () {
     Route::group(['middleware' => 'auth:admin'], function () {
         Route::group(['prefix' => 'posts'], function () {
             Route::group(['prefix' => 'crud'], function () {
-                Route::get('/create_post', ['uses'=>'Admin\Posts\CrudController@create','as'=>'crudCreate']);
+                Route::get('/create_post', ['uses'=>'Admin\Posts\CrudController@createPost_get','as'=>'postCreateGet']);
+                Route::post('/create_post', ['uses'=>'Admin\Posts\CrudController@createPost_post','as'=>'postCreatePost']);
+
                 Route::get('/delete_post', ['uses'=>'Admin\Posts\CrudController@delete','as'=>'crudDelete']);
                 Route::get('/update_post', ['uses'=>'Admin\Posts\CrudController@update','as'=>'crudUpdate']);
             });

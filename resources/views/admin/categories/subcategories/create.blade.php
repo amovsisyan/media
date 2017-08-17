@@ -75,7 +75,7 @@
                         + '&categorySelect=' + this.categorySelect.options[this.categorySelect.selectedIndex].value,
                     xhr = new XMLHttpRequest();
 
-                xhr.open('POST', window.location.href);
+                xhr.open('POST', location.pathname);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.setRequestHeader('X-CSRF-TOKEN', getCSRFToken());
                 xhr.onload = function() {

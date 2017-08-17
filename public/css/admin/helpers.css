@@ -5,5 +5,8 @@
     background: #00C853;
 }
 .status_warning {
-     background: #C62828;
+    background: #C62828;
  }
+.important_icon{
+    color: #C62828;
+}

@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Admin\Posts;
 
 use App\Hashtag;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Helpers;
 use Illuminate\Http\Request;
 use Validator;
-use App\Http\Controllers\Controller;
 
 class HashtagController extends PostsController
 {

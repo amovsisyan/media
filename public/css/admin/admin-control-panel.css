@@ -2,3 +2,7 @@
 #admin-control-panel .row {
     margin: 0;
 }
+/*  POST    CREATE  */
+#post-create-main .col{
+    margin-bottom: 30px;
+}

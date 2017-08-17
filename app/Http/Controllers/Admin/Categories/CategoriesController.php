@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Helpers;
 use Illuminate\Http\Request;
 use Mockery\Exception;
 use Validator;
-use App\Http\Controllers\Controller;
 
 class CategoriesController extends MainCategoriesController
 {
