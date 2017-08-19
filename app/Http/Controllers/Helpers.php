@@ -7,10 +7,14 @@ use Illuminate\Http\Request;
 
 class Helpers extends Controller
 {
+    /**
+     * Explodes Request Alias, Get Last part, which is ID, and return POST by ID
+     * @param $postAlias
+     * @return null
+     */
     public static function getPostByRequest($postAlias)
     {
-        $expl_post = explode('_', $postAlias);
-        $post_id = $expl_post[count($expl_post)-1];
+        $post_id = self::explodeGetLast($postAlias);
 
         if ($post = Post::findOrFail($post_id)) {
             return $post;
@@ -27,5 +31,15 @@ class Helpers extends Controller
         $response['leftNav'] = $adminController->getLeftNavbar();
         $response['panel'] = $adminController->getPanelNavbar($part);
         return $response;
+    }
+
+    /**
+     * Just get string with '_', explode and return last
+     * @param $string
+     * @return mixed
+     */
+    public static function explodeGetLast($string) {
+        $expl_post = explode('_', $string);
+        return $expl_post[count($expl_post)-1];
     }
 }

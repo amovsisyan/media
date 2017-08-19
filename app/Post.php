@@ -8,6 +8,10 @@ class Post extends Model
 {
     protected $table = 'posts';
 
+    protected $fillable = [
+        'alias', 'header', 'text', 'image'
+    ];
+
     public function subcategory(){
         return $this->belongsTo('App\Subcategory', 'subcateg_id');
     }

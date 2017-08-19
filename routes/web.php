@@ -61,3 +61,7 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
         ->where(['category' => '^[a-zA-Z0-9_]*$', 'subcategory' => '^[a-zA-Z0-9_]*$', 'post' => '^[a-zA-Z0-9_]*$']);
 
 Auth::routes();
+
+
+// TODO why we send hashtags or aliases WITH ALIAS_ID  , why we don't explode it in local , and do it on server side ???
+// TODO Change all getElement ... to querySelector

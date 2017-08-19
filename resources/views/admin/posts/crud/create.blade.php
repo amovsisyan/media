@@ -101,19 +101,19 @@
         PostCreate = {
             defaultProperties: {
                 partTemplateCounter: 0,
-                basicPartTemplate: document.getElementsByClassName('post-part')[0],
+                basicPartTemplate: document.querySelector('.post-part')
             },
-            addButton: document.getElementById('add_post'),
-            confirmButton: document.getElementById('confirm_post'),
-            postAlias: document.getElementById('alias'),
-            postMainHeader: document.getElementById('main_header'),
-            postMainText: document.getElementById('main_text'),
-            postMainImage: document.getElementById('main_image'),
-            postSubcategory: document.getElementById('subcategory_select'),
-            hashtagSelect: document.getElementById('hashtag_select'),
-            modalAddPost: document.getElementById('modal_add_post'),
-            postPartAddButton: document.getElementById('post-part-add-button'),
-            postCreateParts: document.getElementById('post-create-parts'),
+            addButton: document.querySelector('#add_post'),
+            confirmButton: document.querySelector('#confirm_post'),
+            postAlias: document.querySelector('#alias'),
+            postMainHeader: document.querySelector('#main_header'),
+            postMainText: document.querySelector('#main_text'),
+            postMainImage: document.querySelector('#main_image'),
+            postSubcategory: document.querySelector('#subcategory_select'),
+            hashtagSelect: document.querySelector('#hashtag_select'),
+            modalAddPost: document.querySelector('#modal_add_post'),
+            postPartAddButton: document.querySelector('#post-part-add-button'),
+            postCreateParts: document.querySelector('#post-create-parts'),
 
             _init: function() {
                 this.renderPartTemplate();
@@ -121,14 +121,14 @@
 
             renderPartTemplate: function() {
                 var num = this.defaultProperties.partTemplateCounter++,
-                    currTempl = document.getElementsByClassName('post-part')[num];
+                    currTempl = document.querySelectorAll('.post-part')[num];
                 this._regeneratePostPartIds(currTempl);
 
-                currTempl.getElementsByClassName('part_header')[0].value = '';
-                currTempl.getElementsByClassName('part_footer')[0].value = '';
-                currTempl.getElementsByClassName('file-path ')[0].value = '';
+                currTempl.querySelector('.part-header').value = '';
+                currTempl.querySelector('.part-footer').value = '';
+                currTempl.querySelector('.file-path ').value = '';
 
-                currTempl.getElementsByClassName('part-delete-button')[0].addEventListener('click',
+                currTempl.querySelector('.part-delete-button').addEventListener('click',
                     this.createModelPartDelete
                 );
             },
@@ -137,43 +137,59 @@
                 var self = this,
                     hashtags = [],
                     xhr = new XMLHttpRequest(),
+                    allPostParts = document.querySelectorAll('.post-part'),
                     formData = new FormData();
 
                 Array.prototype.forEach.call(this.getHashtagList(), (function (element, index, array) {
-                    hashtags.push(element.getElementsByTagName('span')[0].textContent)
+                    hashtags.push(element.querySelector('span').textContent)
                 }));
 
-                formData.append("post_alias", this.postAlias.value);
-                formData.append("post_main_header", this.postMainHeader.value);
-                formData.append("post_main_text", this.postMainText.value);
-                formData.append("post_subcategory", this.postSubcategory.options[this.postSubcategory.selectedIndex].value);
-                formData.append("post_hashtag", JSON.stringify(hashtags));
-                formData.append("post_main_image", this.postMainImage.files[0]);
+                // Main
+                formData.append("postAlias", this.postAlias.value);
+                formData.append("postMainHeader", this.postMainHeader.value);
+                formData.append("postMainText", this.postMainText.value);
+                formData.append("postMainImage", this.postMainImage.files[0]);
+                formData.append("postSubcategory", this.postSubcategory.options[this.postSubcategory.selectedIndex].value);
+                formData.append("postHashtag", JSON.stringify(hashtags));
+
+
+                // Parts
+                Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
+                    formData.append('partHeader[]', element.querySelector('.part-header').value);
+
+                    var fileContainer = element.querySelector('.part-image').files,
+                        file = [];
+                    if (fileContainer.length) {
+                        file = element.querySelector('.part-image').files[0]
+                    }
+                    formData.append('partImage[]', file);
+
+                    formData.append('partFooter[]', element.querySelector('.part-footer').value);
+                }));
 
                 xhr.open('POST', location.pathname, true);
                 xhr.setRequestHeader('X-CSRF-TOKEN', getCSRFToken());
 
                 xhr.onload = function() {
-//                    var response = JSON.parse(xhr.responseText);
-//                    if (xhr.status === 200 && response.error !== true) {
-//                        self.handleResponseToast(xhr.status, 'Added New Hashtag', 'status_ok');
-//                        if (xhr.status === 200) {
-//                            self.hashtagName.value = '';
-//                            self.hashtagAlias.value = '';
-//                        }
-//                    }
-//                    else if (xhr.status !== 200 || response.error === true) {
-//                        if (response.response && response.validate_error === true) {
-//                            var errors = response.response,
-//                                _html = '';
-//                            errors.forEach(function (element, index, array) {
-//                                _html += element;
-//                            });
-//                        } else {
-//                            _html = 'Something Was Wrong'
-//                        }
-//                        self.handleResponseToast(xhr.status, _html, 'status_warning');
-//                    }
+                    var response = JSON.parse(xhr.responseText);
+                    if (xhr.status === 200 && response.error !== true) {
+                        self.handleResponseToast(xhr.status, 'Added New Post', 'status_ok');
+                        if (xhr.status === 200) {
+                            self._regenerateAfterNewCreation();
+                        }
+                    }
+                    else if (xhr.status !== 200 || response.error === true) {
+                        if (response.response && (response.validate_error === true || response.other_error === true)) {
+                            var errors = response.response,
+                                _html = '';
+                            errors.forEach(function (element, index, array) {
+                                _html += element;
+                            });
+                        } else {
+                            _html = 'Something Was Wrong'
+                        }
+                        self.handleResponseToast(xhr.status, _html, 'status_warning');
+                    }
                 };
                 xhr.send(formData);
             },
@@ -192,7 +208,7 @@
 
             regenerateAfterDelete: function() {
                 var self = this,
-                    allPostParts = document.getElementsByClassName('post-part');
+                    allPostParts = document.querySelectorAll('.post-part');
 
                 Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
                     var arr = element.id.split('-'),
@@ -209,32 +225,58 @@
             _regeneratePostPartIds: function(element) {
                 element.dataset.id = this.defaultProperties.partTemplateCounter;
                 element.id = 'post-id-' + this.defaultProperties.partTemplateCounter;
-                element.getElementsByClassName('post-number')[0].innerHTML = this.defaultProperties.partTemplateCounter;
-                element.getElementsByClassName('modal-trigger')[0].href = '#modal_delete_part_' + this.defaultProperties.partTemplateCounter;
-                element.getElementsByClassName('modal')[0].id = 'modal_delete_part_' + this.defaultProperties.partTemplateCounter;
+                element.querySelector('.post-number').innerHTML = this.defaultProperties.partTemplateCounter;
+                element.querySelector('.modal-trigger').href = '#modal_delete_part_' + this.defaultProperties.partTemplateCounter;
+                element.querySelector('.modal').id = 'modal_delete_part_' + this.defaultProperties.partTemplateCounter;
                 $('#modal_delete_part_' + this.defaultProperties.partTemplateCounter).modal();
+            },
+
+            _regenerateAfterNewCreation: function(element) {
+                this.defaultProperties.partTemplateCounter = 1;
+                var allParts = document.querySelectorAll('.post-part');
+
+                Array.prototype.forEach.call(allParts, (function (element, index, array) {
+                        if (index === 0) {
+                            element.querySelector('.part-header').value = '';
+                            element.querySelector('.part-footer').value = '';
+                            element.querySelector('.file-path ').value = '';
+                        } else {
+                            element.remove();
+                        }
+                    })
+                );
+                this.postAlias.value = '';
+                this.postMainHeader.value = '';
+                this.postMainText.value = '';
+                this.postMainImage.value = '';
             },
 
             createModelPartDelete: function(e) {
                 var currElem = getClosest(e.target, '.post-part'),
-                    content = currElem.getElementsByClassName('modal-content'),
-                    paragraph = content[0].getElementsByTagName('p')[0],
-                    _html = '<p>Post N_' + currElem.getElementsByClassName('post-number')[0].innerHTML + '</p>' +
-                        '<p>Post Header: ' + currElem.getElementsByClassName('part_header')[0].value + '</p>' +
-                        '<p>Post Footer: ' + currElem.getElementsByClassName('part_footer')[0].value + '</p>';
+                    content = currElem.querySelector('.modal-content'),
+                    paragraph = content.querySelector('p'),
+                    postParts = document.querySelectorAll('.post-part'),
+                    _html = '';
+                if (postParts.length == 1) {
+                    _html = "<h4 class='red-text'>Can't Delete Last Part</h4>"
+                } else {
+                    _html = '<p>Post N_' + currElem.querySelector('.post-number').innerHTML + '</p>' +
+                        '<p>Post Header: ' + currElem.querySelector('.part-header').value + '</p>' +
+                        '<p>Post Footer: ' + currElem.querySelector('.part-footer').value + '</p>';
+                }
 
                 paragraph.innerHTML = _html;
 
-                currElem.getElementsByClassName('confirm-delete')[0].addEventListener('click',
-                    //can't access to rela this, that's why call PostCreate
+                currElem.querySelector('.confirm-delete').addEventListener('click',
+                    //can't access to real this, that's why call PostCreate
                     PostCreate.confirmPartRemove
                 );
 
             },
 
             createModalContent: function() {
-                var content = this.modalAddPost.getElementsByClassName('modal-content'),
-                    paragraph = content[0].getElementsByTagName('p')[0],
+                var content = this.modalAddPost.querySelector('.modal-content'),
+                    paragraph = content.querySelector('p'),
                     _html = '<p>Header: ' + this.postMainHeader.value + '</p>' +
                         '<p>Main Text: ' + this.postMainText.value + '</p>' +
                         '<p>Category: ' + this.postSubcategory.options[this.postSubcategory.selectedIndex].text + '</p>';
@@ -250,7 +292,7 @@
 
             handleResponseToast: function(status, text, style) {
                 Materialize.toast(text, 5000, 'rounded');
-                var toasts = document.getElementById("toast-container").getElementsByClassName("toast "),
+                var toasts = document.querySelector("#toast-container").querySelectorAll(".toast "),
                     toast = toasts[toasts.length-1];
 
                 toast.classList.add(style);
@@ -259,7 +301,8 @@
             },
 
             getHashtagList: function() {
-                return getClosest(this.hashtagSelect, '.select-wrapper').getElementsByClassName('multiple-select-dropdown')[0].getElementsByClassName('active');
+                var hashtags = getClosest(this.hashtagSelect, '.select-wrapper').querySelector('.multiple-select-dropdown').querySelector('.active');
+                return hashtags ? hashtags : [];
             }
         };
 
