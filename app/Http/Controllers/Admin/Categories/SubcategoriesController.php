@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
-use App\Http\Controllers\Helpers;
+use App\Http\Controllers\Helpers\Helpers;
+use App\Http\Controllers\Helpers\Validation;
 use Illuminate\Http\Request;
-use Validator;
 
 class SubcategoriesController extends MainCategoriesController
 {
@@ -26,26 +26,17 @@ class SubcategoriesController extends MainCategoriesController
 
     protected function createSubcategory_post(Request$request)
     {
-        $validator = Validator::make($request->all(), [
-            'subcategory_name' => 'required|min:2|max:30',
-            'subcategory_alias' => 'required|min:2|max:30',
-            'categorySelect' => 'required|integer',
-        ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $response = [];
-            foreach ($errors->all() as $message) {
-                $response[] = $message;
-            }
+        $validationResult = Validation::validateSubcategoryCreate($request->all());
+        if ($validationResult['error']) {
             return response(
                 [
                     'error' => true,
-                    'validate_error' => true,
-                    'response' => $response
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
                 ], 404
             );
         }
+
         $category = Category::findOrFail($request->categorySelect);
         $subcategory = $category->subcategories()->create(
             [

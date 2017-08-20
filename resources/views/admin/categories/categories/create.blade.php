@@ -67,23 +67,25 @@
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
-                        self.handleResponseToast(xhr.status, 'Added New Category', 'status_ok');
+                        handleResponseToast(xhr.status, 'Added New Category', 'status_ok');
                         if (xhr.status === 200) {
                             self.categoryName.value = '';
                             self.categoryAlias.value = '';
-                        }
+                        };
+                        self.updateAddConfirmButtons();
                     }
                     else if (xhr.status !== 200 || response.error === true) {
-                        if (response.response && response.validate_error === true) {
+                        if (response.response && response.type) {
                             var errors = response.response,
-                                _html = '';
+                                _html = response.type + ': ';
                             errors.forEach(function (element, index, array) {
                                 _html += element;
                             });
                         } else {
                             _html = 'Something Was Wrong'
                         }
-                        self.handleResponseToast(xhr.status, _html, 'status_warning');
+                        handleResponseToast(xhr.status, _html, 'status_warning');
+                        self.updateAddConfirmButtons();
                     }
                 };
                 xhr.send(encodeURI(data));
@@ -96,14 +98,9 @@
                 paragraph.innerHTML = _html;
             },
 
-            handleResponseToast: function(status, text, style) {
-                Materialize.toast(text, 5000, 'rounded');
-                var toasts = document.getElementById("toast-container").getElementsByClassName("toast "),
-                    toast = toasts[toasts.length-1];
-
-                toast.classList.add(style);
+            updateAddConfirmButtons: function() {
                 this.addButton.classList.remove('disabled');
-                this.confirmButton.classList.add('disabled');
+                this.confirmButton.classList.remove('disabled');
             }
         };
         CategoryCreate.confirmButton.addEventListener('click', CategoryCreate.confirmCategory.bind(CategoryCreate));

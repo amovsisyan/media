@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin\Posts;
 
 use App\Hashtag;
-use App\Http\Controllers\Helpers;
+use App\Http\Controllers\Helpers\Helpers;
+use App\Http\Controllers\Helpers\Validation;
 use Illuminate\Http\Request;
-use Validator;
 
 class HashtagController extends PostsController
 {
@@ -37,22 +37,13 @@ class HashtagController extends PostsController
 
     protected function createHashtag_post(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'hashtag_name' => 'required|min:2|max:40',
-            'hashtag_alias' => 'required|min:2|max:40',
-        ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $response = [];
-            foreach ($errors->all() as $message) {
-                $response[] = $message;
-            }
+        $validationResult = Validation::validateHashtagCreate($request->all());
+        if ($validationResult['error']) {
             return response(
                 [
                     'error' => true,
-                    'validate_error' => true,
-                    'response' => $response
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
                 ], 404
             );
         }

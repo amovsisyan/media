@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Helpers\Helpers;
+
 
 class PostController extends SubcategoryController
 {

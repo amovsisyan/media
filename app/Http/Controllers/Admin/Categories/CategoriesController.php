@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
-use App\Http\Controllers\Helpers;
+use App\Http\Controllers\Helpers\Helpers;
+use App\Http\Controllers\Helpers\Validation;
 use Illuminate\Http\Request;
 use Mockery\Exception;
-use Validator;
 
 class CategoriesController extends MainCategoriesController
 {
@@ -26,22 +26,13 @@ class CategoriesController extends MainCategoriesController
 
     protected function createCategory_post(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'category_name' => 'required|min:2|max:30',
-            'category_alias' => 'required|min:2|max:30',
-        ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $response = [];
-            foreach ($errors->all() as $message) {
-                $response[] = $message;
-            }
+        $validationResult = Validation::validateCategoryCreate($request->all());
+        if ($validationResult['error']) {
             return response(
                 [
                     'error' => true,
-                    'validate_error' => true,
-                    'response' => $response
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
                 ], 404
             );
         }

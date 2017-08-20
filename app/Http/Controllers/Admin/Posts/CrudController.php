@@ -4,12 +4,11 @@ namespace App\Http\Controllers\Admin\Posts;
 
 use App\Category;
 use App\Hashtag;
-use App\Http\Controllers\Helpers;
+use App\Http\Controllers\Helpers\Helpers;
+use App\Http\Controllers\Helpers\Validation;
 use App\Subcategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Mockery\Exception;
-use Validator;
 use File;
 
 class CrudController extends PostsController
@@ -41,30 +40,32 @@ class CrudController extends PostsController
         $requestAll =  $request->all();
 
         // Main fields Validation
-        $mainValidation = $this->createPostMainFieldsValidations($requestAll);
-        if($mainValidation['error']) {
+        $mainValidation = Validation::createPostMainFieldsValidations($requestAll);
+        if ($mainValidation['error']) {
             return response(
                 [
                     'error' => true,
-                    'validate_error' => true,
+                    'type' => $mainValidation['type'],
                     'response' => $mainValidation['response']
                 ], 404
             );
         }
 
         // Part fields Validation
-        $partValidation = $this->createPostPartFieldsValidations($requestAll);
-        if($partValidation['error']) {
+        $partValidation = Validation::createPostPartFieldsValidations($requestAll);
+        if ($partValidation['error']) {
             return response(
                 [
                     'error' => true,
-                    'validate_error' => true,
+                    'type' => $partValidation['type'],
                     'response' => $partValidation['response']
                 ], 404
             );
         }
 
         try {
+            //ToDo Make 3 separate private methods for this 3 parts
+
             // Post Main Creation
             $subcategory = Subcategory::findOrFail($request->postSubcategory);
 
@@ -111,78 +112,13 @@ class CrudController extends PostsController
             return response(
                 [
                     'error' => true,
-                    'other_error' => true,
+                    'type' => 'Some Other Error',
                     'response' => [$e->getMessage()]
                 ], 404
             );
         }
 
         return response(['error' => false]);
-    }
-
-    // ToDO Make separate validator classHelper, where will be all validation methods
-    protected function createPostMainFieldsValidations($req) {
-        $rules = [
-            'postAlias' => 'required|min:2|max:60',
-            'postMainHeader' => 'required|min:2|max:60',
-            'postMainText' => 'required|min:2|max:60',
-            'postMainImage' => 'required|image ',
-            'postSubcategory' => 'required',
-            'postHashtag' => 'required',
-        ];
-
-        $validator = Validator::make($req, $rules);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $response = [];
-            foreach ($errors->all() as $message) {
-                $response[] = $message;
-            }
-            return
-                [
-                    'error' => true,
-                    'validate_error' => true,
-                    'response' => $response
-                ];
-        }
-        return true;
-    }
-
-    protected function createPostPartFieldsValidations($req) {
-        $rules = [];
-
-        foreach ($req['partHeader'] as $key => $value) {
-            $k = 'partHeader.' . $key;
-            $rules[$k] = 'required|max:300';
-        };
-
-        foreach ($req['partImage'] as $key => $value) {
-            $k = 'partImage.' . $key;
-            $rules[$k] = 'required|image';
-        };
-
-        foreach ($req['partFooter'] as $key => $value) {
-            $k = 'partFooter.' . $key;
-            $rules[$k] = 'required|max:300';
-        };
-
-        $validator = Validator::make($req, $rules);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $response = [];
-            foreach ($errors->all() as $message) {
-                $response[] = $message;
-            }
-            return
-                [
-                    'error' => true,
-                    'validate_error' => true,
-                    'response' => $response
-                ];
-        }
-        return true;
     }
 
     protected function delete()

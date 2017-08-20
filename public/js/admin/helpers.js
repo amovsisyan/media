@@ -17,7 +17,7 @@ function getCSRFToken() {
  * @param  {String}  selector Selector to match against
  * @return {Boolean|Element}  Returns null if not match found
  */
-function getClosest ( elem, selector ) {
+function getClosest (elem, selector) {
     // Element.matches() polyfill
     if (!Element.prototype.matches) {
         Element.prototype.matches =
@@ -40,3 +40,11 @@ function getClosest ( elem, selector ) {
 
     return null;
 };
+
+function handleResponseToast (status, text, style) {
+    Materialize.toast(text, 5000, 'rounded');
+    var toasts = document.getElementById("toast-container").getElementsByClassName("toast "),
+        toast = toasts[toasts.length-1];
+
+    toast.classList.add(style);
+}

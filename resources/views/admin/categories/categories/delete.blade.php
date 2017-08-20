@@ -69,7 +69,6 @@
 
                 Array.prototype.forEach.call(list, (function (element, index, array) {
                     prepData.push(element.getElementsByTagName('span')[0].textContent);
-                    element.closest();
                 }));
                 var data = 'data=' + JSON.stringify(prepData);
 
@@ -79,7 +78,7 @@
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
-                        self.handleResponseToast(xhr.status, 'Deleted Subcategory(es)', 'status_ok')
+                        self.handleResponseToast(xhr.status, 'Deleted Category(es)', 'status_ok')
                         if (response.ids && response.ids.length) {
                             response.ids.forEach(function (element, index, array) {
                                 var options = self.categorySelect.getElementsByTagName('option');
