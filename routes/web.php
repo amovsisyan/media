@@ -29,7 +29,11 @@ Route::group(['prefix' => 'qwentin'], function () {
                 Route::get('/delete_category', ['uses'=>'Admin\Categories\CategoriesController@deleteCategory_get','as'=>'categoriesDeleteGet']);
                 Route::post('/delete_category', ['uses'=>'Admin\Categories\CategoriesController@deleteCategory_post','as'=>'categoriesDeletePost']);
 
-                Route::get('/change', ['uses'=>'Admin\Categories\CategoriesController@change','as'=>'categoriesChange']);
+                Route::group(['prefix' => 'edit_category'], function () {
+                    Route::post('/save', ['uses'=>'Admin\Categories\CategoriesController@editCategorySave_post','as'=>'categoriesEditSavePost']);
+                });
+                Route::get('/edit_category', ['uses'=>'Admin\Categories\CategoriesController@editCategory_get','as'=>'categoriesEditGet']);
+                Route::post('/edit_category', ['uses'=>'Admin\Categories\CategoriesController@editCategory_post','as'=>'categoriesEditPost']);
             });
             Route::group(['prefix' => 'subcategories'], function () {
                 Route::get('/create_subcategory', ['uses'=>'Admin\Categories\SubcategoriesController@createSubcategory_get','as'=>'subcategoriesCreateGet']);
@@ -37,8 +41,6 @@ Route::group(['prefix' => 'qwentin'], function () {
 
                 Route::get('/delete_subcategory', ['uses'=>'Admin\Categories\SubcategoriesController@deleteSubcategory_get','as'=>'subcategoriesDeleteGet']);
                 Route::post('/delete_subcategory', ['uses'=>'Admin\Categories\SubcategoriesController@deleteSubcategory_post','as'=>'subcategoriesDeletePost']);
-
-                Route::get('/change', ['uses'=>'Admin\Categories\SubcategoriesController@change','as'=>'subcategoriesChange']);
             });
         });
     });
@@ -64,4 +66,8 @@ Auth::routes();
 
 
 // TODO why we send hashtags or aliases WITH ALIAS_ID  , why we don't explode it in local , and do it on server side ???
+//
 // TODO Change all getElement ... to querySelector
+//
+// TODO Why we need modal for every part, lets have one modal, we will send id to modal,
+// TODO: -> and use the same for every part, after the sent ID will be send to back end

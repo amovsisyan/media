@@ -174,10 +174,7 @@
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
                         handleResponseToast(xhr.status, 'Added New Post', 'status_ok');
-                        if (xhr.status === 200) {
-                            self._regenerateAfterNewCreation();
-                        };
-                        self.updateAddConfirmButtons();
+                        self._regenerateAfterNewCreation();
                     }
                     else if (xhr.status !== 200 || response.error === true) {
                         if (response.response && response.type) {
@@ -190,8 +187,8 @@
                             _html = 'Something Was Wrong'
                         }
                         handleResponseToast(xhr.status, _html, 'status_warning');
-                        self.updateAddConfirmButtons();
                     }
+                    self.updateAddConfirmButtons();
                 };
                 xhr.send(formData);
             },
@@ -280,7 +277,6 @@
                     //can't access to real this, that's why call PostCreate
                     PostCreate.confirmPartRemove
                 );
-
             },
 
             createModalContent: function() {

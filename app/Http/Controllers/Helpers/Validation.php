@@ -110,6 +110,41 @@ class Validation extends Controller
         ];
     }
 
+    public static function validateEditCategorySearchValues($allRequest) {
+        $rules = [
+            'searchType' => 'required',
+            'searchText' => 'required',
+        ];
+
+        $validator = Validator::make($allRequest, $rules);
+
+        if ($validator->fails()) {
+            return self::_generateValidationErrorResponse($validator);
+        };
+
+        return [
+            'error' => false,
+        ];
+    }
+
+    public static function validateEditCategorySearchValuesSave($allRequest) {
+        $rules = [
+            'id' => 'required',
+            'newAlias' => 'required|min:2|max:30',
+            'newName' => 'required|min:2|max:30',
+        ];
+
+        $validator = Validator::make($allRequest, $rules);
+
+        if ($validator->fails()) {
+            return self::_generateValidationErrorResponse($validator);
+        };
+
+        return [
+            'error' => false,
+        ];
+    }
+
     private static function _generateValidationErrorResponse($validator)
     {
         $errors = $validator->errors();

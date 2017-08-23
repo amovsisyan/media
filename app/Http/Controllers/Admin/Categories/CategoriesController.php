@@ -6,10 +6,15 @@ use App\Category;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validation;
 use Illuminate\Http\Request;
-use Mockery\Exception;
 
 class CategoriesController extends MainCategoriesController
 {
+    const CATEGORYEDITSEARCHTYPES = [
+        'byID' => '1',
+        'byName' => '2',
+        'byAlias' => '3',
+    ];
+
     protected function change()
     {
         return response()
@@ -66,9 +71,9 @@ class CategoriesController extends MainCategoriesController
 
     protected function deleteCategory_post(Request $request)
     {
+        $ids = [];
         try {
             if ($request->data) {
-                $ids = [];
                 foreach (json_decode($request->data) as $category) {
                     $exp_cat = explode('_', $category);
                     $ids[] = $exp_cat[count($exp_cat)-1];
@@ -82,13 +87,98 @@ class CategoriesController extends MainCategoriesController
                     ]
                 );
             }
-        } catch(Exception $e) {
+        } catch (\Exception $e) {
             return response(
                 [
                     'error' => true,
-                    'response' => $e->getMessage()
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
                 ], 404
             );
         }
+
+        return response(['error' => false]);
+    }
+
+    protected function editCategory_get()
+    {
+        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+
+        return response()
+            -> view('admin.categories.categories.edit', ['response' => $response]);
+    }
+
+    protected function editCategory_post(Request $request)
+    {
+        $validationResult = Validation::validateEditCategorySearchValues($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+
+        switch ($request->searchType) {
+            case self::CATEGORYEDITSEARCHTYPES['byID']:
+                $category = Category::where('id', $request->searchText);
+                break;
+            case self::CATEGORYEDITSEARCHTYPES['byName']:
+                $category = Category::where('name', 'like', "%$request->searchText%");
+                break;
+            default:
+                $category = Category::where('alias', 'like', "%$request->searchText%");
+        }
+        $searchResult = $category->select('id', 'name', 'alias')->get();
+        $response = [];
+        if (!empty($searchResult)) {
+            foreach ($searchResult as $item) {
+                $response[] = [
+                    'id' => $item->id,
+                    'alias' => $item->alias,
+                    'name' => $item->name
+                ];
+            }
+        }
+        return response(
+            [
+                'error' => false,
+                'response' => $response
+            ]
+        );
+    }
+
+    protected function editCategorySave_post(Request $request)
+    {
+        $validationResult = Validation::validateEditCategorySearchValuesSave($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+
+        try {
+            Category::where('id', $request->id)
+                ->update([
+                    'name' => $request->newName,
+                    'alias' => $request->newAlias
+                ]);
+        } catch (\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response(['error' => false]);
     }
 }
