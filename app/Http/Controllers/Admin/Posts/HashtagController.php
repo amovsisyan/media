@@ -48,21 +48,25 @@ class HashtagController extends PostsController
             );
         }
 
-        $hashtag = Hashtag::create(
-            [
-                'hashtag' => $request->hashtag_name,
-                'alias' => $request->hashtag_alias
-            ]
-        );
+        try {
+            $hashtag = Hashtag::create(
+                [
+                    'hashtag' => $request->hashtag_name,
+                    'alias' => $request->hashtag_alias
+                ]
+            );
+        } catch(\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
 
         if ($hashtag) {
             return response(['error' => false]);
         }
-
-        return response(
-            [
-                'error' => true,
-            ], 404
-        );
     }
 }

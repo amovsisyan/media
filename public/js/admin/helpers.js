@@ -41,8 +41,26 @@ function getClosest (elem, selector) {
     return null;
 };
 
-function handleResponseToast (status, text, style) {
-    Materialize.toast(text, 5000, 'rounded');
+function handleResponseToast (response, status, text) {
+    var _html = '',
+        style = '';
+    if (status) {
+        _html = text;
+        style = 'status_ok';
+    } else {
+        if (response.response && response.type) {
+            var errors = response.response;
+
+            _html = response.type + ': ';
+            errors.forEach(function (element, index, array) {
+                _html += element;
+            });
+        } else {
+            _html = 'Something Was Wrong'
+        }
+        style = 'status_warning';
+    }
+    Materialize.toast(_html, 5000, 'rounded');
     var toasts = document.getElementById("toast-container").getElementsByClassName("toast "),
         toast = toasts[toasts.length-1];
 

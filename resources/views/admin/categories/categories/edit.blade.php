@@ -73,16 +73,7 @@
                     if (xhr.status === 200 && response.error !== true) {
                         self.makeParts(response);
                     } else if (xhr.status !== 200 || response.error === true) {
-                        if (response.response && response.type) {
-                            var errors = response.response,
-                                _html = response.type + ': ';
-                            errors.forEach(function (element, index, array) {
-                                _html += element;
-                            });
-                        } else {
-                            _html = 'Something Was Wrong'
-                        }
-                        handleResponseToast(xhr.status, _html, 'status_warning');
+                        handleResponseToast(response, false);
                     }
                     self.searchButton.classList.remove('disabled');
                 };
@@ -141,18 +132,9 @@
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
-                        handleResponseToast(xhr.status, 'Category was updated', 'status_ok');
+                        handleResponseToast(response, true, 'Category was updated');
                     } else if (xhr.status !== 200 || response.error === true) {
-                        if (response.response && response.type) {
-                            var errors = response.response,
-                                _html = response.type + ': ';
-                            errors.forEach(function (element, index, array) {
-                                _html += element;
-                            });
-                        } else {
-                            _html = 'Something Was Wrong'
-                        }
-                        handleResponseToast(xhr.status, _html, 'status_warning');
+                        handleResponseToast(response, false);
                     }
                     elThis.classList.remove('disabled');
                 };

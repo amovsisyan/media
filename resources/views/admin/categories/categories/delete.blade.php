@@ -78,7 +78,7 @@
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
-                        self.handleResponseToast(xhr.status, 'Deleted Category(es)', 'status_ok')
+                        handleResponseToast(response, true, 'Deleted Category(es)');
                         if (response.ids && response.ids.length) {
                             response.ids.forEach(function (element, index, array) {
                                 var options = self.categorySelect.getElementsByTagName('option');
@@ -92,12 +92,7 @@
                         }
                     }
                     else if (xhr.status !== 200 || response.error === true) {
-                        var errors = response.response,
-                            _html = '';
-                        errors.forEach(function (element, index, array) {
-                            _html += element;
-                        });
-                        self.handleResponseToast(xhr.status, _html, 'status_warning')
+                        handleResponseToast(response, false);
                     }
                 };
                 xhr.send(encodeURI(data));

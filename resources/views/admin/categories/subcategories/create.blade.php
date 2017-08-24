@@ -81,24 +81,13 @@
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
-                        handleResponseToast(xhr.status, 'Added New Subcategory', 'status_ok');
-                        if (xhr.status === 200) {
-                            self.subcategoryName.value = '';
-                            self.subcategoryAlias.value = '';
-                        };
+                        handleResponseToast(response, true, 'Added New Subcategory');
+                        self.subcategoryName.value = '';
+                        self.subcategoryAlias.value = '';
                         self.updateAddConfirmButtons();
                     }
                     else if (xhr.status !== 200 || response.error === true) {
-                        if (response.response && response.type) {
-                            var errors = response.response,
-                                _html = response.type + ': ';
-                            errors.forEach(function (element, index, array) {
-                                _html += element;
-                            });
-                        } else {
-                            _html = 'Something Was Wrong'
-                        }
-                        handleResponseToast(xhr.status, _html, 'status_warning');
+                        handleResponseToast(response, false);
                         self.updateAddConfirmButtons();
                     }
                 };

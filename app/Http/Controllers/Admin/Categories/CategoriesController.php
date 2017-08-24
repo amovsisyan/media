@@ -42,22 +42,26 @@ class CategoriesController extends MainCategoriesController
             );
         }
 
-        $category = Category::create(
-            [
-                'name' => $request->category_name,
-                'alias' => $request->category_alias
-            ]
-        );
+        try {
+            $category = Category::create(
+                [
+                    'name' => $request->category_name,
+                    'alias' => $request->category_alias
+                ]
+            );
+        } catch (\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
 
         if ($category) {
             return response(['error' => false]);
         }
-
-        return response(
-            [
-                'error' => true,
-            ], 404
-        );
     }
 
     protected function deleteCategory_get()

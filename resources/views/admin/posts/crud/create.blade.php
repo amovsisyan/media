@@ -173,20 +173,11 @@
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
-                        handleResponseToast(xhr.status, 'Added New Post', 'status_ok');
+                        handleResponseToast(response, true, 'Added New Post');
                         self._regenerateAfterNewCreation();
                     }
                     else if (xhr.status !== 200 || response.error === true) {
-                        if (response.response && response.type) {
-                            var errors = response.response,
-                                _html = response.type + ': ';
-                            errors.forEach(function (element, index, array) {
-                                _html += element;
-                            });
-                        } else {
-                            _html = 'Something Was Wrong'
-                        }
-                        handleResponseToast(xhr.status, _html, 'status_warning');
+                        handleResponseToast(response, false);
                     }
                     self.updateAddConfirmButtons();
                 };

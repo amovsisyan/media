@@ -36,14 +36,23 @@ class SubcategoriesController extends MainCategoriesController
                 ], 404
             );
         }
-
-        $category = Category::findOrFail($request->categorySelect);
-        $subcategory = $category->subcategories()->create(
-            [
-                'name' => $request->subcategory_name,
-                'alias' => $request->subcategory_alias
-            ]
-        );
+        try {
+            $category = Category::findOrFail($request->categorySelect);
+            $subcategory = $category->subcategories()->create(
+                [
+                    'name' => $request->subcategory_name,
+                    'alias' => $request->subcategory_alias
+                ]
+            );
+        } catch (\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
 
         if ($subcategory) {
             return response(['error' => false]);
