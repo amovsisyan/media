@@ -4,18 +4,7 @@
     </div>
     <div class="col m3 s6">
         <div class="part-delete-button">
-            <a class="btn-floating waves-effect waves-light red modal-trigger"><i class="material-icons">delete</i></a>
-            <!-- Modal -->
-            <div class="modal">
-                <div class="modal-content left-align">
-                    <h4>Are You Sure You Want Delete This Part?</h4>
-                    <p></p>
-                </div>
-                <div class="modal-footer">
-                    <a class="modal-action modal-close waves-effect waves-green btn-flat confirm-delete">Delete</a>
-                    <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
-                </div>
-            </div>
+            <a class="btn-floating waves-effect waves-light red modal-trigger" href="#deletePostPartModal"><i class="material-icons">delete</i></a>
         </div>
     </div>
     <div class="col m7 s12">

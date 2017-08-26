@@ -69,5 +69,5 @@ Auth::routes();
 //
 // TODO Change all getElement ... to querySelector
 //
-// TODO Why we need modal for every part, lets have one modal, we will send id to modal,
-// TODO: -> and use the same for every part, after the sent ID will be send to back end
+// ToDo need some filesCleanerHelper , when I will delete some category, subcategory, I need to delete files,
+//      todo::-> or we could make something like archive

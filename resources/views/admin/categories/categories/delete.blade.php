@@ -94,16 +94,12 @@
                     else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
+                    self.updateButtonsAfterConfirm();
                 };
                 xhr.send(encodeURI(data));
             },
 
-            handleResponseToast: function(status, text, style) {
-                Materialize.toast(text, 5000, 'rounded');
-                var toasts = document.getElementById("toast-container").getElementsByClassName("toast "),
-                    toast = toasts[toasts.length-1];
-
-                toast.classList.add(style);
+            updateButtonsAfterConfirm: function() {
                 this.deleteBtn.classList.remove('disabled');
                 this.confirmButton.classList.remove('disabled');
             },

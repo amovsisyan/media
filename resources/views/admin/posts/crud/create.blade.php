@@ -67,6 +67,18 @@
                     <h4>Parts</h4>
                 </div>
                 @include('admin.posts.crud.create-part')
+
+                <!-- Modal -->
+                <div class="modal" id="deletePostPartModal">
+                    <div class="modal-content left-align">
+                        <h4>Are You Sure You Want Delete This Part?</h4>
+                        <p></p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="modal-action modal-close waves-effect waves-green btn-flat confirm-delete">Delete</a>
+                        <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+                    </div>
+                </div>
             </div>
             <div class="row right-align post-part-add-button-container">
                 <a class="waves-effect waves-light btn" id="post-part-add-button">+Add Part</a>
@@ -114,6 +126,7 @@
             modalAddPost: document.querySelector('#modal_add_post'),
             postPartAddButton: document.querySelector('#post-part-add-button'),
             postCreateParts: document.querySelector('#post-create-parts'),
+            deletePostPartModal: document.querySelector('#deletePostPartModal'),
 
             _init: function() {
                 this.renderPartTemplate();
@@ -190,15 +203,16 @@
             },
 
             confirmPartRemove: function(e) {
-                var currElem = getClosest(e.target, '.post-part'),
-                    arr =  currElem.id.split('-');
+                var self = PostCreate,
+                    id = self.deletePostPartModal.querySelector('.confirm-delete').getAttribute('data-id'),
+                    currElem = document.querySelector('#post-id-'+id);
 
-                if(PostCreate.defaultProperties.partTemplateCounter == 1 && arr[arr.length-1]) {return false};
-                PostCreate.defaultProperties.partTemplateCounter = arr[arr.length-1];
+
+                if(self.defaultProperties.partTemplateCounter == 1 && id) {return false};
+                self.defaultProperties.partTemplateCounter = id;
 
                 currElem.remove();
-                //can't access to rela this, that's why call PostCreate
-                PostCreate.regenerateAfterDelete();
+                self.regenerateAfterDelete();
             },
 
             regenerateAfterDelete: function() {
@@ -221,9 +235,6 @@
                 element.dataset.id = this.defaultProperties.partTemplateCounter;
                 element.id = 'post-id-' + this.defaultProperties.partTemplateCounter;
                 element.querySelector('.post-number').innerHTML = this.defaultProperties.partTemplateCounter;
-                element.querySelector('.modal-trigger').href = '#modal_delete_part_' + this.defaultProperties.partTemplateCounter;
-                element.querySelector('.modal').id = 'modal_delete_part_' + this.defaultProperties.partTemplateCounter;
-                $('#modal_delete_part_' + this.defaultProperties.partTemplateCounter).modal();
             },
 
             _regenerateAfterNewCreation: function(element) {
@@ -249,11 +260,12 @@
             },
 
             createModelPartDelete: function(e) {
-                var currElem = getClosest(e.target, '.post-part'),
-                    content = currElem.querySelector('.modal-content'),
-                    paragraph = content.querySelector('p'),
+                var self = PostCreate,
+                    currElem = getClosest(e.target, '.post-part'),
+                    paragraph = self.deletePostPartModal.querySelector('p'),
                     postParts = document.querySelectorAll('.post-part'),
                     _html = '';
+
                 if (postParts.length == 1) {
                     _html = "<h4 class='red-text'>Can't Delete Last Part</h4>"
                 } else {
@@ -263,10 +275,10 @@
                 }
 
                 paragraph.innerHTML = _html;
+                self.deletePostPartModal.querySelector('.confirm-delete').dataset.id = currElem.getAttribute('data-id');
 
-                currElem.querySelector('.confirm-delete').addEventListener('click',
-                    //can't access to real this, that's why call PostCreate
-                    PostCreate.confirmPartRemove
+                self.deletePostPartModal.querySelector('.confirm-delete').addEventListener('click',
+                    self.confirmPartRemove
                 );
             },
 
