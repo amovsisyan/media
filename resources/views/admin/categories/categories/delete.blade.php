@@ -40,20 +40,20 @@
         });
 
         CategoryDelete = {
-            deleteBtn: document.getElementById('delete_category'),
-            confirmButton: document.getElementById('confirm_delete_category'),
-            categoryDeleteRow: document.getElementById('category_delete_row'),
-            deleteConfirmBtn: document.getElementById('confirm_delete_category'),
-            modalDeleteCategory: document.getElementById('modal_delete_category'),
-            categorySelect: document.getElementById('category_select'),
+            deleteBtn: document.querySelector('#delete_category'),
+            confirmButton: document.querySelector('#confirm_delete_category'),
+            categoryDeleteRow: document.querySelector('#category_delete_row'),
+            deleteConfirmBtn: document.querySelector('#confirm_delete_category'),
+            modalDeleteCategory: document.querySelector('#modal_delete_category'),
+            categorySelect: document.querySelector('#category_select'),
 
             createModalContent: function() {
-                var content = this.modalDeleteCategory.getElementsByClassName('modal-content'),
-                    paragraph = content[0].getElementsByTagName('p')[0],
+                var content = this.modalDeleteCategory.querySelector('.modal-content'),
+                    paragraph = content.querySelector('p'),
                     list = this.getDeleteList(),
                     cat_s = '';
                 Array.prototype.forEach.call(list, (function (element, index, array) {
-                    cat_s += '<p>' + ++index + '. ' + element.getElementsByTagName('span')[0].textContent + '</p>';
+                    cat_s += '<p>' + ++index + '. ' + element.querySelector('span').textContent + '</p>';
                 }));
                 var _html = '<p>Delete Category(es):' + cat_s + '</p>';
                 paragraph.innerHTML = _html;
@@ -68,7 +68,8 @@
                     xhr = new XMLHttpRequest();
 
                 Array.prototype.forEach.call(list, (function (element, index, array) {
-                    prepData.push(element.getElementsByTagName('span')[0].textContent);
+                    var elementContent = element.querySelector('span').textContent;
+                    prepData.push(explodeGetLast(elementContent, '_'));
                 }));
                 var data = 'data=' + JSON.stringify(prepData);
 
@@ -81,7 +82,7 @@
                         handleResponseToast(response, true, 'Deleted Category(es)');
                         if (response.ids && response.ids.length) {
                             response.ids.forEach(function (element, index, array) {
-                                var options = self.categorySelect.getElementsByTagName('option');
+                                var options = self.categorySelect.querySelectorAll('option');
                                 Array.prototype.forEach.call(options,(function (el, i, arr){
                                     if(el.value === element) {
                                         el.remove();
@@ -105,7 +106,7 @@
             },
 
             getDeleteList: function() {
-                return this.categoryDeleteRow.getElementsByClassName('multiple-select-dropdown')[0].getElementsByClassName('active');
+                return this.categoryDeleteRow.querySelector('.multiple-select-dropdown').querySelectorAll('.active');
             }
         };
         CategoryDelete.deleteBtn.addEventListener('click', CategoryDelete.createModalContent.bind(CategoryDelete));

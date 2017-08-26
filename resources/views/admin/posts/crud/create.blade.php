@@ -154,7 +154,8 @@
                     formData = new FormData();
 
                 Array.prototype.forEach.call(this.getHashtagList(), (function (element, index, array) {
-                    hashtags.push(element.querySelector('span').textContent)
+                    var elementContent = element.querySelector('span').textContent;
+                    hashtags.push(explodeGetLast(elementContent, '_'))
                 }));
 
                 // Main
@@ -164,7 +165,6 @@
                 formData.append("postMainImage", this.postMainImage.files[0]);
                 formData.append("postSubcategory", this.postSubcategory.options[this.postSubcategory.selectedIndex].value);
                 formData.append("postHashtag", JSON.stringify(hashtags));
-
 
                 // Parts
                 Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
@@ -299,7 +299,7 @@
             },
 
             getHashtagList: function() {
-                var hashtags = getClosest(this.hashtagSelect, '.select-wrapper').querySelector('.multiple-select-dropdown').querySelector('.active');
+                var hashtags = getClosest(this.hashtagSelect, '.select-wrapper').querySelector('.multiple-select-dropdown').querySelectorAll('.active');
                 return hashtags ? hashtags : [];
             }
         };

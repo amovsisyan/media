@@ -58,12 +58,12 @@
         });
 
         SubcategoryCreate = {
-            addButton: document.getElementById('add_subcategory'),
-            confirmButton: document.getElementById('confirm_subcategory'),
-            subcategoryName: document.getElementById('subcategory_name'),
-            subcategoryAlias: document.getElementById('subcategory_alias'),
-            categorySelect: document.getElementById('category_select'),
-            modalAddSubcategory: document.getElementById('modal_add_subcategory'),
+            addButton: document.querySelector('#add_subcategory'),
+            confirmButton: document.querySelector('#confirm_subcategory'),
+            subcategoryName: document.querySelector('#subcategory_name'),
+            subcategoryAlias: document.querySelector('#subcategory_alias'),
+            categorySelect: document.querySelector('#category_select'),
+            modalAddSubcategory: document.querySelector('#modal_add_subcategory'),
 
             confirmCategory: function(){
                 this.addButton.classList.add('disabled');
@@ -95,8 +95,8 @@
             },
 
             createModalContent: function() {
-                var content = this.modalAddSubcategory.getElementsByClassName('modal-content'),
-                    paragraph = content[0].getElementsByTagName('p')[0],
+                var content = this.modalAddSubcategory.querySelector('.modal-content'),
+                    paragraph = content.querySelector('p'),
                     _html = '<p>For Category: ' + this.categorySelect.options[this.categorySelect.selectedIndex].text + '</p>'+
                             '<p>Name: ' + this.subcategoryName.value + '</p>' +
                             '<p>Alias: ' + this.subcategoryAlias.value + '</p>';

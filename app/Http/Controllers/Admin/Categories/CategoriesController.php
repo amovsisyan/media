@@ -78,9 +78,8 @@ class CategoriesController extends MainCategoriesController
         $ids = [];
         try {
             if ($request->data) {
-                foreach (json_decode($request->data) as $category) {
-                    $exp_cat = explode('_', $category);
-                    $ids[] = $exp_cat[count($exp_cat)-1];
+                foreach (json_decode($request->data) as $id) {
+                    $ids[] = $id;
                 }
             }
             if (Category::whereIn('id', $ids)->delete()) {

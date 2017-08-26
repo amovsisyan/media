@@ -65,9 +65,6 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 Auth::routes();
 
 
-// TODO why we send hashtags or aliases WITH ALIAS_ID  , why we don't explode it in local , and do it on server side ???
-//
-// TODO Change all getElement ... to querySelector
 //
 // ToDo need some filesCleanerHelper , when I will delete some category, subcategory, I need to delete files,
 //      todo::-> or we could make something like archive

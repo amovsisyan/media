@@ -102,11 +102,7 @@ class CrudController extends PostsController
             };
 
             // Hashtag Attach
-            $hashtagIds = [];
-            foreach (json_decode($request->postHashtag) as $k => $hashtag) {
-                $hashtagIds[] = Helpers::explodeGetLast($hashtag);
-            }
-            $post->hashtags()->attach($hashtagIds);
+            $post->hashtags()->attach(json_decode($request->postHashtag));
 
         } catch (\Exception $e) {
             return response(

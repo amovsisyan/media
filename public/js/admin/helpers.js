@@ -66,3 +66,7 @@ function handleResponseToast (response, status, text) {
 
     toast.classList.add(style);
 }
+
+function explodeGetLast(string, separator) {
+    return string.split(separator).pop();
+}

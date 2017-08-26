@@ -45,11 +45,11 @@
         });
 
         HashtagCreate = {
-            addButton: document.getElementById('add_hashtag'),
-            confirmButton: document.getElementById('confirm_hashtag'),
-            hashtagName: document.getElementById('hashtag_name'),
-            hashtagAlias: document.getElementById('hashtag_alias'),
-            modalAddHashtag: document.getElementById('modal_add_hashtag'),
+            addButton: document.querySelector('#add_hashtag'),
+            confirmButton: document.querySelector('#confirm_hashtag'),
+            hashtagName: document.querySelector('#hashtag_name'),
+            hashtagAlias: document.querySelector('#hashtag_alias'),
+            modalAddHashtag: document.querySelector('#modal_add_hashtag'),
 
             confirmHashtag: function(){
                 this.addButton.classList.add('disabled');
@@ -79,8 +79,8 @@
             },
 
             createModalContent: function() {
-                var content = this.modalAddHashtag.getElementsByClassName('modal-content'),
-                    paragraph = content[0].getElementsByTagName('p')[0],
+                var content = this.modalAddHashtag.querySelector('.modal-content'),
+                    paragraph = content.querySelector('p'),
                     _html = '<p>Name: ' + this.hashtagName.value + '</p><p>Alias: ' + this.hashtagAlias.value + '</p>';
                 paragraph.innerHTML = _html;
             },

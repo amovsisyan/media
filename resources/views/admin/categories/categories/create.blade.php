@@ -47,11 +47,11 @@
         });
 
         CategoryCreate = {
-            addButton: document.getElementById('add_category'),
-            confirmButton: document.getElementById('confirm_category'),
-            categoryName: document.getElementById('category_name'),
-            categoryAlias: document.getElementById('category_alias'),
-            modalAddCategory: document.getElementById('modal_add_category'),
+            addButton: document.querySelector('#add_category'),
+            confirmButton: document.querySelector('#confirm_category'),
+            categoryName: document.querySelector('#category_name'),
+            categoryAlias: document.querySelector('#category_alias'),
+            modalAddCategory: document.querySelector('#modal_add_category'),
 
             confirmCategory: function(){
                 this.addButton.classList.add('disabled');
@@ -81,8 +81,8 @@
             },
 
             createModalContent: function() {
-                var content = this.modalAddCategory.getElementsByClassName('modal-content'),
-                    paragraph = content[0].getElementsByTagName('p')[0],
+                var content = this.modalAddCategory.querySelector('.modal-content'),
+                    paragraph = content.querySelector('p'),
                     _html = '<p>Name: ' + this.categoryName.value + '</p><p>Alias: ' + this.categoryAlias.value + '</p>';
                 paragraph.innerHTML = _html;
             },
