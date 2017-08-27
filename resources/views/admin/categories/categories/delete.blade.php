@@ -81,8 +81,8 @@
                     if (xhr.status === 200 && response.error !== true) {
                         handleResponseToast(response, true, 'Deleted Category(es)');
                         if (response.ids && response.ids.length) {
+                            var options = self.categorySelect.querySelectorAll('option');
                             response.ids.forEach(function (element, index, array) {
-                                var options = self.categorySelect.querySelectorAll('option');
                                 Array.prototype.forEach.call(options,(function (el, i, arr){
                                     if(el.value === element) {
                                         el.remove();
