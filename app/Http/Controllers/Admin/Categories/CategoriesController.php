@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
+use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validation;
 use Illuminate\Http\Request;
@@ -82,13 +83,17 @@ class CategoriesController extends MainCategoriesController
                     $ids[] = $id;
                 }
             }
-            if (Category::whereIn('id', $ids)->delete()) {
-                return response(
-                    [
-                        'error' => false,
-                        'ids' => $ids
-                    ]
-                );
+
+            $deleteDir = DirectoryEditor::clearAfterCategoryDelete($ids);
+            if (!$deleteDir['error']) {
+                if (Category::whereIn('id', $ids)->delete()) {
+                    return response(
+                        [
+                            'error' => false,
+                            'ids' => $ids
+                        ]
+                    );
+                };
             }
         } catch (\Exception $e) {
             return response(

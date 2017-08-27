@@ -65,6 +65,9 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 Auth::routes();
 
 
+// ToDo post edit + make changes in directoryEditor
+// ToDO Atach Detach Hashtag
+// ToDo Subcategory edit + make changes in directoryEditor
+// Todo numbers under text, which will show best text long
+// todo testIt part for all
 //
-// ToDo need some filesCleanerHelper , when I will delete some category, subcategory, I need to delete files,
-//      todo::-> or we could make something like archive

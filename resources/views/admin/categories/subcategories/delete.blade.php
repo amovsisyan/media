@@ -45,8 +45,6 @@
         SubcategoryDelete = {
             deleteBtn: document.querySelector('#delete_subcategory'),
             confirmButton: document.querySelector('#confirm_delete_subcategory'),
-//            subcategoryDeleteRow: document.querySelector('#subcategory_delete_row'),
-//            deleteConfirmBtn: document.querySelector('#confirm_delete_subcategory'),
             modalDeleteSubcategory: document.querySelector('#modal_delete_subcategory'),
             subcategorySelect: document.querySelector('#subcategory_select'),
 
@@ -104,6 +102,5 @@
             }
         };
         SubcategoryDelete.deleteBtn.addEventListener('click', SubcategoryDelete.createModalContent.bind(SubcategoryDelete));
-//        CategoryDelete.confirmButton.addEventListener('click', CategoryDelete.confirmDeleteCategory.bind(CategoryDelete));
     </script>
 @endsection
