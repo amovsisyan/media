@@ -31,9 +31,9 @@ Route::group(['prefix' => 'qwentin'], function () {
 
                 Route::group(['prefix' => 'edit_category'], function () {
                     Route::post('/save', ['uses'=>'Admin\Categories\CategoriesController@editCategorySave_post','as'=>'categoriesEditSavePost']);
+                    Route::get('/', ['uses'=>'Admin\Categories\CategoriesController@editCategory_get','as'=>'categoriesEditGet']);
+                    Route::post('/', ['uses'=>'Admin\Categories\CategoriesController@editCategory_post','as'=>'categoriesEditPost']);
                 });
-                Route::get('/edit_category', ['uses'=>'Admin\Categories\CategoriesController@editCategory_get','as'=>'categoriesEditGet']);
-                Route::post('/edit_category', ['uses'=>'Admin\Categories\CategoriesController@editCategory_post','as'=>'categoriesEditPost']);
             });
             Route::group(['prefix' => 'subcategories'], function () {
                 Route::get('/create_subcategory', ['uses'=>'Admin\Categories\SubcategoriesController@createSubcategory_get','as'=>'subcategoriesCreateGet']);
@@ -41,6 +41,12 @@ Route::group(['prefix' => 'qwentin'], function () {
 
                 Route::get('/delete_subcategory', ['uses'=>'Admin\Categories\SubcategoriesController@deleteSubcategory_get','as'=>'subcategoriesDeleteGet']);
                 Route::post('/delete_subcategory', ['uses'=>'Admin\Categories\SubcategoriesController@deleteSubcategory_post','as'=>'subcategoriesDeletePost']);
+
+                Route::group(['prefix' => 'edit_subcategory'], function () {
+                    Route::post('/save', ['uses'=>'Admin\Categories\SubcategoriesController@editSubcategorySave_post','as'=>'subcategoriesEditSavePost']);
+                    Route::get('/', ['uses'=>'Admin\Categories\SubcategoriesController@editSubcategory_get','as'=>'subcategoriesEditGet']);
+                    Route::post('/', ['uses'=>'Admin\Categories\SubcategoriesController@editSubcategory_post','as'=>'subcategoriesEditPost']);
+                });
             });
         });
     });
@@ -65,9 +71,11 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 Auth::routes();
 
 
+// todo all '/' to DIRECTORY_SEPARATOR
 // ToDo post edit + make changes in directoryEditor
 // ToDO Atach Detach Hashtag
-// ToDo Subcategory edit + make changes in directoryEditor
+// ToDo Attach/Detach Subcategory to Category
+// ToDO Attach/Detach Post to Subcategory
 // Todo numbers under text, which will show best text long
 // todo testIt part for all
 //

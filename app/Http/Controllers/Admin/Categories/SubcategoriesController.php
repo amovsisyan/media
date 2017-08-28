@@ -11,6 +11,12 @@ use Illuminate\Http\Request;
 
 class SubcategoriesController extends MainCategoriesController
 {
+    const CATEGORYEDITSEARCHTYPES = [
+        'byID' => '1',
+        'byName' => '2',
+        'byAlias' => '3',
+    ];
+
     protected function change()
     {
         return response()
@@ -99,6 +105,102 @@ class SubcategoriesController extends MainCategoriesController
                     );
                 };
             }
+        } catch (\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response(['error' => false]);
+    }
+
+    public function editSubcategory_get()
+    {
+        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+
+        return response()
+            -> view('admin.categories.subcategories.edit', ['response' => $response]);
+    }
+
+    public function editSubcategory_post(Request $request)
+    {
+        $validationResult = Validation::validateEditSubcategorySearchValues($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+
+        switch ($request->searchType) {
+            case self::CATEGORYEDITSEARCHTYPES['byID']:
+                $category = Subcategory::where('id', $request->searchText);
+                break;
+            case self::CATEGORYEDITSEARCHTYPES['byName']:
+                $category = Subcategory::where('name', 'like', "%$request->searchText%");
+                break;
+            default:
+                $category = Subcategory::where('alias', 'like', "%$request->searchText%");
+        }
+
+        $searchResult = $category->select('id', 'name', 'alias')->get();
+        $response = [];
+        if (!empty($searchResult)) {
+            foreach ($searchResult as $item) {
+                $response[] = [
+                    'id' => $item->id,
+                    'alias' => $item->alias,
+                    'name' => $item->name
+                ];
+            }
+        }
+        return response(
+            [
+                'error' => false,
+                'response' => $response
+            ]
+        );
+    }
+
+    protected function editSubcategorySave_post(Request $request)
+    {
+        $validationResult = Validation::validateEditSubcategorySearchValuesSave($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+
+        try {
+            $subcategoryBuilder = Subcategory::where('id', $request->id);
+
+            $posts = $subcategoryBuilder->select('id', 'alias')->first()->posts();
+            $subcat = $subcategoryBuilder->select('id', 'alias')->first();
+            // if there is even one post means there is directory with subcategory alias_id
+            if ($posts->count() > 0 && $subcat->alias !== $request->newAlias) {
+                $oldName = $subcat->alias . '_' . $subcat->id;
+                $newName = $request->newAlias . '_' . $subcat->id;
+                $result = DirectoryEditor::updateAfterSubcategoryEdit($oldName, $newName);
+                if ($result['error']) {
+                    throw new \Exception("Directory rename Error");
+                }
+            }
+
+            $subcategoryBuilder->update([
+                'name' => $request->newName,
+                'alias' => $request->newAlias
+            ]);
         } catch (\Exception $e) {
             return response(
                 [
