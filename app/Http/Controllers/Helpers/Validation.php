@@ -165,6 +165,7 @@ class Validation extends Controller
     public static function validateEditSubcategorySearchValuesSave($allRequest) {
         $rules = [
             'id' => 'required',
+            'newCategoryId' => 'required|min:1|max:10',
             'newAlias' => 'required|min:2|max:30',
             'newName' => 'required|min:2|max:30',
         ];

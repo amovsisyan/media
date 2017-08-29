@@ -72,6 +72,7 @@
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
                         self.makeParts(response);
+                        $('.category-for-subcategory').material_select();
                     } else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
@@ -83,14 +84,26 @@
             makeParts: function(response) {
                 var self = this;
                 self.searchResultContainer.innerHTML = '';
-                if (response.response && response.response.length) {
-                    Array.prototype.forEach.call(response.response, (function (element, index, array) {
-                        var clone = self.partTemplate.cloneNode(true);
+                if (response.response && response.response.categories.length && response.response.subcategories.length) {
+                    Array.prototype.forEach.call(response.response.subcategories, (function (element, index, array) {
+                        var clone = self.partTemplate.cloneNode(true),
+                            _options = '',
+                            categoryForSubcategory = clone.querySelector('.category-for-subcategory');
+
                         clone.querySelector('.part-number').innerHTML = ++index;
                         clone.querySelector('.part-alias').value = element.alias;
                         clone.querySelector('.part-name').value = element.name;
                         clone.id = 'search-part-id-' + element.id;
                         clone.dataset.id = element.id;
+
+                        Array.prototype.forEach.call(response.response.categories, (function (el, i, arr) {
+                            if (el.id === element.categ_id) {
+                                _options += '<option value="' + el.id + '" selected>' + el.name + '</option>';
+                            } else {
+                                _options += '<option value="' + el.id + '">' + el.name + '</option>';
+                            }
+                        }));
+                        categoryForSubcategory.innerHTML = _options;
                         self.searchResultContainer.appendChild(clone);
                         clone.classList.remove('hide');
                         clone.querySelector('.part-confirm-button').addEventListener('click',
@@ -107,7 +120,9 @@
                 var self = SubcategoryEdit,
                     currElem = getClosest(e.target, '.part-template'),
                     paragraph = self.changesConfirmModal.querySelector('p'),
+                    categoryForSubcategory = currElem.querySelector('select.category-for-subcategory'),
                     _html = '<p>ID: <span class="red-text part-id">' + currElem.dataset.id + '</span></p>' +
+                        '<p>New Category: <span class="red-text part-category" data-id="' + categoryForSubcategory.options[categoryForSubcategory.selectedIndex].value + '">' + categoryForSubcategory.options[categoryForSubcategory.selectedIndex].text + '</span></p>' +
                         '<p>New Post Alias: <span class="red-text part-alias">' + currElem.querySelector('.part-alias').value + '</span></p>' +
                         '<p>New Post Name: <span class="red-text part-name">' + currElem.querySelector('.part-name').value + '</span></p>';
                 paragraph.innerHTML = _html;
@@ -122,6 +137,7 @@
                     elThis = this,
                     currElem = getClosest(e.target, '.modal'),
                     data = 'id=' + currElem.querySelector('.part-id').innerHTML
+                        + '&newCategoryId=' + currElem.querySelector('.part-category').dataset.id
                         + '&newAlias=' + currElem.querySelector('.part-alias').innerHTML
                         + '&newName=' + currElem.querySelector('.part-name').innerHTML,
                     xhr = new XMLHttpRequest();

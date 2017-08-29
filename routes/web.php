@@ -74,7 +74,6 @@ Auth::routes();
 // todo all '/' to DIRECTORY_SEPARATOR
 // ToDo post edit + make changes in directoryEditor
 // ToDO Atach Detach Hashtag
-// ToDo Attach/Detach Subcategory to Category
 // ToDO Attach/Detach Post to Subcategory
 // Todo numbers under text, which will show best text long
 // todo testIt part for all

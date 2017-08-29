@@ -141,23 +141,26 @@ class SubcategoriesController extends MainCategoriesController
 
         switch ($request->searchType) {
             case self::CATEGORYEDITSEARCHTYPES['byID']:
-                $category = Subcategory::where('id', $request->searchText);
+                $subcategory = Subcategory::where('id', $request->searchText);
                 break;
             case self::CATEGORYEDITSEARCHTYPES['byName']:
-                $category = Subcategory::where('name', 'like', "%$request->searchText%");
+                $subcategory = Subcategory::where('name', 'like', "%$request->searchText%");
                 break;
             default:
-                $category = Subcategory::where('alias', 'like', "%$request->searchText%");
+                $subcategory = Subcategory::where('alias', 'like', "%$request->searchText%");
         }
 
-        $searchResult = $category->select('id', 'name', 'alias')->get();
+        $searchResult = $subcategory->select('id', 'name', 'alias', 'categ_id')->get();
         $response = [];
+        $response['categories'] = Category::select('id', 'name')->get();
         if (!empty($searchResult)) {
             foreach ($searchResult as $item) {
-                $response[] = [
+                $categ = $item->category()->select('id')->first();
+                $response['subcategories'][] = [
                     'id' => $item->id,
                     'alias' => $item->alias,
-                    'name' => $item->name
+                    'name' => $item->name,
+                    'categ_id' => $categ->id,
                 ];
             }
         }
@@ -185,8 +188,10 @@ class SubcategoriesController extends MainCategoriesController
         try {
             $subcategoryBuilder = Subcategory::where('id', $request->id);
 
-            $posts = $subcategoryBuilder->select('id', 'alias')->first()->posts();
-            $subcat = $subcategoryBuilder->select('id', 'alias')->first();
+            $subcat = $subcategoryBuilder->select('id', 'alias', 'categ_id')->first();
+            $posts = $subcat->posts();
+
+            // PART -> SUBCATEGORY DIRECTORY CHANGES
             // if there is even one post means there is directory with subcategory alias_id
             if ($posts->count() > 0 && $subcat->alias !== $request->newAlias) {
                 $oldName = $subcat->alias . '_' . $subcat->id;
@@ -197,6 +202,14 @@ class SubcategoriesController extends MainCategoriesController
                 }
             }
 
+            // PART -> SUBCATEGORY Attach/Detach
+            $categ = $subcat->category()->first();
+            if ($categ->id !== (int)$request->newCategoryId) {
+                $subcat->category()->associate($request->newCategoryId);
+                $subcat->save();
+            }
+
+            // PART -> SUBCATEGORY UPDATE
             $subcategoryBuilder->update([
                 'name' => $request->newName,
                 'alias' => $request->newAlias

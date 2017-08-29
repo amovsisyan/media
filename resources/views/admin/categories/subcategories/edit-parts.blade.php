@@ -2,11 +2,15 @@
     <div class="col m1 s12">
         <h5 class="part-number"></h5>
     </div>
-    <div class="input-field col m5 s12">
+    <div class="input-field col m3 s12">
+        <select class="category-for-subcategory">
+        </select>
+    </div>
+    <div class="input-field col m3 s12">
         <input type="text" class="part-alias validate">
         <label for="search-input">Alias</label>
     </div>
-    <div class="input-field col m5 s12">
+    <div class="input-field col m4 s12">
         <input type="text" class="part-name validate">
         <label for="search-input">Name</label>
     </div>
