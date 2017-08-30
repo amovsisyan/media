@@ -16,7 +16,12 @@ Route::group(['prefix' => 'qwentin'], function () {
                 Route::get('/create_hashtag', ['uses'=>'Admin\Posts\HashtagController@createHashtag_get','as'=>'hashtagCreateGet']);
                 Route::post('/create_hashtag', ['uses'=>'Admin\Posts\HashtagController@createHashtag_post','as'=>'hashtagCreatePost']);
 
-                Route::get('/edit_hashtag', ['uses'=>'Admin\Posts\HashtagController@editHashtag','as'=>'hashtagEdit']);
+                Route::group(['prefix' => 'edit_hashtag'], function () {
+                    Route::post('/save', ['uses'=>'Admin\Posts\HashtagController@editHashtagSave_post','as'=>'hashtagEditSavePost']);
+                    Route::get('/', ['uses'=>'Admin\Posts\HashtagController@editHashtag_get','as'=>'hashtagEditGet']);
+                    Route::post('/', ['uses'=>'Admin\Posts\HashtagController@editHashtag_post','as'=>'hashtagEditPost']);
+                });
+
                 Route::get('/attach_hashtag', ['uses'=>'Admin\Posts\HashtagController@attachHashtag','as'=>'hashtagAttach']);
                 Route::get('/delete_hashtag', ['uses'=>'Admin\Posts\HashtagController@deleteHashtag','as'=>'hashtagDelete']);
             });
@@ -71,10 +76,9 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 Auth::routes();
 
 
-// todo all '/' to DIRECTORY_SEPARATOR
 // ToDo post edit + make changes in directoryEditor
-// ToDO Atach Detach Hashtag
+// ToDO Attach/Detach Hashtag
+// todo delete hashtag
 // ToDO Attach/Detach Post to Subcategory
 // Todo numbers under text, which will show best text long
 // todo testIt part for all
-//

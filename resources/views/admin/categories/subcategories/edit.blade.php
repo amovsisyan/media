@@ -1,7 +1,7 @@
 @extends('admin.index')
 
 @section('content-body')
-    <section id="create-subcategory-panel">
+    <section id="edit-subcategory-panel">
         <div class="container">
             <div class="row center-align">
                 <h4>Edit Subcategory</h4>

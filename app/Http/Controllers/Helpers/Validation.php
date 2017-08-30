@@ -181,6 +181,41 @@ class Validation extends Controller
         ];
     }
 
+    public static function validateEditHashtagSearchValues($allRequest) {
+        $rules = [
+            'searchType' => 'required',
+            'searchText' => 'required',
+        ];
+
+        $validator = Validator::make($allRequest, $rules);
+
+        if ($validator->fails()) {
+            return self::_generateValidationErrorResponse($validator);
+        };
+
+        return [
+            'error' => false,
+        ];
+    }
+
+    public static function validateEditHashtagSearchValuesSave($allRequest) {
+        $rules = [
+            'id' => 'required',
+            'newAlias' => 'required|min:2|max:40',
+            'newName' => 'required|min:2|max:40',
+        ];
+
+        $validator = Validator::make($allRequest, $rules);
+
+        if ($validator->fails()) {
+            return self::_generateValidationErrorResponse($validator);
+        };
+
+        return [
+            'error' => false,
+        ];
+    }
+
     private static function _generateValidationErrorResponse($validator)
     {
         $errors = $validator->errors();

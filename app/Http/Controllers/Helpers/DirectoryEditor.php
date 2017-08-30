@@ -12,6 +12,11 @@ class DirectoryEditor extends Controller
 {
     const IMGCATPATH = DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'cat';
 
+    /**
+     * Delete All Category's Subcategory folders with Posts
+     * @param $categoryIds
+     * @return array
+     */
     public static function clearAfterCategoryDelete($categoryIds)
     {
         $categories = Category::whereIn('id', $categoryIds)->get();
@@ -35,6 +40,11 @@ class DirectoryEditor extends Controller
         return ['error' => false];
     }
 
+    /**
+     * Delete This Subcategory with inner Posts
+     * @param $subcategoryIds
+     * @return array
+     */
     public static function clearAfterSubcategoryDelete($subcategoryIds)
     {
         try {
@@ -50,6 +60,12 @@ class DirectoryEditor extends Controller
         return ['error' => false];
     }
 
+    /**
+     * Changes SUbcategory folder name to new Name after subcategory name edit
+     * @param $oldName
+     * @param $newName
+     * @return array
+     */
     public static function updateAfterSubcategoryEdit($oldName, $newName)
     {
         try {

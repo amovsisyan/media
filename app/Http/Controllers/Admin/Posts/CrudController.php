@@ -77,9 +77,9 @@ class CrudController extends PostsController
                     'image' => $request->postAlias . '.' . $request->file('postMainImage')->getClientOriginalExtension()
                 ]
             );
-            $mainPath = $subcategory->alias . '_' . $subcategory->id . '/' . $post->alias . '_' . $post->id;
+            $mainPath = $subcategory->alias . '_' . $subcategory->id . DIRECTORY_SEPARATOR . $post->alias . '_' . $post->id;
             $file = $request->file('postMainImage');
-            $filename = $mainPath . '/' . $post->image;
+            $filename = $mainPath . DIRECTORY_SEPARATOR . $post->image;
             Storage::disk('public_posts')->put($filename, File::get($file));
 
 
@@ -97,7 +97,7 @@ class CrudController extends PostsController
             $postParts = $post->postParts()->createMany($createArr);
 
             foreach ($requestAll['partImage'] as $key => $file) {
-                $filename = $mainPath . '/parts/' . $postParts[$key]->body;
+                $filename = $mainPath . DIRECTORY_SEPARATOR . 'parts' . DIRECTORY_SEPARATOR . $postParts[$key]->body;
                 Storage::disk('public_posts')->put($filename, File::get($file));
             };
 
