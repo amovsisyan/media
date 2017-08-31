@@ -40,12 +40,12 @@
         });
 
         CategoryDelete = {
-            deleteBtn: document.querySelector('#delete_category'),
-            confirmButton: document.querySelector('#confirm_delete_category'),
-            categoryDeleteRow: document.querySelector('#category_delete_row'),
-            deleteConfirmBtn: document.querySelector('#confirm_delete_category'),
-            modalDeleteCategory: document.querySelector('#modal_delete_category'),
-            categorySelect: document.querySelector('#category_select'),
+            deleteBtn: document.getElementById('delete_category'),
+            confirmButton: document.getElementById('confirm_delete_category'),
+            categoryDeleteRow: document.getElementById('category_delete_row'),
+            deleteConfirmBtn: document.getElementById('confirm_delete_category'),
+            modalDeleteCategory: document.getElementById('modal_delete_category'),
+            categorySelect: document.getElementById('category_select'),
 
             createModalContent: function() {
                 var content = this.modalDeleteCategory.querySelector('.modal-content'),

@@ -58,12 +58,12 @@
         });
 
         SubcategoryCreate = {
-            addButton: document.querySelector('#add_subcategory'),
-            confirmButton: document.querySelector('#confirm_subcategory'),
-            subcategoryName: document.querySelector('#subcategory_name'),
-            subcategoryAlias: document.querySelector('#subcategory_alias'),
-            categorySelect: document.querySelector('#category_select'),
-            modalAddSubcategory: document.querySelector('#modal_add_subcategory'),
+            addButton: document.getElementById('add_subcategory'),
+            confirmButton: document.getElementById('confirm_subcategory'),
+            subcategoryName: document.getElementById('subcategory_name'),
+            subcategoryAlias: document.getElementById('subcategory_alias'),
+            categorySelect: document.getElementById('category_select'),
+            modalAddSubcategory: document.getElementById('modal_add_subcategory'),
 
             confirmCategory: function(){
                 this.addButton.classList.add('disabled');

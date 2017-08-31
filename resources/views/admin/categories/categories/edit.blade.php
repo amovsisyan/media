@@ -49,13 +49,13 @@
             $('#changesConfirmModal').modal();
         });
         CategoryEdit = {
-            searchButton: document.querySelector('#search-button'),
-            searchTypeSelect: document.querySelector('#search-type'),
-            searchText: document.querySelector('#search-text'),
+            searchButton: document.getElementById('search-button'),
+            searchTypeSelect: document.getElementById('search-type'),
+            searchText: document.getElementById('search-text'),
             partTemplate: document.querySelector('.part-template'),
             partNoResult: document.querySelector('.part-no-result'),
-            searchResultContainer: document.querySelector('#search-result'),
-            changesConfirmModal: document.querySelector('#changesConfirmModal'),
+            searchResultContainer: document.getElementById('search-result'),
+            changesConfirmModal: document.getElementById('changesConfirmModal'),
 
             searchCategoryRequest: function(){
                 this.searchButton.classList.add('disabled');

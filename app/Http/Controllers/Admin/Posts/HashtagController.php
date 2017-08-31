@@ -103,10 +103,32 @@ class HashtagController extends PostsController
             -> view('admin.posts.hashtag.attach');
     }
 
-    protected function deleteHashtag()
+    protected function editHashtagDelete_post(Request $request)
     {
-        return response()
-            -> view('admin.posts.hashtag.delete');
+        $validationResult = Validation::validateHashtagDelete($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+
+        try {
+//            Hashtag::where('id', $request->id)->delete();
+        } catch(\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response(['error' => false]);
     }
 
     protected function createHashtag_get()

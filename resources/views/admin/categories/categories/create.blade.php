@@ -47,11 +47,11 @@
         });
 
         CategoryCreate = {
-            addButton: document.querySelector('#add_category'),
-            confirmButton: document.querySelector('#confirm_category'),
-            categoryName: document.querySelector('#category_name'),
-            categoryAlias: document.querySelector('#category_alias'),
-            modalAddCategory: document.querySelector('#modal_add_category'),
+            addButton: document.getElementById('add_category'),
+            confirmButton: document.getElementById('confirm_category'),
+            categoryName: document.getElementById('category_name'),
+            categoryAlias: document.getElementById('category_alias'),
+            modalAddCategory: document.getElementById('modal_add_category'),
 
             confirmCategory: function(){
                 this.addButton.classList.add('disabled');

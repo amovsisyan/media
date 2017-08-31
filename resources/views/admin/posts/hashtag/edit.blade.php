@@ -28,14 +28,25 @@
         <div class="container" id="search-result">
             @include('admin.posts.hashtag.edit-parts')
         </div>
-        <!-- Modal -->
-        <div class="modal" id="changesConfirmModal">
+        <!-- Modal Save -->
+        <div class="modal" id="saveConfirmModal">
             <div class="modal-content left-align">
                 <h4>Are You Sure You Want Make This Changes?</h4>
                 <p></p>
             </div>
             <div class="modal-footer">
                 <a class="modal-action modal-close waves-effect waves-green btn-flat confirm-changes">Save</a>
+                <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+            </div>
+        </div>
+        <!-- Modal Delete -->
+        <div class="modal" id="deleteConfirmModal">
+            <div class="modal-content left-align">
+                <h4>Are You Sure You Want Delete This Hashtag?</h4>
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-action modal-close waves-effect waves-green btn-flat confirm-delete">Delete</a>
                 <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
             </div>
         </div>
@@ -46,16 +57,18 @@
     <script>
         $(document).ready(function(){
             $('#search-type').material_select();
-            $('#changesConfirmModal').modal();
+            $('#saveConfirmModal').modal();
+            $('#deleteConfirmModal').modal();
         });
         HashtagEdit = {
-            searchButton: document.querySelector('#search-button'),
-            searchTypeSelect: document.querySelector('#search-type'),
-            searchText: document.querySelector('#search-text'),
+            searchButton: document.getElementById('search-button'),
+            searchTypeSelect: document.getElementById('search-type'),
+            searchText: document.getElementById('search-text'),
             partTemplate: document.querySelector('.part-template'),
             partNoResult: document.querySelector('.part-no-result'),
-            searchResultContainer: document.querySelector('#search-result'),
-            changesConfirmModal: document.querySelector('#changesConfirmModal'),
+            searchResultContainer: document.getElementById('search-result'),
+            saveConfirmModal: document.getElementById('saveConfirmModal'),
+            deleteConfirmModal: document.getElementById('deleteConfirmModal'),
 
             searchHashtagRequest: function(){
                 this.searchButton.classList.add('disabled');
@@ -94,8 +107,11 @@
                         clone.dataset.id = element.id;
                         self.searchResultContainer.appendChild(clone);
                         clone.classList.remove('hide');
-                        clone.querySelector('.part-confirm-button').addEventListener('click',
-                            self.createModelPartConfirm
+                        clone.querySelector('.save-confirm-button').addEventListener('click',
+                            self.createSaveModelPartConfirm
+                        );
+                        clone.querySelector('.delete-confirm-button').addEventListener('click',
+                            self.createDeleteModelPartConfirm
                         );
                     }));
                 } else {
@@ -104,20 +120,33 @@
                 }
             },
 
-            createModelPartConfirm: function(e) {
+            createSaveModelPartConfirm: function(e) {
                 var self = HashtagEdit,
                     currElem = getClosest(e.target, '.part-template'),
-                    paragraph = self.changesConfirmModal.querySelector('p'),
+                    paragraph = self.saveConfirmModal.querySelector('p'),
                     _html = '<p>ID: <span class="red-text part-id">' + currElem.dataset.id + '</span></p>' +
-                        '<p>New Post Alias: <span class="red-text part-alias">' + currElem.querySelector('.part-alias').value + '</span></p>' +
-                        '<p>New Post Name: <span class="red-text part-name">' + currElem.querySelector('.part-name').value + '</span></p>';
+                        '<p>New Hashtag Alias: <span class="red-text part-alias">' + currElem.querySelector('.part-alias').value + '</span></p>' +
+                        '<p>New Hashtag Name: <span class="red-text part-name">' + currElem.querySelector('.part-name').value + '</span></p>';
                 paragraph.innerHTML = _html;
-                self.changesConfirmModal.querySelector('.confirm-changes').addEventListener('click',
-                    self.createModelSearchConfirm
+                self.saveConfirmModal.querySelector('.confirm-changes').addEventListener('click',
+                    self.createSaveModelSearchConfirm
                 );
             },
 
-            createModelSearchConfirm: function(e) {
+            createDeleteModelPartConfirm: function(e) {
+                var self = HashtagEdit,
+                    currElem = getClosest(e.target, '.part-template'),
+                    paragraph = self.deleteConfirmModal.querySelector('p'),
+                    _html = '<p>ID: <span class="red-text part-id">' + currElem.dataset.id + '</span></p>' +
+                        '<p>Hashtag Alias: <span class="red-text part-alias">' + currElem.querySelector('.part-alias').value + '</span></p>' +
+                        '<p>Hashtag Name: <span class="red-text part-name">' + currElem.querySelector('.part-name').value + '</span></p>';
+                paragraph.innerHTML = _html;
+                self.deleteConfirmModal.querySelector('.confirm-delete').addEventListener('click',
+                    self.createDeleteModelSearchConfirm
+                );
+            },
+
+            createSaveModelSearchConfirm: function(e) {
                 this.classList.add('disabled');
                 var self = HashtagEdit,
                     elThis = this,
@@ -137,6 +166,31 @@
                     } else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
+                    elThis.classList.remove('disabled');
+                };
+                xhr.send(encodeURI(data));
+            },
+
+            createDeleteModelSearchConfirm: function(e) {
+                this.classList.add('disabled');
+                var self = HashtagEdit,
+                    elThis = this,
+                    currElem = getClosest(e.target, '.modal'),
+                    id = currElem.querySelector('.part-id').innerHTML,
+                    data = 'id=' + id,
+                    xhr = new XMLHttpRequest();
+
+                xhr.open('POST', location.pathname + '/delete');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.setRequestHeader('X-CSRF-TOKEN', getCSRFToken());
+                xhr.onload = function() {
+                    var response = JSON.parse(xhr.responseText);
+                    if (xhr.status === 200 && response.error !== true) {
+                        handleResponseToast(response, true, 'Hashtag was deleted');
+                    } else if (xhr.status !== 200 || response.error === true) {
+                        handleResponseToast(response, false);
+                    }
+                    document.getElementById('search-part-id-' + id).remove();
                     elThis.classList.remove('disabled');
                 };
                 xhr.send(encodeURI(data));

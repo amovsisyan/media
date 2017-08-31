@@ -115,18 +115,18 @@
                 partTemplateCounter: 0,
                 basicPartTemplate: document.querySelector('.post-part')
             },
-            addButton: document.querySelector('#add_post'),
-            confirmButton: document.querySelector('#confirm_post'),
-            postAlias: document.querySelector('#alias'),
-            postMainHeader: document.querySelector('#main_header'),
-            postMainText: document.querySelector('#main_text'),
-            postMainImage: document.querySelector('#main_image'),
-            postSubcategory: document.querySelector('#subcategory_select'),
-            hashtagSelect: document.querySelector('#hashtag_select'),
-            modalAddPost: document.querySelector('#modal_add_post'),
-            postPartAddButton: document.querySelector('#post-part-add-button'),
-            postCreateParts: document.querySelector('#post-create-parts'),
-            deletePostPartModal: document.querySelector('#deletePostPartModal'),
+            addButton: document.getElementById('add_post'),
+            confirmButton: document.getElementById('confirm_post'),
+            postAlias: document.getElementById('alias'),
+            postMainHeader: document.getElementById('main_header'),
+            postMainText: document.getElementById('main_text'),
+            postMainImage: document.getElementById('main_image'),
+            postSubcategory: document.getElementById('subcategory_select'),
+            hashtagSelect: document.getElementById('hashtag_select'),
+            modalAddPost: document.getElementById('modal_add_post'),
+            postPartAddButton: document.getElementById('post-part-add-button'),
+            postCreateParts: document.getElementById('post-create-parts'),
+            deletePostPartModal: document.getElementById('deletePostPartModal'),
 
             _init: function() {
                 this.renderPartTemplate();
@@ -205,7 +205,7 @@
             confirmPartRemove: function(e) {
                 var self = PostCreate,
                     id = self.deletePostPartModal.querySelector('.confirm-delete').getAttribute('data-id'),
-                    currElem = document.querySelector('#post-id-'+id);
+                    currElem = document.getElementById('post-id-'+id);
 
 
                 if(self.defaultProperties.partTemplateCounter == 1 && id) {return false};
@@ -256,7 +256,7 @@
                 this.postMainHeader.value = '';
                 this.postMainText.value = '';
                 this.postMainImage.value = '';
-                document.querySelector('#post-create-main').querySelector('.file-path').value = '';
+                document.getElementById('post-create-main').querySelector('.file-path').value = '';
             },
 
             createModelPartDelete: function(e) {

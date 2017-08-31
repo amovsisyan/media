@@ -45,11 +45,11 @@
         });
 
         HashtagCreate = {
-            addButton: document.querySelector('#add_hashtag'),
-            confirmButton: document.querySelector('#confirm_hashtag'),
-            hashtagName: document.querySelector('#hashtag_name'),
-            hashtagAlias: document.querySelector('#hashtag_alias'),
-            modalAddHashtag: document.querySelector('#modal_add_hashtag'),
+            addButton: document.getElementById('add_hashtag'),
+            confirmButton: document.getElementById('confirm_hashtag'),
+            hashtagName: document.getElementById('hashtag_name'),
+            hashtagAlias: document.getElementById('hashtag_alias'),
+            modalAddHashtag: document.getElementById('modal_add_hashtag'),
 
             confirmHashtag: function(){
                 this.addButton.classList.add('disabled');

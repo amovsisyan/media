@@ -18,12 +18,12 @@ Route::group(['prefix' => 'qwentin'], function () {
 
                 Route::group(['prefix' => 'edit_hashtag'], function () {
                     Route::post('/save', ['uses'=>'Admin\Posts\HashtagController@editHashtagSave_post','as'=>'hashtagEditSavePost']);
+                    Route::post('/delete', ['uses'=>'Admin\Posts\HashtagController@editHashtagDelete_post','as'=>'hashtagEditDeletePost']);
                     Route::get('/', ['uses'=>'Admin\Posts\HashtagController@editHashtag_get','as'=>'hashtagEditGet']);
                     Route::post('/', ['uses'=>'Admin\Posts\HashtagController@editHashtag_post','as'=>'hashtagEditPost']);
                 });
 
                 Route::get('/attach_hashtag', ['uses'=>'Admin\Posts\HashtagController@attachHashtag','as'=>'hashtagAttach']);
-                Route::get('/delete_hashtag', ['uses'=>'Admin\Posts\HashtagController@deleteHashtag','as'=>'hashtagDelete']);
             });
         });
         Route::group(['prefix' => 'categories'], function () {
@@ -78,7 +78,6 @@ Auth::routes();
 
 // ToDo post edit + make changes in directoryEditor
 // ToDO Attach/Detach Hashtag
-// todo delete hashtag
 // ToDO Attach/Detach Post to Subcategory
 // Todo numbers under text, which will show best text long
 // todo testIt part for all

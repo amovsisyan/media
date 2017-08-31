@@ -43,10 +43,10 @@
         });
 
         SubcategoryDelete = {
-            deleteBtn: document.querySelector('#delete_subcategory'),
-            confirmButton: document.querySelector('#confirm_delete_subcategory'),
-            modalDeleteSubcategory: document.querySelector('#modal_delete_subcategory'),
-            subcategorySelect: document.querySelector('#subcategory_select'),
+            deleteBtn: document.getElementById('delete_subcategory'),
+            confirmButton: document.getElementById('confirm_delete_subcategory'),
+            modalDeleteSubcategory: document.getElementById('modal_delete_subcategory'),
+            subcategorySelect: document.getElementById('subcategory_select'),
 
             createModalContent: function() {
                 var paragraph = this.modalDeleteSubcategory.querySelector('p'),

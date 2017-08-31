@@ -60,6 +60,22 @@ class Validation extends Controller
         ];
     }
 
+    public static function validateHashtagDelete($allRequest) {
+        $rules = [
+            'id' => 'required|max:10',
+        ];
+
+        $validator = Validator::make($allRequest, $rules);
+
+        if ($validator->fails()) {
+            return self::_generateValidationErrorResponse($validator);
+        };
+
+        return [
+            'error' => false,
+        ];
+    }
+
     public static function createPostMainFieldsValidations($allRequest) {
         $rules = [
             'postAlias' => 'required|min:2|max:60',
