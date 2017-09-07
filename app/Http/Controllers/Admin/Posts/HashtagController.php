@@ -117,7 +117,7 @@ class HashtagController extends PostsController
         }
 
         try {
-//            Hashtag::where('id', $request->id)->delete();
+            Hashtag::where('id', $request->id)->delete();
         } catch(\Exception $e) {
             return response(
                 [

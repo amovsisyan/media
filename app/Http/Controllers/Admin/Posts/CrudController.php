@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Posts;
 
 use App\Category;
 use App\Hashtag;
+use App\Post;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validation;
 use App\Subcategory;
@@ -13,23 +14,41 @@ use File;
 
 class CrudController extends PostsController
 {
+    const POSTEDITSEARCHTYPES = [
+        'byID' => '1',
+        'byHeader' => '2',
+        'byAlias' => '3',
+    ];
+
     protected function createPost_get()
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
 
-        //  CATEGORY    &   SUBCATEGORY
+        //  All CATEGORY    &   SUBCATEGORY
         $categories = Category::select('id', 'name')->orderBy('name')->get();
         foreach ($categories as $key => $category) {
-            $response['categories'][$key][] = $category;
+            $response['categories'][$key]['category'] = [
+                'id' => $category->id,
+                'name' => $category->name
+            ];
             $response['categories'][$key]['subcategory'] = [];
             $subcategories = $category->subcategories()->select('id', 'name')->get();
             foreach ($subcategories as $subcategory) {
-                $response['categories'][$key]['subcategory'][] = $subcategory;
+                $response['categories'][$key]['subcategory'][] = [
+                    'id' => $subcategory->id,
+                    'name' => $subcategory->name
+                ];
             }
         }
 
-        //  HASHTAGS
-        $response['hashtags'] = Hashtag::select('id', 'hashtag')->orderBy('hashtag')->get();
+        //  All HASHTAGS
+        $hashtags = Hashtag::select('id', 'hashtag')->orderBy('hashtag')->get();
+        foreach ($hashtags as $hashtag) {
+            $response['hashtags'][] = [
+                'id' => $hashtag->id,
+                'hashtag' => $hashtag->hashtag
+            ];
+        }
 
         return response()
             -> view('admin.posts.crud.create', ['response' => $response]);
@@ -117,15 +136,139 @@ class CrudController extends PostsController
         return response(['error' => false]);
     }
 
-    protected function delete()
+    protected function updatePost_get()
     {
+        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+
         return response()
-            -> view('admin.posts.crud.delete');
+            -> view('admin.posts.crud.update', ['response' => $response]);
     }
 
-    protected function update()
+    protected function updatePost_post(Request $request)
     {
-        return response()
-            -> view('admin.posts.crud.update');
+        $validationResult = Validation::validateEditPostSearchValues($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+
+        switch ($request->searchType) {
+            case self::POSTEDITSEARCHTYPES['byID']:
+                $post = Post::where('id', $request->searchText);
+                break;
+            case self::POSTEDITSEARCHTYPES['byHeader']:
+                $post = Post::where('header', 'like', "%$request->searchText%");
+                break;
+            default:
+                $post = Post::where('alias', 'like', "%$request->searchText%");
+        }
+
+        $searchResult = $post->select('id', 'header', 'text')->get();
+        $response['posts'] = [];
+        if (!empty($searchResult)) {
+            foreach ($searchResult as $item) {
+                $response['posts'][] = [
+                    'id' => $item->id,
+                    'header' => $item->header,
+                    'text' => $item->text
+                ];
+            }
+        }
+        return response(
+            [
+                'error' => false,
+                'response' => $response
+            ]
+        );
+    }
+
+    protected function updatePostDetails_post(Request $request)
+    {
+        $validationResult = Validation::validateEditPostDetailsValues($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+
+        $response = [];
+        try {
+            $post = Post::where('id', $request->postId)->first();
+            $response['post'] = [
+                "id" => 1,
+                "alias" => $post->alias,
+                "header" => $post->header,
+                "text" => $post->text,
+                "image" => $post->image,
+                "subcateg_id" => $post->subcateg_id
+            ];
+
+            $hashtags = $post->hashtags()->select('hashtags.id')->get();
+            foreach ($hashtags as $hashtag) {
+                $response['post']['hashtags'][] = $hashtag->id;
+            }
+
+            // Post Parts
+            $postParts = $post->postParts()->select('post_parts.id', 'head', 'body', 'foot')->get();
+            foreach ($postParts as $postPart) {
+                $response['post']['postparts'][] = [
+                    'id' => $postPart->id,
+                    'head' => $postPart->head,
+                    'body' => $postPart->body,
+                    'foot' => $postPart->foot,
+                ];
+            }
+
+                // todo this all and hashtag all is doubleing , once these are used also in createPost_get()
+            //  All CATEGORY    &   SUBCATEGORY
+            $categories = Category::select('id', 'name')->orderBy('name')->get();
+            foreach ($categories as $key => $category) {
+                $response['categories'][$key]['category'] = [
+                    'id' => $category->id,
+                    'name' => $category->name
+                ];
+                $response['categories'][$key]['subcategory'] = [];
+                $subcategories = $category->subcategories()->select('id', 'name')->get();
+                foreach ($subcategories as $subcategory) {
+                    $response['categories'][$key]['subcategory'][] = [
+                        'id' => $subcategory->id,
+                        'name' => $subcategory->name
+                    ];
+                }
+            }
+
+            //  All HASHTAGS
+            $hashtags = Hashtag::select('id', 'hashtag')->orderBy('hashtag')->get();
+            foreach ($hashtags as $hashtag) {
+                $response['hashtags'][] = [
+                    'id' => $hashtag->id,
+                    'hashtag' => $hashtag->hashtag
+                ];
+            }
+        } catch(\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response(
+            [
+                'error' => false,
+                'response' => $response
+            ]
+        );
     }
 }

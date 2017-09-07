@@ -1,4 +1,4 @@
-<div class="post-part col s12">
+<div class="post-part col s12 create-part">
     <div class="col m3 s6">
         <h6>Part N_<span class="post-number"></span></h6>
     </div>

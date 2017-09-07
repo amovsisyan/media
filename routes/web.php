@@ -9,8 +9,13 @@ Route::group(['prefix' => 'qwentin'], function () {
                 Route::get('/create_post', ['uses'=>'Admin\Posts\CrudController@createPost_get','as'=>'postCreateGet']);
                 Route::post('/create_post', ['uses'=>'Admin\Posts\CrudController@createPost_post','as'=>'postCreatePost']);
 
-                Route::get('/delete_post', ['uses'=>'Admin\Posts\CrudController@delete','as'=>'crudDelete']);
-                Route::get('/update_post', ['uses'=>'Admin\Posts\CrudController@update','as'=>'crudUpdate']);
+                Route::group(['prefix' => 'update_post'], function () {
+                    Route::post('/save', ['uses'=>'Admin\Posts\CrudController@updatePostsave_postget','as'=>'postEditSavePost']);
+                    Route::post('/delete', ['uses'=>'Admin\Posts\CrudController@updatePostDelete_post','as'=>'postEditDeletePost']);
+                    Route::post('/edit_details', ['uses'=>'Admin\Posts\CrudController@updatePostDetails_post','as'=>'postEditDetailsPost']);
+                    Route::get('/', ['uses'=>'Admin\Posts\CrudController@updatePost_get','as'=>'postEditGet']);
+                    Route::post('/', ['uses'=>'Admin\Posts\CrudController@updatePost_post','as'=>'postEditPost']);
+                });
             });
             Route::group(['prefix' => 'hashtag'], function () {
                 Route::get('/create_hashtag', ['uses'=>'Admin\Posts\HashtagController@createHashtag_get','as'=>'hashtagCreateGet']);
@@ -76,7 +81,10 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 Auth::routes();
 
 
-// ToDo post edit + make changes in directoryEditor
+// ToDo bug Post update init Subcategories group select
+// ToDO not sure but there was bug when we add post, double request
+// ToDo Archive posts
+// ToDO Post delete + make changes in directoryEditor
 // ToDO Attach/Detach Hashtag
 // ToDO Attach/Detach Post to Subcategory
 // Todo numbers under text, which will show best text long
