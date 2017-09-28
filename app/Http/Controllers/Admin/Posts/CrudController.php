@@ -218,6 +218,7 @@ class CrudController extends PostsController
             ];
 
             $hashtags = $post->hashtags()->select('hashtags.id')->get();
+            $response['post']['hashtags'] = [];
             foreach ($hashtags as $hashtag) {
                 $response['post']['hashtags'][] = $hashtag->id;
             }
@@ -242,6 +243,7 @@ class CrudController extends PostsController
 
             //  All HASHTAGS
             $hashtags = Hashtag::select('id', 'hashtag')->orderBy('hashtag')->get();
+            $response['hashtags'] = [];
             foreach ($hashtags as $hashtag) {
                 $response['hashtags'][] = [
                     'id' => $hashtag->id,
