@@ -9,7 +9,7 @@ class Post extends Model
     protected $table = 'posts';
 
     protected $fillable = [
-        'alias', 'header', 'text', 'image'
+        'alias', 'header', 'text', 'image', 'subcateg_id'
     ];
 
     public function subcategory(){

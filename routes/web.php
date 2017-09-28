@@ -10,11 +10,16 @@ Route::group(['prefix' => 'qwentin'], function () {
                 Route::post('/create_post', ['uses'=>'Admin\Posts\CrudController@createPost_post','as'=>'postCreatePost']);
 
                 Route::group(['prefix' => 'update_post'], function () {
-                    Route::post('/save', ['uses'=>'Admin\Posts\CrudController@updatePostsave_postget','as'=>'postEditSavePost']);
-                    Route::post('/delete', ['uses'=>'Admin\Posts\CrudController@updatePostDelete_post','as'=>'postEditDeletePost']);
-                    Route::post('/edit_details', ['uses'=>'Admin\Posts\CrudController@updatePostDetails_post','as'=>'postEditDetailsPost']);
+                    Route::group(['prefix' => '/main/{id}'], function () {
+                        Route::get('/', ['uses'=>'Admin\Posts\CrudController@postMainDetails_get','as'=>'postMainDetailsGet'])->where(['id' => '^[0-9]*$']);
+                        Route::post('/', ['uses'=>'Admin\Posts\CrudController@postMainDetails_post','as'=>'postMainDetailsPost'])->where(['id' => '^[0-9]*$']);
+                        Route::get('/parts', ['uses'=>'Admin\Posts\CrudController@postPartsDetails_get','as'=>'postPartsDetailsGet'])->where(['id' => '^[0-9]*$']);
+                        Route::post('/parts', ['uses'=>'Admin\Posts\CrudController@postPartsDetails_post','as'=>'postPartsDetailsPost'])->where(['id' => '^[0-9]*$']);
+                        Route::post('/parts/delete', ['uses'=>'Admin\Posts\CrudController@postPartDelete_post','as'=>'postPartDeletePost'])->where(['id' => '^[0-9]*$']);
+                    });
                     Route::get('/', ['uses'=>'Admin\Posts\CrudController@updatePost_get','as'=>'postEditGet']);
                     Route::post('/', ['uses'=>'Admin\Posts\CrudController@updatePost_post','as'=>'postEditPost']);
+                    Route::post('/delete', ['uses'=>'Admin\Posts\CrudController@postDelete_post','as'=>'postDelete']);
                 });
             });
             Route::group(['prefix' => 'hashtag'], function () {
@@ -81,6 +86,11 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 Auth::routes();
 
 
+// todo simplify Validation controller (possible need some validationAbstract controller and simplify parts which used many times)
+// todo add post parts PART
+// todo postCreate Attach hashtag doesnt work properly as explode doesn't return expected result
+// ToDo find more optimize datapickers for JS (change back queryselector to documentGetElementByClassName)
+// ToDo getHashtagList to helper
 // ToDo bug Post update init Subcategories group select
 // ToDO not sure but there was bug when we add post, double request
 // ToDo Archive posts

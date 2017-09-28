@@ -3,7 +3,7 @@
 @section('content-body')
     <section id="create-post-panel">
         <div class="container">
-            @include('admin.posts.crud.create-update-template')
+            @include('admin.posts.crud.create-template')
         </div>
         <div class="container">
             <div class="row right-align m_t_50 post-create-btns">
@@ -120,8 +120,7 @@
                     if (fileContainer.length) {
                         file = element.querySelector('.part-image').files[0]
                     }
-                    formData.append('partImage[]', file);
-
+                    formData.append('partImage[' + index + ']', file);
                     formData.append('partFooter[]', element.querySelector('.part-footer').value);
                 }));
 

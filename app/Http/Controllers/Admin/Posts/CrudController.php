@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin\Posts;
 
 use App\Category;
 use App\Hashtag;
+use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Post;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validation;
+use App\PostParts;
 use App\Subcategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -20,6 +22,9 @@ class CrudController extends PostsController
         'byAlias' => '3',
     ];
 
+    /** Returns Data for Post Creation View
+     * @return \Illuminate\Http\Response
+     */
     protected function createPost_get()
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
@@ -54,6 +59,10 @@ class CrudController extends PostsController
             -> view('admin.posts.crud.create', ['response' => $response]);
     }
 
+    /** Create New Post with Post Parts
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
     protected function createPost_post(Request $request)
     {
         $requestAll =  $request->all();
@@ -136,6 +145,7 @@ class CrudController extends PostsController
         return response(['error' => false]);
     }
 
+    // todo rename this method and add annotation
     protected function updatePost_get()
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
@@ -144,6 +154,7 @@ class CrudController extends PostsController
             -> view('admin.posts.crud.update', ['response' => $response]);
     }
 
+    // todo rename this method and add annotation
     protected function updatePost_post(Request $request)
     {
         $validationResult = Validation::validateEditPostSearchValues($request->all());
@@ -187,24 +198,18 @@ class CrudController extends PostsController
         );
     }
 
-    protected function updatePostDetails_post(Request $request)
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function postMainDetails_get(Request $request, $id)
     {
-        $validationResult = Validation::validateEditPostDetailsValues($request->all());
-        if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
-        }
-
-        $response = [];
+        $response = Helpers::prepareAdminNavbars(request()->segment(3));
         try {
-            $post = Post::where('id', $request->postId)->first();
+            $post = Post::where('id', $id)->first();
             $response['post'] = [
-                "id" => 1,
+                "id" => $post->id,
                 "alias" => $post->alias,
                 "header" => $post->header,
                 "text" => $post->text,
@@ -217,18 +222,7 @@ class CrudController extends PostsController
                 $response['post']['hashtags'][] = $hashtag->id;
             }
 
-            // Post Parts
-            $postParts = $post->postParts()->select('post_parts.id', 'head', 'body', 'foot')->get();
-            foreach ($postParts as $postPart) {
-                $response['post']['postparts'][] = [
-                    'id' => $postPart->id,
-                    'head' => $postPart->head,
-                    'body' => $postPart->body,
-                    'foot' => $postPart->foot,
-                ];
-            }
-
-                // todo this all and hashtag all is doubleing , once these are used also in createPost_get()
+            // todo this all and hashtag all is doubleing , once these are used also in createPost_get()
             //  All CATEGORY    &   SUBCATEGORY
             $categories = Category::select('id', 'name')->orderBy('name')->get();
             foreach ($categories as $key => $category) {
@@ -264,10 +258,295 @@ class CrudController extends PostsController
             );
         }
 
+        return response()
+            -> view('admin.posts.crud.update-main-details', ['response' => $response]);
+    }
+
+    /** Prepare Post Main Details Info by Post Id
+     * Make Changes After Post Main Info Changed
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function postMainDetails_post(Request $request, $id)
+    {
+        $requestAll =  $request->all();
+
+        // Main fields Validation
+        $mainValidation = Validation::updatePostMainFieldsValidations($requestAll);
+        if ($mainValidation['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $mainValidation['type'],
+                    'response' => $mainValidation['response']
+                ], 404
+            );
+        }
+
+        try {
+            // ToDo Make 3 separate private methods for this 3 parts
+            // Post Main Creation
+            $post = Post::findOrFail($id);
+            $oldPost = clone $post;
+            $oldInfo['oldPost'] = $post;
+
+            $updateArr = [
+                'alias' => $request->postAlias,
+                'header' => $request->postMainHeader,
+                'text' => $request->postMainText,
+            ];
+
+            $subcategCHANGED = false;
+            $oldSubcat = [];
+            if ($post->subcateg_id !== (int)$request->postSubcategory) {
+                $updateArr['subcateg_id'] = $request->postSubcategory;
+                $oldSubcat = $post->subcategory()->first();
+                $subcategCHANGED = true;
+            }
+
+
+            $postMainImageCHANGED = false;
+            $postAliasCHANGED = false;
+            $postMainImage = $request->file('postMainImage');
+            $imgName = explode('.', $post->image);
+            if ($post->alias !== $request->postAlias) {
+                // case alias changed, image sent
+                $postAliasCHANGED = true;
+                if ($postMainImage) {
+                    $ext = $postMainImage->getClientOriginalExtension();
+                    $postMainImageCHANGED = true;
+                }
+                // case alias changed, image didn't sent
+                else {
+                    $ext = end($imgName);
+                }
+                $updateArr['image'] = $request->postAlias . '.' . $ext;
+            }
+            // case alias NOT changed, but image sent
+            elseif($postMainImage) {
+                $postMainImageCHANGED = true;
+                // update only if new added image have other extension, otherwise we don't need to update in table
+                if ($postMainImage->getClientOriginalExtension() !== end($imgName)) {
+                    $ext = $postMainImage->getClientOriginalExtension();
+                    $updateArr['image'] = $request->postAlias . '.' . $ext;
+                }
+            }
+
+            $updatedPost = $post->update($updateArr);
+
+            if ($updatedPost) {
+                $newSubcat = $post->subcategory()->first();
+                if ($subcategCHANGED && !empty($oldSubcat)) {
+                    $result = DirectoryEditor::updateAfterSubcategoryEditforPost($oldSubcat, $newSubcat, $oldPost);
+                    if ($result['error']) {
+                        throw new \Exception("Directory rename Error");
+                    }
+                }
+
+                if ($postAliasCHANGED) {
+                    $result = DirectoryEditor::updateAfterAliasEditedforPost($newSubcat, $oldPost, $post);
+                    if ($result['error']) {
+                        throw new \Exception("Directory rename Error");
+                    }
+                }
+
+                if ($postMainImageCHANGED) {
+                    $postPath = $newSubcat->alias . '_' . $newSubcat->id . DIRECTORY_SEPARATOR . $post->alias . '_' . $post->id;
+                    $postFilesDir = DirectoryEditor::IMGCATPATH . DIRECTORY_SEPARATOR . $postPath;
+                    File::delete(File::files($postFilesDir));
+                    $file = $request->file('postMainImage');
+                    $filename = $postPath . DIRECTORY_SEPARATOR . $post->image;
+                    Storage::disk('public_posts')->put($filename, File::get($file));
+                }
+            }
+
+            // Hashtag Attach
+            $post->hashtags()->detach();
+            $post->hashtags()->attach(json_decode($request->postHashtag));
+
+        } catch (\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response(['error' => false]);
+    }
+
+    /** Prepare Post Part Details Info by Post Id
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function postPartsDetails_get(Request $request, $id)
+    {
+        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        try {
+            $post = Post::where('id', $id)->first();
+            // Post Parts
+            $postParts = $post->postParts()->select('post_parts.id', 'head', 'body', 'foot')->get();
+            foreach ($postParts as $postPart) {
+                $response['post']['postparts'][] = [
+                    'id' => $postPart->id,
+                    'head' => $postPart->head,
+                    'body' => $postPart->body,
+                    'foot' => $postPart->foot,
+                ];
+            }
+        } catch(\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response()
+            -> view('admin.posts.crud.update-parts-details', ['response' => $response]);
+    }
+
+    /** Update Post Part
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function postPartsDetails_post(Request $request)
+    {
+        $validationResult = Validation::validatePostPartsUpdate($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+        try {
+            $postPart = PostParts::findOrFail($request->partId);
+            $oldPostPart = clone $postPart;
+            $updateArr = [
+                'head' => $request->head,
+                'foot' => $request->foot
+            ];
+            $newName = $oldPostPart->body;
+
+            $imgUpdated = false;
+            $file = $request->file('body');
+            if ($file) {
+                $imgUpdated = true;
+                $imgName = explode('.', $oldPostPart->body);
+                $ext = end($imgName);
+                if ($ext !== $file->getClientOriginalExtension()) {
+                    $newName = [
+                        $imgName[0],  $file->getClientOriginalExtension()
+                    ];
+                    $updateArr['body'] = implode('.', $newName);
+                }
+            }
+            $postPart->update($updateArr);
+            if ($imgUpdated) {
+                $getRes = DirectoryEditor::postPartImageEdit($postPart, $oldPostPart);
+                if (!$getRes['error'] && $getRes['toAddDir']) {
+                    $filename = $getRes['toAddDir'] . $newName;
+                    Storage::disk('public_posts')->put($filename, File::get($file));
+                }
+            }
+        } catch (\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
         return response(
             [
                 'error' => false,
-                'response' => $response
+            ]
+        );
+    }
+
+    /**
+     * Delete Post Part
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function postPartDelete_post(Request $request)
+    {
+        $validationResult = Validation::validatePostPartDelete($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+        try {
+            $postPart = PostParts::findOrFail($request->partId);
+            DirectoryEditor::removePostPartImage($postPart);
+            $postPart->delete();
+        } catch (\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response(
+            [
+                'error' => false,
+            ]
+        );
+    }
+
+    /**
+     * Delete Post
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function postDelete_post(Request $request)
+    {
+        $validationResult = Validation::validatePostDelete($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+        try {
+            $post = Post::findOrFail($request->postId);
+            DirectoryEditor::removePostDir($post);
+            $post->delete();
+        } catch (\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response(
+            [
+                'error' => false,
             ]
         );
     }

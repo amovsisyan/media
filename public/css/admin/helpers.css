@@ -7,6 +7,9 @@
 .status_warning {
     background: #C62828;
  }
-.important_icon{
+.important_icon {
     color: #C62828;
+}
+.collapsible-body {
+    overflow: hidden;
 }

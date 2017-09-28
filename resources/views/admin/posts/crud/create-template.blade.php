@@ -1,5 +1,5 @@
 <div class="row center-align">
-    <h4>Create(Update) Post</h4>
+    <h4>Create Post</h4>
     <h6>(All fields with <span class="important_icon">*</span> are required)</h6>
 </div>
 <div class="row" id="post-create-main">
@@ -35,7 +35,7 @@
             </div>
         </div>
     </div>
-    <div class="input-field col m7 s12">
+    <div class="input-field col m7 s12" id="subcategory_select_container">
         <select id="subcategory_select">
             @if (!empty($response) && !empty($response['categories']))
                 @foreach ($response['categories'] as $category)
@@ -49,7 +49,7 @@
         </select>
         <label>Select Subcategory <span class="important_icon">*</span></label>
     </div>
-    <div class="input-field col m7 s12">
+    <div class="input-field col m7 s12" id="hashtag_select_container">
         <select multiple id="hashtag_select">
             <option value="" disabled selected>Select Hashtag</option>
             @if (!empty($response) && !empty($response['hashtags']))

@@ -6,3 +6,22 @@
 #post-create-main .col{
     margin-bottom: 30px;
 }
+
+/*	 Collapse		*/
+.part-template .collapsible-body {
+    padding: 3rem;
+}
+#post-parts-details .fixed-action-btn,
+.part-template .fixed-action-btn {
+    position: relative;
+}
+.part-template .fixed-action-btn ul {
+    top: 15%;
+}
+.part-template .fixed-action-btn .btn-floating {
+    text-align: center;
+}
+#post-parts-details .fixed-action-btn ul {
+    position: static;
+    margin-top: 10px;
+}
