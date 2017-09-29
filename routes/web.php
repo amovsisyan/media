@@ -88,14 +88,12 @@ Auth::routes();
 
 // todo simplify Validation controller (possible need some validationAbstract controller and simplify parts which used many times)
 // todo add post parts PART
-// todo postCreate Attach hashtag doesnt work properly as explode doesn't return expected result
 // ToDo find more optimize datapickers for JS (change back queryselector to documentGetElementByClassName)
 // ToDo getHashtagList to helper
-// ToDo bug Post update init Subcategories group select
-// ToDO not sure but there was bug when we add post, double request
 // ToDo Archive posts
-// ToDO Post delete + make changes in directoryEditor
 // ToDO Attach/Detach Hashtag
 // ToDO Attach/Detach Post to Subcategory
+// ToDO Attach/Detach PostPart to Post
+// ToDO Attach/Detach Subcategory to Category
 // Todo numbers under text, which will show best text long
 // todo testIt part for all

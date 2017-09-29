@@ -100,6 +100,9 @@ class DirectoryEditor extends Controller
             $newDir = $prefix . $newName;
             $postDir = $oldPost->alias . '_' . $oldPost->id;
             $postSourceDir = $oldDir . DIRECTORY_SEPARATOR . $postDir;
+            if (!File::isDirectory($newDir)) {
+                File::makeDirectory($newDir, 0777);
+            }
             $postDestinationDir = $newDir . DIRECTORY_SEPARATOR . $postDir;
             $error = !File::moveDirectory($postSourceDir, $postDestinationDir);
         } catch (\Exception $e) {

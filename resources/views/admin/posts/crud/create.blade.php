@@ -92,6 +92,8 @@
             },
 
             confirmPost: function(){
+                this.updateAddConfirmButtons(true);
+
                 var self = this,
                     hashtags = [],
                     xhr = new XMLHttpRequest(),
@@ -136,14 +138,21 @@
                     else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
-                    self.updateAddConfirmButtons();
+                    self.updateAddConfirmButtons(false);
                 };
                 xhr.send(formData);
             },
 
-            updateAddConfirmButtons: function() {
-                this.addButton.classList.remove('disabled');
-                this.confirmButton.classList.remove('disabled');
+            updateAddConfirmButtons: function(add) {
+                console.log(this.addButton);
+                if (add) {
+                    this.addButton.classList.add('disabled');
+                    this.confirmButton.classList.add('disabled');
+                } else {
+                    this.addButton.classList.remove('disabled');
+                    this.confirmButton.classList.remove('disabled');
+                }
+
             },
 
             confirmPartRemove: function(e) {
