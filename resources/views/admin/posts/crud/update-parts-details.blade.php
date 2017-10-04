@@ -46,7 +46,7 @@
                                             </a>
                                             <ul>
                                                 <li><a class="btn-floating modal-trigger part-save-btn" href="#updatePostPartModal">Save</a></li>
-                                                <li><a class="btn-floating red modal-trigger part-delete-btn" href="#deletePostPartModal">Del</a></li>
+                                                <li><a class="btn-floating red modal-trigger part-delete-btn" href="#removePostPartModal">Del</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -57,42 +57,104 @@
                 </ul>
             </div>
         </div>
-
-        <!-- Modal -->
-        <div class="modal" id="deletePostPartModal">
-            <div class="modal-content left-align">
-                <h4>Are You Sure You Want Delete This Post Part?</h4>
-                <p></p>
+    </section>
+    <section id="post-parts-details">
+        <div class="container">
+            <div class="row" id="new-post-parts">
+                <div class="col s12">
+                    <h4>New Post Parts</h4>
+                </div>
+                <div id="parts-container">
+                    @include('admin.posts.crud.create-part')
+                </div>
             </div>
-            <div class="modal-footer">
-                <a class="modal-action modal-close waves-effect waves-green btn-flat red" id="post-part-confirm-delete">Delete</a>
-                <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
-            </div>
-        </div>
-
-        <!-- Modal -->
-        <div class="modal" id="updatePostPartModal">
-            <div class="modal-content left-align">
-                <h4>Are You Sure You Want Update This Post Part?</h4>
-                <p></p>
-            </div>
-            <div class="modal-footer">
-                <a class="modal-action modal-close waves-effect waves-green btn-flat green" id="post-part-confirm-update">Update</a>
-                <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+            <div class="row right-align post-part-add-button-container">
+                <a class="waves-effect waves-light btn" id="post-part-add-button">+Add Part</a>
             </div>
         </div>
     </section>
+
+    <section id="post-parts-add-buttons">
+        <div class="container">
+            <div class="row right-align m_t_50 post-create-btns">
+                <a class="waves-effect waves-light btn">Finish & Test</a>
+                <!-- Modal -->
+                <a id='add_post' class="waves-effect waves-light btn modal-trigger" href="#modal_add_post">Finish & Add</a>
+                <div id="modal_add_post" class="modal">
+                    <div class="modal-content left-align">
+                        <h4>Are You Sure You Want Add This(these) Post Part(s)?</h4>
+                        <p></p>
+                    </div>
+                    <div class="modal-footer">
+                        <a id='confirm-post-parts-addition' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+                        <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal" id="removePostPartModal">
+        <div class="modal-content left-align">
+            <h4>Are You Sure You Want Delete This Post Part?</h4>
+            <p></p>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-action modal-close waves-effect waves-green btn-flat red" id="post-part-confirm-delete">Delete</a>
+            <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="updatePostPartModal">
+        <div class="modal-content left-align">
+            <h4>Are You Sure You Want Update This Post Part?</h4>
+            <p></p>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-action modal-close waves-effect waves-green btn-flat green" id="post-part-confirm-update">Update</a>
+            <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="deletePostPartModal">
+        <div class="modal-content left-align">
+            <h4>Are You Sure You Want Delete This Not Generated Post Part?</h4>
+            <p></p>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-action modal-close waves-effect waves-green btn-flat red" id="post-part-delete">Delete</a>
+            <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+        </div>
+    </div>
 @endsection
 
 @section('script')
     <script>
         $('.modal').modal();
         PostPartDetails = {
+            newPartCount: 1,
             partSaveBtns:document.getElementsByClassName('part-save-btn'),
             postPartConfirmUpdate:document.getElementById('post-part-confirm-update'),
+            postPartDelete:document.getElementById('post-part-delete'),
+            postPartAddBtn:document.getElementById('post-part-add-button'),
 
             partDeleteBtns:document.getElementsByClassName('part-delete-btn'),
             postPartConfirmDelete:document.getElementById('post-part-confirm-delete'),
+
+            partsContainer: document.getElementById('parts-container'),
+            postPart:document.getElementsByClassName('post-part')[0],
+            partDeleteBtn:document.getElementsByClassName('part-delete-button')[0],
+
+            confirmPostPartsAdditionBtn: document.getElementById('confirm-post-parts-addition'),
+
+            init: function() {
+                document.getElementsByClassName('post-number')[0].innerHTML = this.newPartCount;
+                this.postPart.id = 'post-part-id-' + this.newPartCount;
+                this.postPart.dataset.num = this.newPartCount;
+            },
 
             sendIdToUpdateModal: function (e) {
                  var el = getClosest(e.target, '.collapsible-body'),
@@ -166,6 +228,127 @@
                 };
                 xhr.send(data);
                 this.postPartConfirmDelete.classList.remove('disabled');
+            },
+
+            partDelEvent: function(e) {
+                this.postPartDelete.dataset.num = getClosest(e.target, '.create-part').dataset.num;
+            },
+
+            addPostPart: function() {
+                var clone = this.postPart.cloneNode(true);
+                this.partsContainer.appendChild(clone);
+                this.renderPartTemplate();
+            },
+
+            renderPartTemplate: function() {
+                var num = this.newPartCount++,
+                    currTempl = document.getElementsByClassName('post-part')[num];
+                this._regeneratePostPartIds(currTempl);
+
+                currTempl.getElementsByClassName('part-header')[0].value = '';
+                currTempl.getElementsByClassName('part-footer')[0].value = '';
+                currTempl.getElementsByClassName('file-path ')[0].value = '';
+
+                currTempl.getElementsByClassName('part-delete-button')[0].addEventListener('click',
+                    this.partDelEvent.bind(this)
+                );
+            },
+
+            _regeneratePostPartIds: function(element) {
+                element.dataset.num = this.newPartCount;
+                element.id = 'post-part-id-' + this.newPartCount;
+                element.getElementsByClassName('post-number')[0].innerHTML = this.newPartCount;
+            },
+
+            generatePartDelBtnListener: function(e) {
+                if (this.newPartCount === 1) {
+                    alert('You Cant Delete Last Part');
+                } else {
+                    document.getElementById('post-part-id-' + e.target.dataset.num).remove();
+                    this.newPartCount = e.target.dataset.num;
+                    this.regenerateAfterPartDelete();
+                }
+            },
+
+            regenerateAfterPartDelete: function () {
+                var self = this,
+                    allPostParts = document.getElementsByClassName('post-part');
+
+                Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
+                    var arr = element.id.split('-'),
+                        id = arr[arr.length-1];
+                    if (id > self.newPartCount) {
+                        self._regeneratePostPartIds(element);
+                        self.newPartCount++;
+                    }
+                }));
+
+                this.newPartCount--;
+            },
+
+            addPostPartsRequest: function () {
+                this.updateAddConfirmButtons(true);
+
+                var self = this,
+                    xhr = new XMLHttpRequest(),
+                    allPostParts = document.getElementsByClassName('post-part'),
+                    formData = new FormData();
+
+                // Parts
+                Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
+                    formData.append('partHeader[]', element.getElementsByClassName('part-header')[0].value);
+
+                    var fileContainer = element.getElementsByClassName('part-image')[0].files,
+                        file = [];
+                    if (fileContainer.length) {
+                        file = element.getElementsByClassName('part-image')[0].files[0]
+                    }
+                    formData.append('partImage[' + index + ']', file);
+                    formData.append('partFooter[]', element.getElementsByClassName('part-footer')[0].value);
+                }));
+
+                xhr.open('POST', location.pathname + '/add-parts', true);
+                xhr.setRequestHeader('X-CSRF-TOKEN', getCSRFToken());
+
+                xhr.onload = function() {
+                    var response = JSON.parse(xhr.responseText);
+                    if (xhr.status === 200 && response.error !== true) {
+                        handleResponseToast(response, true, 'Added New Post Parts');
+                        self._regenerateAfterNewCreation();
+                        location.reload();
+                    }
+                    else if (xhr.status !== 200 || response.error === true) {
+                        handleResponseToast(response, false);
+                    }
+                };
+                xhr.send(formData);
+                self.updateAddConfirmButtons(false);
+            },
+
+            _regenerateAfterNewCreation: function(element) {
+                this.newPartCount = 1;
+                var allParts = document.getElementsByClassName('post-part');
+
+                Array.prototype.forEach.call(allParts, (function (element, index, array) {
+                        if (index === 0) {
+                            element.getElementsByClassName('part-header')[0].value = '';
+                            element.getElementsByClassName('part-footer')[0].value = '';
+                            element.getElementsByClassName('part-image')[0].value = '';
+                            element.getElementsByClassName('file-path')[0].value = '';
+                        } else {
+                            element.remove();
+                        }
+                    })
+                );
+            },
+
+            updateAddConfirmButtons: function (add) {
+                if (add) {
+                    this.confirmPostPartsAdditionBtn.classList.add('disabled');
+                } else {
+                    this.confirmPostPartsAdditionBtn.classList.remove('disabled');
+                }
+
             }
         };
 
@@ -178,5 +361,10 @@
 
         PostPartDetails.postPartConfirmUpdate.addEventListener('click', PostPartDetails.updatePostPartRequest.bind(PostPartDetails));
         PostPartDetails.postPartConfirmDelete.addEventListener('click', PostPartDetails.deletePostPartRequest.bind(PostPartDetails));
+        PostPartDetails.postPartDelete.addEventListener('click', PostPartDetails.generatePartDelBtnListener.bind(PostPartDetails));
+        PostPartDetails.partDeleteBtn.addEventListener('click', PostPartDetails.partDelEvent.bind(PostPartDetails));
+        PostPartDetails.postPartAddBtn.addEventListener('click', PostPartDetails.addPostPart.bind(PostPartDetails));
+        PostPartDetails.confirmPostPartsAdditionBtn.addEventListener('click', PostPartDetails.addPostPartsRequest.bind(PostPartDetails));
+        PostPartDetails.init();
     </script>
 @endsection

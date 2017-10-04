@@ -100,6 +100,48 @@ class CrudController extends PostsController
         return response(['error' => false]);
     }
 
+    /**
+     * Add New Post Parts
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function postAddNewParts_post(Request $request, $id)
+    {
+        $requestAll =  $request->all();
+
+        // Part fields Validation
+        $partValidation = Validation::createPostPartFieldsValidations($requestAll);
+        if ($partValidation['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $partValidation['type'],
+                    'response' => $partValidation['response']
+                ], 404
+            );
+        }
+
+        try {
+            $post = Post::findOrFail($id);
+            $subcategory = $post->subcategory()->first();
+            $mainPath = $subcategory->alias . '_' . $subcategory->id . DIRECTORY_SEPARATOR . $post->alias . '_' . $post->id;
+
+            // Post Parts Creation
+            self::_createPostParts($request, $post, $mainPath);
+        } catch (\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response(['error' => false]);
+    }
+
     // todo rename this method and add annotation
     protected function updatePost_get()
     {
@@ -200,7 +242,8 @@ class CrudController extends PostsController
             -> view('admin.posts.crud.update-main-details', ['response' => $response]);
     }
 
-    /** Prepare Post Main Details Info by Post Id
+    /**
+     * Prepare Post Main Details Info by Post Id
      * Make Changes After Post Main Info Changed
      * @param Request $request
      * @param $id
@@ -244,7 +287,8 @@ class CrudController extends PostsController
         return response(['error' => false]);
     }
 
-    /** Prepare Post Part Details Info by Post Id
+    /**
+     * Prepare Post Part Details Info by Post Id
      * @param Request $request
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
@@ -278,7 +322,8 @@ class CrudController extends PostsController
             -> view('admin.posts.crud.update-parts-details', ['response' => $response]);
     }
 
-    /** Update Post Part
+    /**
+     * Update Post Part
      * @param Request $request
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
@@ -548,10 +593,28 @@ class CrudController extends PostsController
     private static function _createPostParts($request, $post, $mainPath)
     {
         $createArr = [];
+        $postParts = $post->postParts()->get();
+
+        // this needs for update, it helps not overwrite existing images (image names)
+        $arrOfBusyNums = [];
+        if ($postParts->count()) {
+            foreach ($postParts as $part) {
+                $explodedOnce =  explode('_', $part->body);
+                $lastPart = end($explodedOnce);
+                $arrOfBusyNums[] = explode('.', $lastPart)[0];
+            }
+        };
+
         foreach ($request['partHeader'] as $key => $value) {
+            if (in_array($key, $arrOfBusyNums)) {
+                $bodyKey = max($arrOfBusyNums) + 1;
+                $arrOfBusyNums[] = $bodyKey;
+            } else {
+                $bodyKey = $key;
+            }
             $createArr[$key] = [
                 'head' => $request['partHeader'][$key],
-                'body' => $post->alias . '_' . $key . '.' . $request->file('partImage')[$key]->getClientOriginalExtension(),
+                'body' => $post->alias . '_' . $bodyKey . '.' . $request->file('partImage')[$key]->getClientOriginalExtension(),
                 'foot' => $request['partFooter'][$key],
             ];
         };
@@ -565,6 +628,10 @@ class CrudController extends PostsController
         return ['error' => false];
     }
 
+    /**
+     * return All Categories and Subcategories
+     * @return array
+     */
     private static function _getAllCategoriesSubcategories()
     {
         $response = [];
@@ -586,6 +653,10 @@ class CrudController extends PostsController
         return $response;
     }
 
+    /**
+     * return All Hashtags
+     * @return array
+     */
     private static function _getAllHashtags()
     {
         $response = [];

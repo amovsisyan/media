@@ -144,7 +144,6 @@
             },
 
             updateAddConfirmButtons: function(add) {
-                console.log(this.addButton);
                 if (add) {
                     this.addButton.classList.add('disabled');
                     this.confirmButton.classList.add('disabled');
@@ -165,10 +164,10 @@
                 self.defaultProperties.partTemplateCounter = id;
 
                 currElem.remove();
-                self.regenerateAfterDelete();
+                self.regenerateAfterPartDelete();
             },
 
-            regenerateAfterDelete: function() {
+            regenerateAfterPartDelete: function() {
                 var self = this,
                     allPostParts = document.querySelectorAll('.post-part');
 

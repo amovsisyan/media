@@ -13,9 +13,12 @@ Route::group(['prefix' => 'qwentin'], function () {
                     Route::group(['prefix' => '/main/{id}'], function () {
                         Route::get('/', ['uses'=>'Admin\Posts\CrudController@postMainDetails_get','as'=>'postMainDetailsGet'])->where(['id' => '^[0-9]*$']);
                         Route::post('/', ['uses'=>'Admin\Posts\CrudController@postMainDetails_post','as'=>'postMainDetailsPost'])->where(['id' => '^[0-9]*$']);
-                        Route::get('/parts', ['uses'=>'Admin\Posts\CrudController@postPartsDetails_get','as'=>'postPartsDetailsGet'])->where(['id' => '^[0-9]*$']);
-                        Route::post('/parts', ['uses'=>'Admin\Posts\CrudController@postPartsDetails_post','as'=>'postPartsDetailsPost'])->where(['id' => '^[0-9]*$']);
-                        Route::post('/parts/delete', ['uses'=>'Admin\Posts\CrudController@postPartDelete_post','as'=>'postPartDeletePost'])->where(['id' => '^[0-9]*$']);
+                        Route::group(['prefix' => 'parts'], function () {
+                            Route::get('/', ['uses'=>'Admin\Posts\CrudController@postPartsDetails_get','as'=>'postPartsDetailsGet'])->where(['id' => '^[0-9]*$']);
+                            Route::post('/', ['uses'=>'Admin\Posts\CrudController@postPartsDetails_post','as'=>'postPartsDetailsPost'])->where(['id' => '^[0-9]*$']);
+                            Route::post('/delete', ['uses'=>'Admin\Posts\CrudController@postPartDelete_post','as'=>'postPartDeletePost'])->where(['id' => '^[0-9]*$']);
+                            Route::post('/add-parts', ['uses'=>'Admin\Posts\CrudController@postAddNewParts_post','as'=>'postAddNewParts'])->where(['id' => '^[0-9]*$']);
+                        });
                     });
                     Route::get('/', ['uses'=>'Admin\Posts\CrudController@updatePost_get','as'=>'postEditGet']);
                     Route::post('/', ['uses'=>'Admin\Posts\CrudController@updatePost_post','as'=>'postEditPost']);
@@ -86,6 +89,7 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 Auth::routes();
 
 
+// todo updateAddConfirmButtons make some helper for disableing/enableing during requests in fron side
 // todo simplify Validation controller (possible need some validationAbstract controller and simplify parts which used many times)
 // todo add post parts PART
 // ToDo find more optimize datapickers for JS (change back queryselector to documentGetElementByClassName)
@@ -97,3 +101,7 @@ Auth::routes();
 // ToDO Attach/Detach Subcategory to Category
 // Todo numbers under text, which will show best text long
 // todo testIt part for all
+// todo seo optimization
+// todo user registration, password dont remember, reset, email sending
+// todo users can comment under posts
+// todo after post Part delete update number
