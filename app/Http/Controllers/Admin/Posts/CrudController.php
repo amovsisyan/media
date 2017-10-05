@@ -7,7 +7,7 @@ use App\Hashtag;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Post;
 use App\Http\Controllers\Helpers\Helpers;
-use App\Http\Controllers\Helpers\Validation;
+use App\Http\Controllers\Helpers\Validator\PostsValidation;
 use App\PostParts;
 use App\Subcategory;
 use Illuminate\Http\Request;
@@ -52,7 +52,7 @@ class CrudController extends PostsController
         $requestAll =  $request->all();
 
         // Main fields Validation
-        $mainValidation = Validation::createPostMainFieldsValidations($requestAll);
+        $mainValidation = PostsValidation::createPostMainFieldsValidations($requestAll);
         if ($mainValidation['error']) {
             return response(
                 [
@@ -64,7 +64,7 @@ class CrudController extends PostsController
         }
 
         // Part fields Validation
-        $partValidation = Validation::createPostPartFieldsValidations($requestAll);
+        $partValidation = PostsValidation::createPostPartFieldsValidations($requestAll);
         if ($partValidation['error']) {
             return response(
                 [
@@ -111,7 +111,7 @@ class CrudController extends PostsController
         $requestAll =  $request->all();
 
         // Part fields Validation
-        $partValidation = Validation::createPostPartFieldsValidations($requestAll);
+        $partValidation = PostsValidation::createPostPartFieldsValidations($requestAll);
         if ($partValidation['error']) {
             return response(
                 [
@@ -154,7 +154,7 @@ class CrudController extends PostsController
     // todo rename this method and add annotation
     protected function updatePost_post(Request $request)
     {
-        $validationResult = Validation::validateEditPostSearchValues($request->all());
+        $validationResult = PostsValidation::validateEditPostSearchValues($request->all());
         if ($validationResult['error']) {
             return response(
                 [
@@ -254,7 +254,7 @@ class CrudController extends PostsController
         $requestAll =  $request->all();
 
         // Main fields Validation
-        $mainValidation = Validation::updatePostMainFieldsValidations($requestAll);
+        $mainValidation = PostsValidation::updatePostMainFieldsValidations($requestAll);
         if ($mainValidation['error']) {
             return response(
                 [
@@ -329,7 +329,7 @@ class CrudController extends PostsController
      */
     protected function postPartsDetails_post(Request $request)
     {
-        $validationResult = Validation::validatePostPartsUpdate($request->all());
+        $validationResult = PostsValidation::validatePostPartsUpdate($request->all());
         if ($validationResult['error']) {
             return response(
                 [
@@ -393,7 +393,7 @@ class CrudController extends PostsController
      */
     protected function postPartDelete_post(Request $request)
     {
-        $validationResult = Validation::validatePostPartDelete($request->all());
+        $validationResult = PostsValidation::validatePostPartDelete($request->all());
         if ($validationResult['error']) {
             return response(
                 [
@@ -431,7 +431,7 @@ class CrudController extends PostsController
      */
     protected function postDelete_post(Request $request)
     {
-        $validationResult = Validation::validatePostDelete($request->all());
+        $validationResult = PostsValidation::validatePostDelete($request->all());
         if ($validationResult['error']) {
             return response(
                 [

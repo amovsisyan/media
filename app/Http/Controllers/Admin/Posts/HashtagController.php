@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\Posts;
 
 use App\Hashtag;
 use App\Http\Controllers\Helpers\Helpers;
-use App\Http\Controllers\Helpers\Validation;
+use App\Http\Controllers\Helpers\Validator\PostsValidation;
 use Illuminate\Http\Request;
 
 class HashtagController extends PostsController
@@ -25,7 +25,7 @@ class HashtagController extends PostsController
 
     protected function editHashtag_post(Request $request)
     {
-        $validationResult = Validation::validateEditHashtagSearchValues($request->all());
+        $validationResult = PostsValidation::validateEditHashtagSearchValues($request->all());
         if ($validationResult['error']) {
             return response(
                 [
@@ -67,7 +67,7 @@ class HashtagController extends PostsController
 
     protected function editHashtagSave_post(Request $request)
     {
-        $validationResult = Validation::validateEditHashtagSearchValuesSave($request->all());
+        $validationResult = PostsValidation::validateEditHashtagSearchValuesSave($request->all());
         if ($validationResult['error']) {
             return response(
                 [
@@ -105,7 +105,7 @@ class HashtagController extends PostsController
 
     protected function editHashtagDelete_post(Request $request)
     {
-        $validationResult = Validation::validateHashtagDelete($request->all());
+        $validationResult = PostsValidation::validateHashtagDelete($request->all());
         if ($validationResult['error']) {
             return response(
                 [
@@ -141,7 +141,7 @@ class HashtagController extends PostsController
 
     protected function createHashtag_post(Request $request)
     {
-        $validationResult = Validation::validateHashtagCreate($request->all());
+        $validationResult = PostsValidation::validateHashtagCreate($request->all());
         if ($validationResult['error']) {
             return response(
                 [

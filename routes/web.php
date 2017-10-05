@@ -89,8 +89,6 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 Auth::routes();
 
 
-// todo simplify Validation controller (possible need some validationAbstract controller and simplify parts which used many times)
-// todo add post parts PART
 // ToDo find more optimize datapickers for JS (change back queryselector to documentGetElementByClassName)
 // ToDo getHashtagList to helper
 // ToDo Archive posts

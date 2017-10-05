@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\Categories;
 use App\Category;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
-use App\Http\Controllers\Helpers\Validation;
+use App\Http\Controllers\Helpers\Validator\CategoriesValidation;
 use App\Subcategory;
 use Illuminate\Http\Request;
 
@@ -34,7 +34,7 @@ class SubcategoriesController extends MainCategoriesController
 
     protected function createSubcategory_post(Request$request)
     {
-        $validationResult = Validation::validateSubcategoryCreate($request->all());
+        $validationResult = CategoriesValidation::validateSubcategoryCreate($request->all());
         if ($validationResult['error']) {
             return response(
                 [
@@ -128,7 +128,7 @@ class SubcategoriesController extends MainCategoriesController
 
     public function editSubcategory_post(Request $request)
     {
-        $validationResult = Validation::validateEditSubcategorySearchValues($request->all());
+        $validationResult = CategoriesValidation::validateEditSubcategorySearchValues($request->all());
         if ($validationResult['error']) {
             return response(
                 [
@@ -174,7 +174,7 @@ class SubcategoriesController extends MainCategoriesController
 
     protected function editSubcategorySave_post(Request $request)
     {
-        $validationResult = Validation::validateEditSubcategorySearchValuesSave($request->all());
+        $validationResult = CategoriesValidation::validateEditSubcategorySearchValuesSave($request->all());
         if ($validationResult['error']) {
             return response(
                 [

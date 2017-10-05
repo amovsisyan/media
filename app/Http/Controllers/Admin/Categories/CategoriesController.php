@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\Categories;
 use App\Category;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
-use App\Http\Controllers\Helpers\Validation;
+use App\Http\Controllers\Helpers\Validator\CategoriesValidation;
 use Illuminate\Http\Request;
 
 class CategoriesController extends MainCategoriesController
@@ -32,7 +32,7 @@ class CategoriesController extends MainCategoriesController
 
     protected function createCategory_post(Request $request)
     {
-        $validationResult = Validation::validateCategoryCreate($request->all());
+        $validationResult = CategoriesValidation::validateCategoryCreate($request->all());
         if ($validationResult['error']) {
             return response(
                 [
@@ -118,7 +118,7 @@ class CategoriesController extends MainCategoriesController
 
     protected function editCategory_post(Request $request)
     {
-        $validationResult = Validation::validateEditCategorySearchValues($request->all());
+        $validationResult = CategoriesValidation::validateEditCategorySearchValues($request->all());
         if ($validationResult['error']) {
             return response(
                 [
@@ -160,7 +160,7 @@ class CategoriesController extends MainCategoriesController
 
     protected function editCategorySave_post(Request $request)
     {
-        $validationResult = Validation::validateEditCategorySearchValuesSave($request->all());
+        $validationResult = CategoriesValidation::validateEditCategorySearchValuesSave($request->all());
         if ($validationResult['error']) {
             return response(
                 [

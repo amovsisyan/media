@@ -1,81 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Helpers;
+namespace App\Http\Controllers\Helpers\Validator;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Validator;
 
-class Validation extends Controller
+class PostsValidation extends AbstractValidator
 {
-    public static function validateCategoryCreate($allRequest)
-    {
-        $rules = [
-            'category_name' => 'required|min:2|max:30',
-            'category_alias' => 'required|min:2|max:30',
-        ];
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return [
-            'error' => false,
-        ];
-    }
-
-    public static function validateSubcategoryCreate($allRequest)
-    {
-        $rules = [
-            'subcategory_name' => 'required|min:2|max:30',
-            'subcategory_alias' => 'required|min:2|max:30',
-            'categorySelect' => 'required|integer',
-        ];
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return [
-            'error' => false,
-        ];
-    }
-
-    public static function validateHashtagCreate($allRequest) {
-        $rules = [
-            'hashtag_name' => 'required|min:2|max:40',
-            'hashtag_alias' => 'required|min:2|max:40',
-        ];
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return [
-            'error' => false,
-        ];
-    }
-
-    public static function validateHashtagDelete($allRequest) {
-        $rules = [
-            'id' => 'required|max:10',
-        ];
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return [
-            'error' => false,
-        ];
-    }
-
     public static function createPostMainFieldsValidations($allRequest) {
         $rules = [
             'postAlias' => 'required|min:2|max:60',
@@ -220,97 +150,10 @@ class Validation extends Controller
         ];
     }
 
-    public static function validateEditCategorySearchValues($allRequest) {
-        $rules = [
-            'searchType' => 'required',
-            'searchText' => 'required',
-        ];
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return [
-            'error' => false,
-        ];
-    }
-
     public static function validateEditPostSearchValues($allRequest) {
         $rules = [
             'searchType' => 'required',
             'searchText' => 'required',
-        ];
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return [
-            'error' => false,
-        ];
-    }
-
-    public static function validatePostMainDetailsValues($allRequest) {
-        $rules = [
-            'postId' => 'required|max:10',
-            'type' => 'required|max:10',
-        ];
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return [
-            'error' => false,
-        ];
-    }
-    public static function validateEditCategorySearchValuesSave($allRequest) {
-        $rules = [
-            'id' => 'required',
-            'newAlias' => 'required|min:2|max:30',
-            'newName' => 'required|min:2|max:30',
-        ];
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return [
-            'error' => false,
-        ];
-    }
-
-    public static function validateEditSubcategorySearchValues($allRequest) {
-        $rules = [
-            'searchType' => 'required',
-            'searchText' => 'required',
-        ];
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return [
-            'error' => false,
-        ];
-    }
-
-    public static function validateEditSubcategorySearchValuesSave($allRequest) {
-        $rules = [
-            'id' => 'required',
-            'newCategoryId' => 'required|min:1|max:10',
-            'newAlias' => 'required|min:2|max:30',
-            'newName' => 'required|min:2|max:30',
         ];
 
         $validator = Validator::make($allRequest, $rules);
@@ -359,17 +202,36 @@ class Validation extends Controller
         ];
     }
 
-    private static function _generateValidationErrorResponse($validator)
-    {
-        $errors = $validator->errors();
-        $response = [];
-        foreach ($errors->all() as $message) {
-            $response[] = $message;
-        }
+    public static function validateHashtagCreate($allRequest) {
+        $rules = [
+            'hashtag_name' => 'required|min:2|max:40',
+            'hashtag_alias' => 'required|min:2|max:40',
+        ];
+
+        $validator = Validator::make($allRequest, $rules);
+
+        if ($validator->fails()) {
+            return self::_generateValidationErrorResponse($validator);
+        };
+
         return [
-            'error' => true,
-            'type' => 'Validation Error',
-            'response' => $response
+            'error' => false,
+        ];
+    }
+
+    public static function validateHashtagDelete($allRequest) {
+        $rules = [
+            'id' => 'required|max:10',
+        ];
+
+        $validator = Validator::make($allRequest, $rules);
+
+        if ($validator->fails()) {
+            return self::_generateValidationErrorResponse($validator);
+        };
+
+        return [
+            'error' => false,
         ];
     }
 }
