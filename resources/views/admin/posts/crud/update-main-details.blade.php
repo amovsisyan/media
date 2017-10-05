@@ -105,11 +105,13 @@
         });
 
         PostMainUpdate = {
+            updatePostBtn: document.getElementById('update_post'),
             postMainDetails: document.getElementById('post-main-details'),
             confirmMainUpdate: document.getElementById('confirm-main-update'),
 
             confirmMainUpdateRequest: function () {
-                this.confirmMainUpdate.classList.add('disabled');
+                var updateBtns = [this.confirmMainUpdate, this.updatePostBtn];
+                updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
                     hashtags = [],
@@ -148,7 +150,7 @@
                     }
                 };
                 xhr.send(formData);
-                this.confirmMainUpdate.classList.remove('disabled')
+                updateAddConfirmButtons(updateBtns, false);
             },
 
             getHashtagList: function(container) {

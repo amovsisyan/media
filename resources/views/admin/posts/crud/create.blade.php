@@ -92,7 +92,8 @@
             },
 
             confirmPost: function(){
-                this.updateAddConfirmButtons(true);
+                var updateBtns = [this.addButton, this.confirmButton];
+                updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
                     hashtags = [],
@@ -138,20 +139,9 @@
                     else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
-                    self.updateAddConfirmButtons(false);
+                    updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(formData);
-            },
-
-            updateAddConfirmButtons: function(add) {
-                if (add) {
-                    this.addButton.classList.add('disabled');
-                    this.confirmButton.classList.add('disabled');
-                } else {
-                    this.addButton.classList.remove('disabled');
-                    this.confirmButton.classList.remove('disabled');
-                }
-
             },
 
             confirmPartRemove: function(e) {

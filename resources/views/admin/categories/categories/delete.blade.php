@@ -60,8 +60,8 @@
             },
 
             confirmDeleteCategory: function() {
-                this.deleteBtn.classList.add('disabled');
-                this.confirmButton.classList.add('disabled');
+                var updateBtns = [this.deleteBtn, this.confirmButton];
+                updateAddConfirmButtons(updateBtns, true);
                 var self = this,
                     prepData = [],
                     list = this.getDeleteList(),
@@ -95,14 +95,9 @@
                     else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
-                    self.updateButtonsAfterConfirm();
+                    updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(encodeURI(data));
-            },
-
-            updateButtonsAfterConfirm: function() {
-                this.deleteBtn.classList.remove('disabled');
-                this.confirmButton.classList.remove('disabled');
             },
 
             getDeleteList: function() {

@@ -79,8 +79,8 @@
             <div class="row right-align m_t_50 post-create-btns">
                 <a class="waves-effect waves-light btn">Finish & Test</a>
                 <!-- Modal -->
-                <a id='add_post' class="waves-effect waves-light btn modal-trigger" href="#modal_add_post">Finish & Add</a>
-                <div id="modal_add_post" class="modal">
+                <a id='add-parts' class="waves-effect waves-light btn modal-trigger" href="#modal-add-parts">Finish & Add</a>
+                <div id="modal-add-parts" class="modal">
                     <div class="modal-content left-align">
                         <h4>Are You Sure You Want Add This(these) Post Part(s)?</h4>
                         <p></p>
@@ -136,6 +136,8 @@
         $('.modal').modal();
         PostPartDetails = {
             newPartCount: 1,
+            addPartsBtn:document.getElementById('add-parts'),
+
             partSaveBtns:document.getElementsByClassName('part-save-btn'),
             postPartConfirmUpdate:document.getElementById('post-part-confirm-update'),
             postPartDelete:document.getElementById('post-part-delete'),
@@ -169,7 +171,9 @@
             },
 
             updatePostPartRequest: function(e) {
-                this.postPartConfirmUpdate.classList.add('disabled');
+                var updateBtns = [this.postPartConfirmUpdate];
+                updateAddConfirmButtons(updateBtns, true);
+
                 var self = this,
                     id = e.target.dataset.id,
                     el = document.getElementById('part-num-' + id),
@@ -202,13 +206,15 @@
                     } else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
-                    self.postPartConfirmUpdate.classList.remove('disabled');
+                    updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(data);
             },
 
             deletePostPartRequest: function (e) {
-                this.postPartConfirmDelete.classList.add('disabled');
+                var updateBtns = [this.postPartConfirmDelete];
+                updateAddConfirmButtons(updateBtns, true);
+
                 var self = this,
                     id = e.target.dataset.id,
                     data = encodeURI('partId=' + id),
@@ -227,7 +233,7 @@
                     }
                 };
                 xhr.send(data);
-                this.postPartConfirmDelete.classList.remove('disabled');
+                updateAddConfirmButtons(updateBtns, false);
             },
 
             partDelEvent: function(e) {
@@ -287,7 +293,8 @@
             },
 
             addPostPartsRequest: function () {
-                this.updateAddConfirmButtons(true);
+                var updateBtns = [this.confirmPostPartsAdditionBtn, this.addPartsBtn];
+                updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
                     xhr = new XMLHttpRequest(),
@@ -322,7 +329,7 @@
                     }
                 };
                 xhr.send(formData);
-                self.updateAddConfirmButtons(false);
+                updateAddConfirmButtons(updateBtns, false);
             },
 
             _regenerateAfterNewCreation: function(element) {
@@ -340,15 +347,6 @@
                         }
                     })
                 );
-            },
-
-            updateAddConfirmButtons: function (add) {
-                if (add) {
-                    this.confirmPostPartsAdditionBtn.classList.add('disabled');
-                } else {
-                    this.confirmPostPartsAdditionBtn.classList.remove('disabled');
-                }
-
             }
         };
 

@@ -66,8 +66,8 @@
             modalAddSubcategory: document.getElementById('modal_add_subcategory'),
 
             confirmCategory: function(){
-                this.addButton.classList.add('disabled');
-                this.confirmButton.classList.add('disabled');
+                var updateBtns = [this.addButton, this.confirmButton];
+                updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
                     data = 'subcategory_name=' + this.subcategoryName.value
@@ -84,12 +84,11 @@
                         handleResponseToast(response, true, 'Added New Subcategory');
                         self.subcategoryName.value = '';
                         self.subcategoryAlias.value = '';
-                        self.updateAddConfirmButtons();
                     }
                     else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
-                        self.updateAddConfirmButtons();
                     }
+                    updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(encodeURI(data));
             },
@@ -101,11 +100,6 @@
                             '<p>Name: ' + this.subcategoryName.value + '</p>' +
                             '<p>Alias: ' + this.subcategoryAlias.value + '</p>';
                 paragraph.innerHTML = _html;
-            },
-
-            updateAddConfirmButtons: function() {
-                this.addButton.classList.remove('disabled');
-                this.confirmButton.classList.remove('disabled');
             }
         };
         SubcategoryCreate.addButton.addEventListener('click', SubcategoryCreate.createModalContent.bind(SubcategoryCreate));

@@ -89,7 +89,6 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 Auth::routes();
 
 
-// todo updateAddConfirmButtons make some helper for disableing/enableing during requests in fron side
 // todo simplify Validation controller (possible need some validationAbstract controller and simplify parts which used many times)
 // todo add post parts PART
 // ToDo find more optimize datapickers for JS (change back queryselector to documentGetElementByClassName)

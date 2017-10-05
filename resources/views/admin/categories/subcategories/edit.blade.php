@@ -58,7 +58,8 @@
             changesConfirmModal: document.getElementById('changesConfirmModal'),
 
             searchSubcategoryRequest: function(){
-                this.searchButton.classList.add('disabled');
+                var updateBtns = [this.searchButton];
+                updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
                     data = 'searchType=' + this.searchTypeSelect.value
@@ -76,7 +77,7 @@
                     } else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
-                    self.searchButton.classList.remove('disabled');
+                    updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(encodeURI(data));
             },
@@ -132,7 +133,8 @@
             },
 
             createModelSearchConfirm: function(e) {
-                this.classList.add('disabled');
+                var updateBtns = [this];
+                updateAddConfirmButtons(updateBtns, true);
                 var self = SubcategoryEdit,
                     elThis = this,
                     currElem = getClosest(e.target, '.modal'),
@@ -152,7 +154,7 @@
                     } else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
-                    elThis.classList.remove('disabled');
+                    updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(encodeURI(data));
             }

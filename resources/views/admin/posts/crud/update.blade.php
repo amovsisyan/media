@@ -63,7 +63,8 @@
             partNoResult: document.getElementById('part-no-result'),
 
             searchPostRequest: function(){
-                this.searchButton.classList.add('disabled');
+                var updateBtns = [this.searchButton];
+                updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
                     data = 'searchType=' + this.searchTypeSelect.value
@@ -80,7 +81,7 @@
                     } else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
-                    self.searchButton.classList.remove('disabled');
+                    updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(encodeURI(data));
             },
@@ -119,7 +120,8 @@
             },
 
             postConfirmDeleteRequest: function(e) {
-                this.postConfirmDelete.classList.add('disabled');
+                var updateBtns = [this.postConfirmDelete];
+                updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
                     id = e.target.dataset.id,
@@ -139,7 +141,7 @@
                     }
                 };
                 xhr.send(encodeURI(data));
-                this.postConfirmDelete.classList.remove('disabled');
+                updateAddConfirmButtons(updateBtns, false);
             }
         };
         PostEdit.searchButton.addEventListener('click', PostEdit.searchPostRequest.bind(PostEdit));

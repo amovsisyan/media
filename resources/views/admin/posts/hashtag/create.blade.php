@@ -52,8 +52,8 @@
             modalAddHashtag: document.getElementById('modal_add_hashtag'),
 
             confirmHashtag: function(){
-                this.addButton.classList.add('disabled');
-                this.confirmButton.classList.add('disabled');
+                var updateBtns = [this.addButton, this.confirmButton];
+                updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
                     data = 'hashtag_name=' + this.hashtagName.value + '&hashtag_alias=' + this.hashtagAlias.value,
@@ -68,12 +68,11 @@
                         handleResponseToast(response, true, 'Added New Hashtag');
                         self.hashtagName.value = '';
                         self.hashtagAlias.value = '';
-                        self.updateAddConfirmButtons();
                     }
                     else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
-                        self.updateAddConfirmButtons();
                     }
+                    updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(encodeURI(data));
             },
@@ -83,11 +82,6 @@
                     paragraph = content.querySelector('p'),
                     _html = '<p>Name: ' + this.hashtagName.value + '</p><p>Alias: ' + this.hashtagAlias.value + '</p>';
                 paragraph.innerHTML = _html;
-            },
-
-            updateAddConfirmButtons: function() {
-                this.addButton.classList.remove('disabled');
-                this.confirmButton.classList.remove('disabled');
             }
         };
         HashtagCreate.confirmButton.addEventListener('click', HashtagCreate.confirmHashtag.bind(HashtagCreate));
