@@ -20,7 +20,7 @@ abstract class AbstractValidator extends Controller
         ];
     }
 
-    protected static function _generateValidationOKResponse()
+    protected static function _generateValidationSimpleOKResponse()
     {
         return [
             'error' => false,

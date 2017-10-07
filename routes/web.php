@@ -21,8 +21,15 @@ Route::group(['prefix' => 'qwentin'], function () {
                         });
                     });
                     Route::get('/', ['uses'=>'Admin\Posts\CrudController@updatePost_get','as'=>'postEditGet']);
+                                                                            // this method also calls below
                     Route::post('/', ['uses'=>'Admin\Posts\CrudController@updatePost_post','as'=>'postEditPost']);
                     Route::post('/delete', ['uses'=>'Admin\Posts\CrudController@postDelete_post','as'=>'postDelete']);
+                });
+                Route::group(['prefix' => 'attach_post_part'], function () {
+                    Route::get('/{id}', ['uses'=>'Admin\Posts\CrudController@postPartsAttach_get','as'=>'postPartsAttachGet'])->where(['id' => '^[0-9]*$']);
+                                                                            // this method also calls above
+                    Route::post('/{id}', ['uses'=>'Admin\Posts\CrudController@updatePost_post','as'=>'postPartsAttachGetPostsPost'])->where(['id' => '^[0-9]*$']);
+                    Route::post('/{id}/save', ['uses'=>'Admin\Posts\CrudController@postPartsAttachSave_post','as'=>'postPartsAttachSavePost'])->where(['id' => '^[0-9]*$']);
                 });
             });
             Route::group(['prefix' => 'hashtag'], function () {
@@ -88,13 +95,8 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 
 Auth::routes();
 
-// ToDo getHashtagList to helper
-// ToDo Archive posts
-// ToDO Attach/Detach Hashtag
-// ToDO Attach/Detach Post to Subcategory
-// ToDO Attach/Detach PostPart to Post
-// ToDO Attach/Detach Subcategory to Category
 // Todo numbers under text, which will show best text long
+// todo make some standard helperresponse or some responseClass with some kind of specific/standard responses for catch and validation error
 // todo testIt part for all
 // todo seo optimization
 // todo user registration, password dont remember, reset, email sending
@@ -102,3 +104,4 @@ Auth::routes();
 // todo after post Part delete update number
 // todo optimize database
 // todo read yahoo front optimization and make them
+// ToDo Archive posts

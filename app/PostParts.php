@@ -10,7 +10,7 @@ class PostParts extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'head', 'body', 'foot'
+        'head', 'body', 'foot', 'post_id'
     ];
 
     public function post(){

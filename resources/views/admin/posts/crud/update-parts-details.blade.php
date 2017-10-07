@@ -47,6 +47,7 @@
                                             <ul>
                                                 <li><a class="btn-floating modal-trigger part-save-btn" href="#updatePostPartModal">Save</a></li>
                                                 <li><a class="btn-floating red modal-trigger part-delete-btn" href="#removePostPartModal">Del</a></li>
+                                                <li><a class="btn-floating orange" href="/qwentin/posts/crud/attach_post_part/{{$postParts['id']}}" target="_blank">Attach</a></li>
                                             </ul>
                                         </div>
                                     </div>

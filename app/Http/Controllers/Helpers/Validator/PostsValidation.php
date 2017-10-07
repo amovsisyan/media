@@ -22,9 +22,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function createPostPartFieldsValidations($allRequest) {
@@ -51,9 +49,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function updatePostMainFieldsValidations($allRequest) {
@@ -71,9 +67,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function updatePostPartFieldsValidations($allRequest) {
@@ -95,9 +89,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validatePostPartsUpdate($allRequest) {
@@ -113,9 +105,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validatePostPartDelete($allRequest) {
@@ -129,9 +119,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validatePostDelete($allRequest) {
@@ -145,9 +133,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validateEditPostSearchValues($allRequest) {
@@ -162,9 +148,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validateEditHashtagSearchValues($allRequest) {
@@ -179,9 +163,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validateEditHashtagSearchValuesSave($allRequest) {
@@ -197,9 +179,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validateHashtagCreate($allRequest) {
@@ -214,9 +194,7 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validateHashtagDelete($allRequest) {
@@ -230,8 +208,20 @@ class PostsValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
+        return self::_generateValidationSimpleOKResponse();
+    }
+
+    public static function postPartsAttachSave($allRequest) {
+        $rules = [
+            'newPostId' => 'required|max:10',
         ];
+
+        $validator = Validator::make($allRequest, $rules);
+
+        if ($validator->fails()) {
+            return self::_generateValidationErrorResponse($validator);
+        };
+
+        return self::_generateValidationSimpleOKResponse();
     }
 }

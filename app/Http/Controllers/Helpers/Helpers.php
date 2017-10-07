@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminController;
 class Helpers extends Controller
 {
     /**
+     * todo do we need this if we explode in front side
      * Explodes Request Alias, Get Last part, which is ID, and return POST by ID
      * @param $postAlias
      * @return null
@@ -36,6 +37,7 @@ class Helpers extends Controller
     }
 
     /**
+     * todo do we need this if we explode in front side
      * Just get string with '_', explode and return last
      * @param $string
      * @return mixed

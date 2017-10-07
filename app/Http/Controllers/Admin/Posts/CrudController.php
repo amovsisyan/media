@@ -152,6 +152,8 @@ class CrudController extends PostsController
     }
 
     // todo rename this method and add annotation
+    // IMPORTANT
+    // This method calls in two places, see web.php
     protected function updatePost_post(Request $request)
     {
         $validationResult = PostsValidation::validateEditPostSearchValues($request->all());
@@ -445,6 +447,79 @@ class CrudController extends PostsController
             $post = Post::findOrFail($request->postId);
             DirectoryEditor::removePostDir($post);
             $post->delete();
+        } catch (\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response(
+            [
+                'error' => false,
+            ]
+        );
+    }
+
+    /**
+     * Get Post Part by it's ID
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function postPartsAttach_get(Request $request, $id)
+    {
+        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        try {
+            $postPart = PostParts::where('id', $id)->first();
+            $response['postpart'] = [
+                'head' => $postPart->head,
+            ];
+        } catch(\Exception $e) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => 'Some Other Error',
+                    'response' => [$e->getMessage()]
+                ], 404
+            );
+        }
+
+        return response()
+            -> view('admin.posts.crud.attach-part', ['response' => $response]);
+    }
+
+    /**
+     * Proceed post part attachment to new post
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function postPartsAttachSave_post(Request $request, $id)
+    {
+        $validationResult = PostsValidation::postPartsAttachSave($request->all());
+        if ($validationResult['error']) {
+            return response(
+                [
+                    'error' => true,
+                    'type' => $validationResult['type'],
+                    'response' => $validationResult['response']
+                ], 404
+            );
+        }
+        try {
+            $postPart = PostParts::where('id', $id)->first();
+            $oldPost = clone $postPart->post()->first();
+            $newPost = Post::where('id', $request->newPostId)->first();
+            $dirEdited = DirectoryEditor::postPartAttachmentProcess($oldPost, $newPost, $postPart);
+            $updateArr = [
+                'post_id' => $request->newPostId,
+                'body' => $dirEdited['newName']
+            ];
+            $postPart->update($updateArr);
         } catch (\Exception $e) {
             return response(
                 [

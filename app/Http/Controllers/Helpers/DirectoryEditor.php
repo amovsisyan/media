@@ -236,4 +236,55 @@ class DirectoryEditor extends Controller
             'toAddDir' => $toAddDir
         ];
     }
+
+    /**
+     * Edit directories after post part Attachment
+     * @param $oldPost
+     * @param $newPost
+     * @param $postPart
+     * @return array
+     */
+    public static function postPartAttachmentProcess($oldPost, $newPost, $postPart)
+    {
+        try {
+            $postParts = $newPost->postParts()->get();
+
+            // this needs for update, it helps not overwrite existing images (image names)
+            $arrOfBusyNums = [];
+            if ($postParts->count()) {
+                foreach ($postParts as $part) {
+                    $explodedOnce =  explode('_', $part->body);
+                    $lastPart = end($explodedOnce);
+                    $arrOfBusyNums[] = explode('.', $lastPart)[0];
+                }
+            };
+            $bodyKey = max($arrOfBusyNums) + 1;
+            $partNameExplod = explode('.', $postPart->body);
+            $extension = end($partNameExplod);
+            $newName = $newPost->alias . '_' . $bodyKey . '.' . $extension;
+
+            $subForOld = $oldPost->subcategory()->first();
+            $subForNew = $newPost->subcategory()->first();
+            $toMainDir = self::IMGCATPATH . DIRECTORY_SEPARATOR;
+            $fromAddDir =  $subForOld->alias . '_' . $subForOld->id .  DIRECTORY_SEPARATOR .
+                $oldPost->alias . '_' . $oldPost->id . DIRECTORY_SEPARATOR .
+                self::PARTS . DIRECTORY_SEPARATOR . $postPart->body;
+            $toAddDir = $subForNew->alias . '_' . $subForNew->id .  DIRECTORY_SEPARATOR .
+                $newPost->alias . '_' . $newPost->id . DIRECTORY_SEPARATOR .
+                self::PARTS . DIRECTORY_SEPARATOR . $newName;
+            $partOldFullDir = $toMainDir . $fromAddDir;
+            $partNewFullDir = $toMainDir . $toAddDir;
+            $error = !File::move($partOldFullDir, $partNewFullDir);
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+                'toAddDir' => ''
+            ];
+        }
+
+        return [
+            'error' => $error,
+            'newName' => $newName
+        ];
+    }
 }

@@ -18,9 +18,7 @@ class CategoriesValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validateEditCategorySearchValues($allRequest) {
@@ -35,9 +33,7 @@ class CategoriesValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validateEditCategorySearchValuesSave($allRequest) {
@@ -53,9 +49,7 @@ class CategoriesValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validateSubcategoryCreate($allRequest)
@@ -71,9 +65,7 @@ class CategoriesValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validateEditSubcategorySearchValues($allRequest) {
@@ -88,9 +80,7 @@ class CategoriesValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 
     public static function validateEditSubcategorySearchValuesSave($allRequest) {
@@ -107,8 +97,6 @@ class CategoriesValidation extends AbstractValidator
             return self::_generateValidationErrorResponse($validator);
         };
 
-        return [
-            'error' => false,
-        ];
+        return self::_generateValidationSimpleOKResponse();
     }
 }
