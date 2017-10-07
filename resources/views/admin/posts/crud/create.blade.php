@@ -58,7 +58,7 @@
         PostCreate = {
             defaultProperties: {
                 partTemplateCounter: 0,
-                basicPartTemplate: document.querySelector('.post-part')
+                basicPartTemplate: document.getElementsByClassName('post-part')[0]
             },
             addButton: document.getElementById('add_post'),
             confirmButton: document.getElementById('confirm_post'),
@@ -79,14 +79,14 @@
 
             renderPartTemplate: function() {
                 var num = this.defaultProperties.partTemplateCounter++,
-                    currTempl = document.querySelectorAll('.post-part')[num];
+                    currTempl = document.getElementsByClassName('post-part')[num];
                 this._regeneratePostPartIds(currTempl);
 
-                currTempl.querySelector('.part-header').value = '';
-                currTempl.querySelector('.part-footer').value = '';
-                currTempl.querySelector('.file-path ').value = '';
+                currTempl.getElementsByClassName('part-header')[0].value = '';
+                currTempl.getElementsByClassName('part-footer')[0].value = '';
+                currTempl.getElementsByClassName('file-path ')[0].value = '';
 
-                currTempl.querySelector('.part-delete-button').addEventListener('click',
+                currTempl.getElementsByClassName('part-delete-button')[0].addEventListener('click',
                     this.createModelPartDelete
                 );
             },
@@ -98,11 +98,11 @@
                 var self = this,
                     hashtags = [],
                     xhr = new XMLHttpRequest(),
-                    allPostParts = document.querySelectorAll('.post-part'),
+                    allPostParts = document.getElementsByClassName('post-part'),
                     formData = new FormData();
 
                 Array.prototype.forEach.call(this.getHashtagList(), (function (element, index, array) {
-                    var elementContent = element.querySelector('span').textContent;
+                    var elementContent = element.getElementsByTagName('span')[0].textContent;
                     hashtags.push(explodeGetLast(elementContent, '_'))
                 }));
 
@@ -116,15 +116,15 @@
 
                 // Parts
                 Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
-                    formData.append('partHeader[]', element.querySelector('.part-header').value);
+                    formData.append('partHeader[]', element.getElementsByClassName('part-header')[0].value);
 
-                    var fileContainer = element.querySelector('.part-image').files,
+                    var fileContainer = element.getElementsByClassName('part-image')[0].files,
                         file = [];
                     if (fileContainer.length) {
-                        file = element.querySelector('.part-image').files[0]
+                        file = element.getElementsByClassName('part-image')[0].files[0]
                     }
                     formData.append('partImage[' + index + ']', file);
-                    formData.append('partFooter[]', element.querySelector('.part-footer').value);
+                    formData.append('partFooter[]', element.getElementsByClassName('part-footer')[0].value);
                 }));
 
                 xhr.open('POST', location.pathname, true);
@@ -146,7 +146,7 @@
 
             confirmPartRemove: function(e) {
                 var self = PostCreate,
-                    id = self.deletePostPartModal.querySelector('.confirm-delete').getAttribute('data-id'),
+                    id = self.deletePostPartModal.getElementsByClassName('confirm-delete')[0].getAttribute('data-id'),
                     currElem = document.getElementById('post-id-'+id);
 
 
@@ -159,7 +159,7 @@
 
             regenerateAfterPartDelete: function() {
                 var self = this,
-                    allPostParts = document.querySelectorAll('.post-part');
+                    allPostParts = document.getElementsByClassName('post-part');
 
                 Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
                     var arr = element.id.split('-'),
@@ -176,19 +176,19 @@
             _regeneratePostPartIds: function(element) {
                 element.dataset.id = this.defaultProperties.partTemplateCounter;
                 element.id = 'post-id-' + this.defaultProperties.partTemplateCounter;
-                element.querySelector('.post-number').innerHTML = this.defaultProperties.partTemplateCounter;
+                element.getElementsByClassName('post-number')[0].innerHTML = this.defaultProperties.partTemplateCounter;
             },
 
             _regenerateAfterNewCreation: function(element) {
                 this.defaultProperties.partTemplateCounter = 1;
-                var allParts = document.querySelectorAll('.post-part');
+                var allParts = document.getElementsByClassName('post-part');
 
                 Array.prototype.forEach.call(allParts, (function (element, index, array) {
                         if (index === 0) {
-                            element.querySelector('.part-header').value = '';
-                            element.querySelector('.part-footer').value = '';
-                            element.querySelector('.part-image').value = '';
-                            element.querySelector('.file-path').value = '';
+                            element.getElementsByClassName('part-header')[0].value = '';
+                            element.getElementsByClassName('part-footer')[0].value = '';
+                            element.getElementsByClassName('part-image')[0].value = '';
+                            element.getElementsByClassName('file-path')[0].value = '';
                         } else {
                             element.remove();
                         }
@@ -198,35 +198,35 @@
                 this.postMainHeader.value = '';
                 this.postMainText.value = '';
                 this.postMainImage.value = '';
-                document.getElementById('post-create-main').querySelector('.file-path').value = '';
+                document.getElementById('post-create-main').getElementsByClassName('file-path')[0].value = '';
             },
 
             createModelPartDelete: function(e) {
                 var self = PostCreate,
                     currElem = getClosest(e.target, '.post-part'),
-                    paragraph = self.deletePostPartModal.querySelector('p'),
-                    postParts = document.querySelectorAll('.post-part'),
+                    paragraph = self.deletePostPartModal.getElementsByTagName('p')[0],
+                    postParts = document.getElementsByClassName('post-part'),
                     _html = '';
 
                 if (postParts.length == 1) {
                     _html = "<h4 class='red-text'>Can't Delete Last Part</h4>"
                 } else {
-                    _html = '<p>Post N_' + currElem.querySelector('.post-number').innerHTML + '</p>' +
-                        '<p>Post Header: ' + currElem.querySelector('.part-header').value + '</p>' +
-                        '<p>Post Footer: ' + currElem.querySelector('.part-footer').value + '</p>';
+                    _html = '<p>Post N_' + currElem.getElementsByClassName('post-number')[0].innerHTML + '</p>' +
+                        '<p>Post Header: ' + currElem.getElementsByClassName('part-header')[0].value + '</p>' +
+                        '<p>Post Footer: ' + currElem.getElementsByClassName('part-footer')[0].value + '</p>';
                 }
 
                 paragraph.innerHTML = _html;
-                self.deletePostPartModal.querySelector('.confirm-delete').dataset.id = currElem.getAttribute('data-id');
+                self.deletePostPartModal.getElementsByClassName('confirm-delete')[0].dataset.id = currElem.getAttribute('data-id');
 
-                self.deletePostPartModal.querySelector('.confirm-delete').addEventListener('click',
+                self.deletePostPartModal.getElementsByClassName('confirm-delete')[0].addEventListener('click',
                     self.confirmPartRemove
                 );
             },
 
             createModalContent: function() {
-                var content = this.modalAddPost.querySelector('.modal-content'),
-                    paragraph = content.querySelector('p'),
+                var content = this.modalAddPost.getElementsByClassName('modal-content')[0],
+                    paragraph = content.getElementsByTagName('p')[0],
                     _html = '<p>Header: ' + this.postMainHeader.value + '</p>' +
                         '<p>Main Text: ' + this.postMainText.value + '</p>' +
                         '<p>Category: ' + this.postSubcategory.options[this.postSubcategory.selectedIndex].text + '</p>';
@@ -241,7 +241,9 @@
             },
 
             getHashtagList: function() {
-                var hashtags = getClosest(this.hashtagSelect, '.select-wrapper').querySelector('.multiple-select-dropdown').querySelectorAll('.active');
+                var hashtags = getClosest(this.hashtagSelect, '.select-wrapper')
+                    .getElementsByClassName('multiple-select-dropdown')[0]
+                    .getElementsByClassName('active');
                 return hashtags ? hashtags : [];
             }
         };

@@ -64,8 +64,8 @@
             searchButton: document.getElementById('search-button'),
             searchTypeSelect: document.getElementById('search-type'),
             searchText: document.getElementById('search-text'),
-            partTemplate: document.querySelector('.part-template'),
-            partNoResult: document.querySelector('.part-no-result'),
+            partTemplate: document.getElementsByClassName('part-template')[0],
+            partNoResult: document.getElementsByClassName('part-no-result')[0],
             searchResultContainer: document.getElementById('search-result'),
             saveConfirmModal: document.getElementById('saveConfirmModal'),
             deleteConfirmModal: document.getElementById('deleteConfirmModal'),
@@ -101,17 +101,17 @@
                     Array.prototype.forEach.call(response.response.hashtags, (function (element, index, array) {
                         var clone = self.partTemplate.cloneNode(true);
 
-                        clone.querySelector('.part-number').innerHTML = ++index;
-                        clone.querySelector('.part-alias').value = element.alias;
-                        clone.querySelector('.part-name').value = element.name;
+                        clone.getElementsByClassName('part-number')[0].innerHTML = ++index;
+                        clone.getElementsByClassName('part-alias')[0].value = element.alias;
+                        clone.getElementsByClassName('part-name')[0].value = element.name;
                         clone.id = 'search-part-id-' + element.id;
                         clone.dataset.id = element.id;
                         self.searchResultContainer.appendChild(clone);
                         clone.classList.remove('hide');
-                        clone.querySelector('.save-confirm-button').addEventListener('click',
+                        clone.getElementsByClassName('save-confirm-button')[0].addEventListener('click',
                             self.createSaveModelPartConfirm
                         );
-                        clone.querySelector('.delete-confirm-button').addEventListener('click',
+                        clone.getElementsByClassName('delete-confirm-button')[0].addEventListener('click',
                             self.createDeleteModelPartConfirm
                         );
                     }));
@@ -124,12 +124,12 @@
             createSaveModelPartConfirm: function(e) {
                 var self = HashtagEdit,
                     currElem = getClosest(e.target, '.part-template'),
-                    paragraph = self.saveConfirmModal.querySelector('p'),
+                    paragraph = self.saveConfirmModal.getElementsByTagName('p')[0],
                     _html = '<p>ID: <span class="red-text part-id">' + currElem.dataset.id + '</span></p>' +
-                        '<p>New Hashtag Alias: <span class="red-text part-alias">' + currElem.querySelector('.part-alias').value + '</span></p>' +
-                        '<p>New Hashtag Name: <span class="red-text part-name">' + currElem.querySelector('.part-name').value + '</span></p>';
+                        '<p>New Hashtag Alias: <span class="red-text part-alias">' + currElem.getElementsByClassName('part-alias')[0].value + '</span></p>' +
+                        '<p>New Hashtag Name: <span class="red-text part-name">' + currElem.getElementsByClassName('part-name')[0].value + '</span></p>';
                 paragraph.innerHTML = _html;
-                self.saveConfirmModal.querySelector('.confirm-changes').addEventListener('click',
+                self.saveConfirmModal.getElementsByClassName('confirm-changes')[0].addEventListener('click',
                     self.createSaveModelSearchConfirm
                 );
             },
@@ -137,12 +137,12 @@
             createDeleteModelPartConfirm: function(e) {
                 var self = HashtagEdit,
                     currElem = getClosest(e.target, '.part-template'),
-                    paragraph = self.deleteConfirmModal.querySelector('p'),
+                    paragraph = self.deleteConfirmModal.getElementsByTagName('p')[0],
                     _html = '<p>ID: <span class="red-text part-id">' + currElem.dataset.id + '</span></p>' +
-                        '<p>Hashtag Alias: <span class="red-text part-alias">' + currElem.querySelector('.part-alias').value + '</span></p>' +
-                        '<p>Hashtag Name: <span class="red-text part-name">' + currElem.querySelector('.part-name').value + '</span></p>';
+                        '<p>Hashtag Alias: <span class="red-text part-alias">' + currElem.getElementsByClassName('part-alias')[0].value + '</span></p>' +
+                        '<p>Hashtag Name: <span class="red-text part-name">' + currElem.getElementsByClassName('part-name')[0].value + '</span></p>';
                 paragraph.innerHTML = _html;
-                self.deleteConfirmModal.querySelector('.confirm-delete').addEventListener('click',
+                self.deleteConfirmModal.getElementsByClassName('confirm-delete')[0].addEventListener('click',
                     self.createDeleteModelSearchConfirm
                 );
             },
@@ -153,9 +153,9 @@
                 var self = HashtagEdit,
                     elThis = this,
                     currElem = getClosest(e.target, '.modal'),
-                    data = 'id=' + currElem.querySelector('.part-id').innerHTML
-                        + '&newAlias=' + currElem.querySelector('.part-alias').innerHTML
-                        + '&newName=' + currElem.querySelector('.part-name').innerHTML,
+                    data = 'id=' + currElem.getElementsByClassName('part-id')[0].innerHTML
+                        + '&newAlias=' + currElem.getElementsByClassName('part-alias')[0].innerHTML
+                        + '&newName=' + currElem.getElementsByClassName('part-name')[0].innerHTML,
                     xhr = new XMLHttpRequest();
 
                 xhr.open('POST', location.pathname + '/save');
@@ -179,7 +179,7 @@
                 var self = HashtagEdit,
                     elThis = this,
                     currElem = getClosest(e.target, '.modal'),
-                    id = currElem.querySelector('.part-id').innerHTML,
+                    id = currElem.getElementsByClassName('part-id')[0].innerHTML,
                     data = 'id=' + id,
                     xhr = new XMLHttpRequest();
 

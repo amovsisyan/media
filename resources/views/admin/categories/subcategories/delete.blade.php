@@ -49,7 +49,7 @@
             subcategorySelect: document.getElementById('subcategory_select'),
 
             createModalContent: function() {
-                var paragraph = this.modalDeleteSubcategory.querySelector('p'),
+                var paragraph = this.modalDeleteSubcategory.getElementsByTagName('p')[0],
                     selectedOption = this.subcategorySelect.options[this.subcategorySelect.selectedIndex],
                     _html = '<p>SubcategoryId: ' + selectedOption.value + '</p>' +
                         '<p>SubcategoryName: ' + selectedOption.innerHTML + '</p>';
@@ -76,7 +76,7 @@
                     if (xhr.status === 200 && response.error !== true) {
                         handleResponseToast(response, true, 'Deleted Subcategory');
                         if (response.ids && response.ids.length) {
-                            var options = self.subcategorySelect.querySelectorAll('option');
+                            var options = self.subcategorySelect.getElementsByTagName('option');
                             response.ids.forEach(function (element, index, array) {
                                 Array.prototype.forEach.call(options,(function (el, i, arr){
                                     if(el.value === element) {

@@ -78,8 +78,8 @@
             },
 
             createModalContent: function() {
-                var content = this.modalAddHashtag.querySelector('.modal-content'),
-                    paragraph = content.querySelector('p'),
+                var content = this.modalAddHashtag.getElementsByClassName('modal-content')[0],
+                    paragraph = content.getElementsByTagName('p')[0],
                     _html = '<p>Name: ' + this.hashtagName.value + '</p><p>Alias: ' + this.hashtagAlias.value + '</p>';
                 paragraph.innerHTML = _html;
             }

@@ -70,8 +70,7 @@
                         handleResponseToast(response, true, 'Added New Category');
                         self.categoryName.value = '';
                         self.categoryAlias.value = '';
-                    }
-                    else if (xhr.status !== 200 || response.error === true) {
+                    } else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
                     updateAddConfirmButtons(updateBtns, false);
@@ -80,8 +79,8 @@
             },
 
             createModalContent: function() {
-                var content = this.modalAddCategory.querySelector('.modal-content'),
-                    paragraph = content.querySelector('p'),
+                var content = this.modalAddCategory.getElementsByClassName('modal-content')[0],
+                    paragraph = content.getElementsByTagName('p')[0],
                     _html = '<p>Name: ' + this.categoryName.value + '</p><p>Alias: ' + this.categoryAlias.value + '</p>';
                 paragraph.innerHTML = _html;
             }

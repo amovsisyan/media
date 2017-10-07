@@ -94,8 +94,8 @@
             },
 
             createModalContent: function() {
-                var content = this.modalAddSubcategory.querySelector('.modal-content'),
-                    paragraph = content.querySelector('p'),
+                var content = this.modalAddSubcategory.getElementsByClassName('modal-content')[0],
+                    paragraph = content.getElementsByTagName('p')[0],
                     _html = '<p>For Category: ' + this.categorySelect.options[this.categorySelect.selectedIndex].text + '</p>'+
                             '<p>Name: ' + this.subcategoryName.value + '</p>' +
                             '<p>Alias: ' + this.subcategoryAlias.value + '</p>';

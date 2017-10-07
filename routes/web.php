@@ -88,8 +88,6 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 
 Auth::routes();
 
-
-// ToDo find more optimize datapickers for JS (change back queryselector to documentGetElementByClassName)
 // ToDo getHashtagList to helper
 // ToDo Archive posts
 // ToDO Attach/Detach Hashtag
@@ -102,3 +100,5 @@ Auth::routes();
 // todo user registration, password dont remember, reset, email sending
 // todo users can comment under posts
 // todo after post Part delete update number
+// todo optimize database
+// todo read yahoo front optimization and make them

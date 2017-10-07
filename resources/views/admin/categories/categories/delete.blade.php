@@ -48,12 +48,12 @@
             categorySelect: document.getElementById('category_select'),
 
             createModalContent: function() {
-                var content = this.modalDeleteCategory.querySelector('.modal-content'),
-                    paragraph = content.querySelector('p'),
+                var content = this.modalDeleteCategory.getElementsByClassName('modal-content')[0],
+                    paragraph = content.getElementsByTagName('p')[0],
                     list = this.getDeleteList(),
                     cat_s = '';
                 Array.prototype.forEach.call(list, (function (element, index, array) {
-                    cat_s += '<p>' + ++index + '. ' + element.querySelector('span').textContent + '</p>';
+                    cat_s += '<p>' + ++index + '. ' + element.getElementsByTagName('span')[0].textContent + '</p>';
                 }));
                 var _html = '<p>Delete Category(es):' + cat_s + '</p>';
                 paragraph.innerHTML = _html;
@@ -68,9 +68,10 @@
                     xhr = new XMLHttpRequest();
 
                 Array.prototype.forEach.call(list, (function (element, index, array) {
-                    var elementContent = element.querySelector('span').textContent;
+                    var elementContent = element.getElementsByTagName('span')[0].textContent;
                     prepData.push(explodeGetLast(elementContent, '_'));
                 }));
+
                 var data = 'data=' + JSON.stringify(prepData);
 
                 xhr.open('POST', location.pathname);
@@ -81,7 +82,7 @@
                     if (xhr.status === 200 && response.error !== true) {
                         handleResponseToast(response, true, 'Deleted Category(es)');
                         if (response.ids && response.ids.length) {
-                            var options = self.categorySelect.querySelectorAll('option');
+                            var options = self.categorySelect.getElementsByTagName('option');
                             response.ids.forEach(function (element, index, array) {
                                 Array.prototype.forEach.call(options,(function (el, i, arr){
                                     if(el.value === element) {
@@ -101,7 +102,7 @@
             },
 
             getDeleteList: function() {
-                return this.categoryDeleteRow.querySelector('.multiple-select-dropdown').querySelectorAll('.active');
+                return this.categoryDeleteRow.getElementsByClassName('multiple-select-dropdown')[0].getElementsByClassName('active');
             }
         };
         CategoryDelete.deleteBtn.addEventListener('click', CategoryDelete.createModalContent.bind(CategoryDelete));

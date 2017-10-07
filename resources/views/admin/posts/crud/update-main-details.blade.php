@@ -125,7 +125,7 @@
                     formData = new FormData();
 
                 Array.prototype.forEach.call(this.getHashtagList(hashtagContainer), (function (element, index, array) {
-                    var elementContent = element.querySelector('span').textContent;
+                    var elementContent = element.getElementsByTagName('span')[0].textContent;
                     hashtags.push(explodeGetLast(elementContent, '_'))
                 }));
 
@@ -154,7 +154,10 @@
             },
 
             getHashtagList: function(container) {
-                var hashtags = container.querySelector('.select-wrapper').querySelector('.multiple-select-dropdown').querySelectorAll('.active');
+                var hashtags = container
+                    .getElementsByClassName('select-wrapper')[0]
+                    .getElementsByClassName('multiple-select-dropdown')[0]
+                    .getElementsByClassName('active');
                 return hashtags ? hashtags : [];
             }
         };

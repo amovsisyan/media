@@ -52,8 +52,8 @@
             searchButton: document.getElementById('search-button'),
             searchTypeSelect: document.getElementById('search-type'),
             searchText: document.getElementById('search-text'),
-            partTemplate: document.querySelector('.part-template'),
-            partNoResult: document.querySelector('.part-no-result'),
+            partTemplate: document.getElementsByClassName('part-template')[0],
+            partNoResult: document.getElementsByClassName('part-no-result')[0],
             searchResultContainer: document.getElementById('search-result'),
             changesConfirmModal: document.getElementById('changesConfirmModal'),
 
@@ -87,14 +87,14 @@
                 if (response.response && response.response.length) {
                     Array.prototype.forEach.call(response.response, (function (element, index, array) {
                         var clone = self.partTemplate.cloneNode(true);
-                        clone.querySelector('.part-number').innerHTML = ++index;
-                        clone.querySelector('.part-alias').value = element.alias;
-                        clone.querySelector('.part-name').value = element.name;
+                        clone.getElementsByClassName('part-number')[0].innerHTML = ++index;
+                        clone.getElementsByClassName('part-alias')[0].value = element.alias;
+                        clone.getElementsByClassName('part-name')[0].value = element.name;
                         clone.id = 'search-part-id-' + element.id;
                         clone.dataset.id = element.id;
                         self.searchResultContainer.appendChild(clone);
                         clone.classList.remove('hide');
-                        clone.querySelector('.part-confirm-button').addEventListener('click',
+                        clone.getElementsByClassName('part-confirm-button')[0].addEventListener('click',
                             self.createModelPartConfirm
                         );
                     }));
@@ -107,12 +107,12 @@
             createModelPartConfirm: function(e) {
                 var self = CategoryEdit,
                     currElem = getClosest(e.target, '.part-template'),
-                    paragraph = self.changesConfirmModal.querySelector('p'),
+                    paragraph = self.changesConfirmModal.getElementsByTagName('p')[0],
                     _html = '<p>ID: <span class="red-text part-id">' + currElem.dataset.id + '</span></p>' +
-                        '<p>New Post Alias: <span class="red-text part-alias">' + currElem.querySelector('.part-alias').value + '</span></p>' +
-                        '<p>New Post Name: <span class="red-text part-name">' + currElem.querySelector('.part-name').value + '</span></p>';
+                        '<p>New Post Alias: <span class="red-text part-alias">' + currElem.getElementsByClassName('part-alias')[0].value + '</span></p>' +
+                        '<p>New Post Name: <span class="red-text part-name">' + currElem.getElementsByClassName('part-name')[0].value + '</span></p>';
                 paragraph.innerHTML = _html;
-                self.changesConfirmModal.querySelector('.confirm-changes').addEventListener('click',
+                self.changesConfirmModal.getElementsByClassName('confirm-changes')[0].addEventListener('click',
                     self.createModelSearchConfirm
                 );
             },
@@ -123,9 +123,9 @@
                 var self = CategoryEdit,
                     elThis = this,
                     currElem = getClosest(e.target, '.modal'),
-                    data = 'id=' + currElem.querySelector('.part-id').innerHTML
-                        + '&newAlias=' + currElem.querySelector('.part-alias').innerHTML
-                        + '&newName=' + currElem.querySelector('.part-name').innerHTML,
+                    data = 'id=' + currElem.getElementsByClassName('part-id')[0].innerHTML
+                        + '&newAlias=' + currElem.getElementsByClassName('part-alias')[0].innerHTML
+                        + '&newName=' + currElem.getElementsByClassName('part-name')[0].innerHTML,
                     xhr = new XMLHttpRequest();
 
                 xhr.open('POST', location.pathname + '/save');
