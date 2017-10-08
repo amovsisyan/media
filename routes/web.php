@@ -97,11 +97,14 @@ Auth::routes();
 
 // Todo numbers under text, which will show best text long
 // todo make some standard helperresponse or some responseClass with some kind of specific/standard responses for catch and validation error
+// todo overwrite DirectoryEditor to Abstract
+// todo DirectoryEditor create pathGetters f.e. pathTillSubplus(), PathTillPostplus()
+// todo make method instead of case in crud
+// todo make some helpers in models like getSubByPostId, getAllPostPartsByPostId ...
 // todo testIt part for all
 // todo seo optimization
 // todo user registration, password dont remember, reset, email sending
 // todo users can comment under posts
 // todo after post Part delete update number
-// todo optimize database
 // todo read yahoo front optimization and make them
 // ToDo Archive posts

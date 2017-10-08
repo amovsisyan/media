@@ -16,9 +16,9 @@ class CreateTablePostHashtag extends Migration
         Schema::create('post_hashtag', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('post_id')->unsigned();
-            $table->foreign('post_id')->references('id')->on('posts');
+            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
             $table->integer('hashtag_id')->unsigned();
-            $table->foreign('hashtag_id')->references('id')->on('hashtags');
+            $table->foreign('hashtag_id')->references('id')->on('hashtags')->onDelete('cascade');
         });
     }
 

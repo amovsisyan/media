@@ -36,7 +36,7 @@ class CrudController extends PostsController
 
         //  All HASHTAGS
         $getAllHashtags = self::_getAllHashtags();
-        $response['hashtags'] = $getAllHashtags['hashtags'];
+        $response['hashtags'] = !empty($getAllHashtags['hashtags']) ? $getAllHashtags['hashtags'] : [];
 
         return response()
             -> view('admin.posts.crud.create', ['response' => $response]);

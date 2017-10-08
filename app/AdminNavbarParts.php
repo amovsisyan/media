@@ -8,7 +8,7 @@ class AdminNavbarParts extends Model
 {
     protected $table = 'admin_navbar_parts';
 
-    public function category(){
+    public function navbar(){
         return $this->belongsTo('App\AdminNavbar', 'admin_navbar_part_id');
     }
 

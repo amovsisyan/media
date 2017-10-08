@@ -15,8 +15,8 @@ class CreateTableAdminPanelNavbar extends Migration
     {
         Schema::create('admin_panel_navbar', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('alias', 40);
-            $table->string('name', 40);
+            $table->string('alias', 40)->unique();
+            $table->string('name', 40)->unique();
             $table->integer('admin_navbar_part_id')->unsigned();
             $table->foreign('admin_navbar_part_id')->references('id')->on('admin_navbar_parts');
             $table->timestamps();

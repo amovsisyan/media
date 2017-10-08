@@ -15,12 +15,12 @@ class CreatTablePosts extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('alias', 60);
+            $table->string('alias', 30)->unique();
             $table->string('header', 60);
-            $table->string('text', 60);
+            $table->string('text', 80);
             $table->string('image', 30);
             $table->integer('subcateg_id')->unsigned();
-            $table->foreign('subcateg_id')->references('id')->on('subcategories');
+            $table->foreign('subcateg_id')->references('id')->on('subcategories')->onDelete('cascade');
             $table->timestamps();
         });
     }

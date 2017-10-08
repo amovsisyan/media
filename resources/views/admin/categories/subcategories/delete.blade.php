@@ -6,13 +6,15 @@
             <div class="row" id="subcategory_delete_row">
                 <div class="input-field col m6 s12">
                     <select id="subcategory_select">
-                        @foreach ($response['categories'] as $category)
-                            <optgroup label="{{ $category[0]['name'] }}">
-                                @foreach ($category['subcategory'] as $subcategory)
-                                    <option value="{{ $subcategory['id'] }}">{{ $subcategory['name'] }}</option>
-                                @endforeach
-                            </optgroup>
-                        @endforeach
+                        @if ($response && isset($response['categories']) && !empty($response['categories']))
+                            @foreach ($response['categories'] as $category)
+                                <optgroup label="{{ $category[0]['name'] }}">
+                                    @foreach ($category['subcategory'] as $subcategory)
+                                        <option value="{{ $subcategory['id'] }}">{{ $subcategory['name'] }}</option>
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        @endif
                     </select>
                     <label>Select Subcategory for delete <span class="important_icon">*</span></label>
                 </div>
