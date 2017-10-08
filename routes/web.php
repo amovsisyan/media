@@ -95,7 +95,6 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 
 Auth::routes();
 
-// Todo numbers under text, which will show best text long
 // todo make some standard helperresponse or some responseClass with some kind of specific/standard responses for catch and validation error
 // todo overwrite DirectoryEditor to Abstract
 // todo DirectoryEditor create pathGetters f.e. pathTillSubplus(), PathTillPostplus()
@@ -108,3 +107,4 @@ Auth::routes();
 // todo after post Part delete update number
 // todo read yahoo front optimization and make them
 // ToDo Archive posts
+// Todo numbers under text(DONE), but it doesn't work when we add dynamically

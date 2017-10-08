@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Posts;
 
 use App\Hashtag;
+use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validator\PostsValidation;
 use Illuminate\Http\Request;
@@ -134,6 +135,7 @@ class HashtagController extends PostsController
     protected function createHashtag_get()
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response['colLength'] = DBColumnLengthData::HASHTAG_TABLE;
 
         return response()
             -> view('admin.posts.hashtag.create', ['response' => $response]);

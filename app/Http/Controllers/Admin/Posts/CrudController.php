@@ -12,6 +12,7 @@ use App\PostParts;
 use App\Subcategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Data\DBColumnLengthData;
 use File;
 
 class CrudController extends PostsController
@@ -32,11 +33,16 @@ class CrudController extends PostsController
 
         //  All CATEGORY    &   SUBCATEGORY
         $getAllCatSubcat = self::_getAllCategoriesSubcategories();
-        $response['categories'] = $getAllCatSubcat['categories'];
+        $response['categories'] = !empty($getAllCatSubcat) && !empty($getAllCatSubcat['categories']) ? $getAllCatSubcat['categories'] : [];
 
         //  All HASHTAGS
         $getAllHashtags = self::_getAllHashtags();
         $response['hashtags'] = !empty($getAllHashtags['hashtags']) ? $getAllHashtags['hashtags'] : [];
+
+        $response['colLength'] = [
+            'post' => DBColumnLengthData::POSTS_TABLE,
+            'parts' => DBColumnLengthData::POST_PARTS_TABLE,
+        ];
 
         return response()
             -> view('admin.posts.crud.create', ['response' => $response]);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
+use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validator\CategoriesValidation;
@@ -27,6 +28,7 @@ class SubcategoriesController extends MainCategoriesController
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
         $response['categories'] = Category::select('id', 'name')->get();
+        $response['colLength'] = DBColumnLengthData::SUBCATEGORIES_TABLE;
 
         return response()
             -> view('admin.categories.subcategories.create', ['response' => $response]);

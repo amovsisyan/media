@@ -9,7 +9,7 @@
     </div>
     <div class="col m7 s12">
         <div class="input-field">
-            <input type="text" class="part-header validate">
+            <input type="text" class="part-header validate" data-length={{$response['colLength']['parts']['head']}}>
             <label for="part-header">Part Header (Russian) <span class="important_icon">*</span></label>
         </div>
     </div>
@@ -26,7 +26,7 @@
     </div>
     <div class="col m7 s12">
         <div class="input-field">
-            <input type="text" class="part-footer validate">
+            <input type="text" class="part-footer validate" data-length={{$response['colLength']['parts']['foot']}}>
             <label for="part-footer">Part Footer (Russian) <span class="important_icon">*</span></label>
         </div>
     </div>

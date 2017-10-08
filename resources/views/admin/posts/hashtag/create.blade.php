@@ -9,13 +9,13 @@
             <div class="row">
                 <div class="col m6 s12">
                     <div class="input-field col s8">
-                        <input id="hashtag_alias" name="alias" type="text" class="validate">
+                        <input id="hashtag_alias" name="alias" type="text" class="validate" data-length={{$response['colLength']['alias']}}>
                         <label for="alias">Alias(English)</label>
                     </div>
                 </div>
                 <div class="col m6 s12">
                     <div class="input-field col s8">
-                        <input id="hashtag_name" name="name" type="text" class="validate">
+                        <input id="hashtag_name" name="name" type="text" class="validate" data-length={{$response['colLength']['hashtag']}}>
                         <label for="name">Name(Russian)</label>
                     </div>
                 </div>

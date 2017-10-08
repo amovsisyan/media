@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use \App\Http\Controllers\Data\DBColumnLengthData;
 
 class CreateTableHashtags extends Migration
 {
@@ -15,8 +16,8 @@ class CreateTableHashtags extends Migration
     {
         Schema::create('hashtags', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('hashtag',40)->unique();
-            $table->string('alias',40)->unique();
+            $table->string('hashtag',DBColumnLengthData::HASHTAG_TABLE['hashtag'])->unique();
+            $table->string('alias',DBColumnLengthData::HASHTAG_TABLE['alias'])->unique();
         });
     }
 

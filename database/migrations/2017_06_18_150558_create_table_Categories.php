@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use \App\Http\Controllers\Data\DBColumnLengthData;
 
 class CreateTableCategories extends Migration
 {
@@ -15,8 +16,8 @@ class CreateTableCategories extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('alias', 30)->unique();
-            $table->string('name', 30)->unique();
+            $table->string('alias', DBColumnLengthData::CATEGORIES_TABLE['alias'])->unique();
+            $table->string('name', DBColumnLengthData::CATEGORIES_TABLE['name'])->unique();
             $table->timestamps();
         });
     }

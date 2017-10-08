@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
+use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validator\CategoriesValidation;
@@ -25,6 +26,7 @@ class CategoriesController extends MainCategoriesController
     protected function createCategory_get()
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response['colLength'] = DBColumnLengthData::CATEGORIES_TABLE;
 
         return response()
             -> view('admin.categories.categories.create', ['response' => $response]);

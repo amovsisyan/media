@@ -8,19 +8,19 @@
     </div>
     <div class="col m7 s12">
         <div class="input-field">
-            <input id="alias" name="alias" type="text" class="validate">
+            <input id="alias" name="alias" type="text" class="validate" data-length={{$response['colLength']['post']['alias']}}>
             <label for="alias">Alias (English) <span class="important_icon">*</span></label>
         </div>
     </div>
     <div class="col s12">
         <div class="input-field">
-            <textarea id="main_header" name="main_header" class="materialize-textarea"></textarea>
+            <textarea id="main_header" name="main_header" class="materialize-textarea" data-length={{$response['colLength']['post']['header']}}></textarea>
             <label for="main_header">Header (Russian) <span class="important_icon">*</span></label>
         </div>
     </div>
     <div class="col s12">
         <div class="input-field">
-            <textarea id="main_text" name="main_text" class="materialize-textarea"></textarea>
+            <textarea id="main_text" name="main_text" class="materialize-textarea" data-length={{$response['colLength']['post']['text']}}></textarea>
             <label for="main_text">Main Text (Russian) <span class="important_icon">*</span></label>
         </div>
     </div>
