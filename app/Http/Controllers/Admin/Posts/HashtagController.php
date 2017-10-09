@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Posts;
 
 use App\Hashtag;
+use App\Http\Controllers\Admin\Response\ResponseController;
 use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validator\PostsValidation;
@@ -28,25 +29,10 @@ class HashtagController extends PostsController
     {
         $validationResult = PostsValidation::validateEditHashtagSearchValues($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
+        $hashtag = self::_hashtagBySearchType($request);
 
-        switch ($request->searchType) {
-            case self::CATEGORYEDITSEARCHTYPES['byID']:
-                $hashtag = Hashtag::where('id', $request->searchText);
-                break;
-            case self::CATEGORYEDITSEARCHTYPES['byName']:
-                $hashtag = Hashtag::where('hashtag', 'like', "%$request->searchText%");
-                break;
-            default:
-                $hashtag = Hashtag::where('alias', 'like', "%$request->searchText%");
-        }
         $searchResult = $hashtag->select('id', 'hashtag', 'alias')->get();
         $response['hashtags'] = [];
         if (!empty($searchResult)) {
@@ -70,29 +56,18 @@ class HashtagController extends PostsController
     {
         $validationResult = PostsValidation::validateEditHashtagSearchValuesSave($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
+            $updateArr = [
+                'hashtag' => $request->newName,
+                'alias' => $request->newAlias
+            ];
             Hashtag::where('id', $request->id)
-                ->update([
-                    'hashtag' => $request->newName,
-                    'alias' => $request->newAlias
-                ]);
+                ->update($updateArr);
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response(['error' => false]);
@@ -108,25 +83,13 @@ class HashtagController extends PostsController
     {
         $validationResult = PostsValidation::validateHashtagDelete($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
             Hashtag::where('id', $request->id)->delete();
         } catch(\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response(['error' => false]);
@@ -135,6 +98,7 @@ class HashtagController extends PostsController
     protected function createHashtag_get()
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
+
         $response['colLength'] = DBColumnLengthData::HASHTAG_TABLE;
 
         return response()
@@ -145,34 +109,32 @@ class HashtagController extends PostsController
     {
         $validationResult = PostsValidation::validateHashtagCreate($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
-            $hashtag = Hashtag::create(
-                [
-                    'hashtag' => $request->hashtag_name,
-                    'alias' => $request->hashtag_alias
-                ]
-            );
+            $createArr = [
+                'hashtag' => $request->hashtag_name,
+                'alias' => $request->hashtag_alias
+            ];
+            $hashtag = Hashtag::create($createArr);
         } catch(\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
-        if ($hashtag) {
-            return response(['error' => false]);
+        return response(['error' => false]);
+    }
+
+    protected static function _hashtagBySearchType($request) {
+        switch ($request->searchType) {
+            case self::CATEGORYEDITSEARCHTYPES['byID']:
+                return Hashtag::where('id', $request->searchText);
+                break;
+            case self::CATEGORYEDITSEARCHTYPES['byName']:
+                return Hashtag::where('hashtag', 'like', "%$request->searchText%");
+                break;
+            default:
+                return Hashtag::where('alias', 'like', "%$request->searchText%");
         }
     }
 }

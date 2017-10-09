@@ -63,7 +63,7 @@ class DirectoryEditor extends Controller
     }
 
     /**
-     * Changes SUbcategory folder name to new Name after subcategory name edit
+     * Changes Subcategory folder name to new Name after subcategory name edit
      * @param $oldName
      * @param $newName
      * @return array

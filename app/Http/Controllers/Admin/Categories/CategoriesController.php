@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
+use App\Http\Controllers\Admin\Response\ResponseController;
 use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
@@ -26,6 +27,7 @@ class CategoriesController extends MainCategoriesController
     protected function createCategory_get()
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
+
         $response['colLength'] = DBColumnLengthData::CATEGORIES_TABLE;
 
         return response()
@@ -36,40 +38,26 @@ class CategoriesController extends MainCategoriesController
     {
         $validationResult = CategoriesValidation::validateCategoryCreate($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
-            $category = Category::create(
-                [
-                    'name' => $request->category_name,
-                    'alias' => $request->category_alias
-                ]
-            );
+            $createArr = [
+                'name' => $request->category_name,
+                'alias' => $request->category_alias
+            ];
+            $category = Category::create($createArr);
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
-        if ($category) {
-            return response(['error' => false]);
-        }
+        return response(['error' => false]);
     }
 
     protected function deleteCategory_get()
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
+
         $response['categories'] = Category::select('id', 'name')->get();
 
         return response()
@@ -78,6 +66,7 @@ class CategoriesController extends MainCategoriesController
 
     protected function deleteCategory_post(Request $request)
     {
+        // couldn't validate category IDs cause response is json
         $ids = [];
         try {
             if ($request->data) {
@@ -98,13 +87,7 @@ class CategoriesController extends MainCategoriesController
                 };
             }
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response(['error' => false]);
@@ -122,25 +105,10 @@ class CategoriesController extends MainCategoriesController
     {
         $validationResult = CategoriesValidation::validateEditCategorySearchValues($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
+        $category = self::_categoryBySearchType($request);
 
-        switch ($request->searchType) {
-            case self::CATEGORYEDITSEARCHTYPES['byID']:
-                $category = Category::where('id', $request->searchText);
-                break;
-            case self::CATEGORYEDITSEARCHTYPES['byName']:
-                $category = Category::where('name', 'like', "%$request->searchText%");
-                break;
-            default:
-                $category = Category::where('alias', 'like', "%$request->searchText%");
-        }
         $searchResult = $category->select('id', 'name', 'alias')->get();
         $response = [];
         if (!empty($searchResult)) {
@@ -164,31 +132,33 @@ class CategoriesController extends MainCategoriesController
     {
         $validationResult = CategoriesValidation::validateEditCategorySearchValuesSave($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
+            $updateArr = [
+                'name' => $request->newName,
+                'alias' => $request->newAlias
+            ];
             Category::where('id', $request->id)
-                ->update([
-                    'name' => $request->newName,
-                    'alias' => $request->newAlias
-                ]);
+                ->update($updateArr);
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response(['error' => false]);
+    }
+
+    protected static function _categoryBySearchType($request) {
+        switch ($request->searchType) {
+            case self::CATEGORYEDITSEARCHTYPES['byID']:
+                return Category::where('id', $request->searchText);
+                break;
+            case self::CATEGORYEDITSEARCHTYPES['byName']:
+                return Category::where('name', 'like', "%$request->searchText%");
+                break;
+            default:
+                return Category::where('alias', 'like', "%$request->searchText%");
+        }
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Post;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validator\PostsValidation;
+use App\Http\Controllers\Admin\Response\ResponseController;
 use App\PostParts;
 use App\Subcategory;
 use Illuminate\Http\Request;
@@ -60,25 +61,13 @@ class CrudController extends PostsController
         // Main fields Validation
         $mainValidation = PostsValidation::createPostMainFieldsValidations($requestAll);
         if ($mainValidation['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $mainValidation['type'],
-                    'response' => $mainValidation['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($mainValidation);
         }
 
         // Part fields Validation
         $partValidation = PostsValidation::createPostPartFieldsValidations($requestAll);
         if ($partValidation['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $partValidation['type'],
-                    'response' => $partValidation['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($partValidation);
         }
 
         try {
@@ -94,13 +83,7 @@ class CrudController extends PostsController
             $post->hashtags()->attach(json_decode($request->postHashtag));
 
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response(['error' => false]);
@@ -114,18 +97,12 @@ class CrudController extends PostsController
      */
     protected function postAddNewParts_post(Request $request, $id)
     {
-        $requestAll =  $request->all();
+        $requestAll = $request->all();
 
         // Part fields Validation
         $partValidation = PostsValidation::createPostPartFieldsValidations($requestAll);
         if ($partValidation['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $partValidation['type'],
-                    'response' => $partValidation['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($partValidation);
         }
 
         try {
@@ -136,13 +113,7 @@ class CrudController extends PostsController
             // Post Parts Creation
             self::_createPostParts($request, $post, $mainPath);
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response(['error' => false]);
@@ -164,25 +135,9 @@ class CrudController extends PostsController
     {
         $validationResult = PostsValidation::validateEditPostSearchValues($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
-
-        switch ($request->searchType) {
-            case self::POSTEDITSEARCHTYPES['byID']:
-                $post = Post::where('id', $request->searchText);
-                break;
-            case self::POSTEDITSEARCHTYPES['byHeader']:
-                $post = Post::where('header', 'like', "%$request->searchText%");
-                break;
-            default:
-                $post = Post::where('alias', 'like', "%$request->searchText%");
-        }
+        $post = self::_postBySearchType($request);
 
         $searchResult = $post->select('id', 'header', 'text')->get();
         $response['posts'] = [];
@@ -211,6 +166,7 @@ class CrudController extends PostsController
     protected function postMainDetails_get(Request $request, $id)
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        // todo not sure that we need try/catch here
         try {
             $post = Post::where('id', $id)->first();
             $response['post'] = [
@@ -237,13 +193,7 @@ class CrudController extends PostsController
             $response['hashtags'] = $getAllHashtags['hashtags'];
 
         } catch(\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response()
@@ -264,13 +214,7 @@ class CrudController extends PostsController
         // Main fields Validation
         $mainValidation = PostsValidation::updatePostMainFieldsValidations($requestAll);
         if ($mainValidation['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $mainValidation['type'],
-                    'response' => $mainValidation['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($mainValidation);
         }
 
         try {
@@ -283,13 +227,7 @@ class CrudController extends PostsController
             self::_postHashtagsEdited($request, $post);
 
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response(['error' => false]);
@@ -304,6 +242,7 @@ class CrudController extends PostsController
     protected function postPartsDetails_get(Request $request, $id)
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        // todo not sure that we need try/catch here
         try {
             $post = Post::where('id', $id)->first();
             // Post Parts
@@ -317,13 +256,7 @@ class CrudController extends PostsController
                 ];
             }
         } catch(\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response()
@@ -339,13 +272,7 @@ class CrudController extends PostsController
     {
         $validationResult = PostsValidation::validatePostPartsUpdate($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
         try {
             $postPart = PostParts::findOrFail($request->partId);
@@ -378,20 +305,10 @@ class CrudController extends PostsController
                 }
             }
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
-        return response(
-            [
-                'error' => false,
-            ]
-        );
+        return response(['error' => false]);
     }
 
     /**
@@ -403,33 +320,17 @@ class CrudController extends PostsController
     {
         $validationResult = PostsValidation::validatePostPartDelete($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
         try {
             $postPart = PostParts::findOrFail($request->partId);
             DirectoryEditor::removePostPartImage($postPart);
             $postPart->delete();
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
-        return response(
-            [
-                'error' => false,
-            ]
-        );
+        return response(['error' => false]);
     }
 
     /**
@@ -441,33 +342,17 @@ class CrudController extends PostsController
     {
         $validationResult = PostsValidation::validatePostDelete($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
         try {
             $post = Post::findOrFail($request->postId);
             DirectoryEditor::removePostDir($post);
             $post->delete();
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
-        return response(
-            [
-                'error' => false,
-            ]
-        );
+        return response(['error' => false]);
     }
 
     /**
@@ -479,19 +364,14 @@ class CrudController extends PostsController
     protected function postPartsAttach_get(Request $request, $id)
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        // todo not sure that we need try/catch here
         try {
             $postPart = PostParts::where('id', $id)->first();
             $response['postpart'] = [
                 'head' => $postPart->head,
             ];
         } catch(\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response()
@@ -508,13 +388,7 @@ class CrudController extends PostsController
     {
         $validationResult = PostsValidation::postPartsAttachSave($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
         try {
             $postPart = PostParts::where('id', $id)->first();
@@ -527,20 +401,10 @@ class CrudController extends PostsController
             ];
             $postPart->update($updateArr);
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
-        return response(
-            [
-                'error' => false,
-            ]
-        );
+        return response(['error' => false]);
     }
 
     /**
@@ -749,5 +613,18 @@ class CrudController extends PostsController
             ];
         }
         return $response;
+    }
+
+    protected static function _postBySearchType($request) {
+        switch ($request->searchType) {
+            case self::POSTEDITSEARCHTYPES['byID']:
+                return Post::where('id', $request->searchText);
+                break;
+            case self::POSTEDITSEARCHTYPES['byHeader']:
+                return Post::where('header', 'like', "%$request->searchText%");
+                break;
+            default:
+                return Post::where('alias', 'like', "%$request->searchText%");
+        }
     }
 }

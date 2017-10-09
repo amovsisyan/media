@@ -68,6 +68,20 @@ class CategoriesValidation extends AbstractValidator
         return self::_generateValidationSimpleOKResponse();
     }
 
+    public static function validateSubcategoryDelete($allRequest)
+    {
+        $rules = [
+            'subcategoryId' => 'required|min:2|max:10',
+        ];
+        $validator = Validator::make($allRequest, $rules);
+
+        if ($validator->fails()) {
+            return self::_generateValidationErrorResponse($validator);
+        };
+
+        return self::_generateValidationSimpleOKResponse();
+    }
+
     public static function validateEditSubcategorySearchValues($allRequest) {
         $rules = [
             'searchType' => 'required',

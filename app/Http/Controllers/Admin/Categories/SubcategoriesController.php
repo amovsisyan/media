@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
+use App\Http\Controllers\Admin\Response\ResponseController;
 use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
@@ -27,6 +28,7 @@ class SubcategoriesController extends MainCategoriesController
     protected function createSubcategory_get()
     {
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
+
         $response['categories'] = Category::select('id', 'name')->get();
         $response['colLength'] = DBColumnLengthData::SUBCATEGORIES_TABLE;
 
@@ -38,35 +40,21 @@ class SubcategoriesController extends MainCategoriesController
     {
         $validationResult = CategoriesValidation::validateSubcategoryCreate($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
-        }
-        try {
-            $category = Category::findOrFail($request->categorySelect);
-            $subcategory = $category->subcategories()->create(
-                [
-                    'name' => $request->subcategory_name,
-                    'alias' => $request->subcategory_alias
-                ]
-            );
-        } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
 
-        if ($subcategory) {
-            return response(['error' => false]);
+        try {
+            $category = Category::findOrFail($request->categorySelect);
+            $createArr = [
+                'name' => $request->subcategory_name,
+                'alias' => $request->subcategory_alias
+            ];
+            $subcategory = $category->subcategories()->create($createArr);
+        } catch (\Exception $e) {
+            return ResponseController::_catchedResponse($e);
         }
+
+        return response(['error' => false]);
     }
 
     public function deleteSubcategory_get()
@@ -90,11 +78,12 @@ class SubcategoriesController extends MainCategoriesController
 
     protected function deleteSubcategory_post(Request $request)
     {
-        $ids = [];
+        $validationResult = CategoriesValidation::validateSubcategoryDelete($request->all());
+        if ($validationResult['error']) {
+            return ResponseController::_validationResultResponse($validationResult);
+        }
         try {
-            if ($request->subcategoryId) {
-                $ids[] = $request->subcategoryId;
-            }
+            $ids[] = $request->subcategoryId;
 
             $deleteDir = DirectoryEditor::clearAfterSubcategoryDelete($ids);
             if (!$deleteDir['error']) {
@@ -108,13 +97,7 @@ class SubcategoriesController extends MainCategoriesController
                 };
             }
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response(['error' => false]);
@@ -132,25 +115,10 @@ class SubcategoriesController extends MainCategoriesController
     {
         $validationResult = CategoriesValidation::validateEditSubcategorySearchValues($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
 
-        switch ($request->searchType) {
-            case self::CATEGORYEDITSEARCHTYPES['byID']:
-                $subcategory = Subcategory::where('id', $request->searchText);
-                break;
-            case self::CATEGORYEDITSEARCHTYPES['byName']:
-                $subcategory = Subcategory::where('name', 'like', "%$request->searchText%");
-                break;
-            default:
-                $subcategory = Subcategory::where('alias', 'like', "%$request->searchText%");
-        }
+        $subcategory = self::_subcategoryBySearchType($request);
 
         $searchResult = $subcategory->select('id', 'name', 'alias', 'categ_id')->get();
         $response = [];
@@ -178,13 +146,7 @@ class SubcategoriesController extends MainCategoriesController
     {
         $validationResult = CategoriesValidation::validateEditSubcategorySearchValuesSave($request->all());
         if ($validationResult['error']) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => $validationResult['type'],
-                    'response' => $validationResult['response']
-                ], 404
-            );
+            return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
@@ -198,10 +160,7 @@ class SubcategoriesController extends MainCategoriesController
             if ($posts->count() > 0 && $subcat->alias !== $request->newAlias) {
                 $oldName = $subcat->alias . '_' . $subcat->id;
                 $newName = $request->newAlias . '_' . $subcat->id;
-                $result = DirectoryEditor::updateAfterSubcategoryEdit($oldName, $newName);
-                if ($result['error']) {
-                    throw new \Exception("Directory rename Error");
-                }
+                DirectoryEditor::updateAfterSubcategoryEdit($oldName, $newName);
             }
 
             // PART -> SUBCATEGORY Attach/Detach
@@ -212,20 +171,28 @@ class SubcategoriesController extends MainCategoriesController
             }
 
             // PART -> SUBCATEGORY UPDATE
-            $subcategoryBuilder->update([
+            $updateArr = [
                 'name' => $request->newName,
                 'alias' => $request->newAlias
-            ]);
+            ];
+            $subcategoryBuilder->update($updateArr);
         } catch (\Exception $e) {
-            return response(
-                [
-                    'error' => true,
-                    'type' => 'Some Other Error',
-                    'response' => [$e->getMessage()]
-                ], 404
-            );
+            return ResponseController::_catchedResponse($e);
         }
 
         return response(['error' => false]);
+    }
+
+    protected static function _subcategoryBySearchType($request) {
+        switch ($request->searchType) {
+            case self::CATEGORYEDITSEARCHTYPES['byID']:
+                return Subcategory::where('id', $request->searchText);
+                break;
+            case self::CATEGORYEDITSEARCHTYPES['byName']:
+                return Subcategory::where('name', 'like', "%$request->searchText%");
+                break;
+            default:
+                return Subcategory::where('alias', 'like', "%$request->searchText%");
+        }
     }
 }
