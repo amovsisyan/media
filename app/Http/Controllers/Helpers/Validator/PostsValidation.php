@@ -2,18 +2,35 @@
 
 namespace App\Http\Controllers\Helpers\Validator;
 
+use App\Http\Controllers\Data\DBColumnLengthData;
 use Validator;
 
 class PostsValidation extends AbstractValidator
 {
+    const POST_COMMON_RULES = [
+        'alias' => 'required|min:2|max:' . DBColumnLengthData::POSTS_TABLE['alias'],
+        'header' => 'required|min:2|max:' . DBColumnLengthData::POSTS_TABLE['header'],
+        'text' => 'required|min:2|max:' . DBColumnLengthData::POSTS_TABLE['text']
+    ];
+
+    const POST_PARTS_COMMON_RULES = [
+        'head' => 'required|max:' . DBColumnLengthData::POST_PARTS_TABLE['head'],
+        'foot' => 'required|max:' . DBColumnLengthData::POST_PARTS_TABLE['foot']
+    ];
+
+    const HASHTAG_COMMON_RULES = [
+        'alias' => 'required|max:' . DBColumnLengthData::HASHTAG_TABLE['alias'],
+        'hashtag' => 'required|max:' . DBColumnLengthData::HASHTAG_TABLE['hashtag']
+    ];
+
     public static function createPostMainFieldsValidations($allRequest) {
         $rules = [
-            'postAlias' => 'required|min:2|max:60',
-            'postMainHeader' => 'required|min:2|max:60',
-            'postMainText' => 'required|min:2|max:60',
+            'postAlias' => self::POST_COMMON_RULES['alias'],
+            'postMainHeader' => self::POST_COMMON_RULES['header'],
+            'postMainText' => self::POST_COMMON_RULES['text'],
             'postMainImage' => 'required|image ',
             'postSubcategory' => 'required',
-            'postHashtag' => 'required',
+            'postHashtag' => 'required'
         ];
 
         $validator = Validator::make($allRequest, $rules);
@@ -30,7 +47,7 @@ class PostsValidation extends AbstractValidator
 
         foreach ($allRequest['partHeader'] as $key => $value) {
             $k = 'partHeader.' . $key;
-            $rules[$k] = 'required|max:300';
+            $rules[$k] = self::POST_PARTS_COMMON_RULES['head'];
         };
 
         foreach ($allRequest['partImage'] as $key => $value) {
@@ -40,7 +57,7 @@ class PostsValidation extends AbstractValidator
 
         foreach ($allRequest['partFooter'] as $key => $value) {
             $k = 'partFooter.' . $key;
-            $rules[$k] = 'required|max:300';
+            $rules[$k] = self::POST_PARTS_COMMON_RULES['foot'];
         };
 
         $validator = Validator::make($allRequest, $rules);
@@ -54,11 +71,11 @@ class PostsValidation extends AbstractValidator
 
     public static function updatePostMainFieldsValidations($allRequest) {
         $rules = [
-            'postAlias' => 'required|min:2|max:60',
-            'postMainHeader' => 'required|min:2|max:60',
-            'postMainText' => 'required|min:2|max:60',
+            'postAlias' => self::POST_COMMON_RULES['alias'],
+            'postMainHeader' => self::POST_COMMON_RULES['header'],
+            'postMainText' => self::POST_COMMON_RULES['text'],
             'postSubcategory' => 'required',
-            'postHashtag' => 'required',
+            'postHashtag' => 'required'
         ];
 
         $validator = Validator::make($allRequest, $rules);
@@ -75,12 +92,12 @@ class PostsValidation extends AbstractValidator
 
         foreach ($allRequest['partHeader'] as $key => $value) {
             $k = 'partHeader.' . $key;
-            $rules[$k] = 'required|max:300';
+            $rules[$k] = self::POST_PARTS_COMMON_RULES['head'];
         };
 
         foreach ($allRequest['partFooter'] as $key => $value) {
             $k = 'partFooter.' . $key;
-            $rules[$k] = 'required|max:300';
+            $rules[$k] = self::POST_PARTS_COMMON_RULES['foot'];
         };
 
         $validator = Validator::make($allRequest, $rules);
@@ -95,8 +112,8 @@ class PostsValidation extends AbstractValidator
     public static function validatePostPartsUpdate($allRequest) {
         $rules = [
             'partId' => 'required|min:1|max:10',
-            'head' => 'required|min:1|max:300',
-            'foot' => 'required|min:1|max:300',
+            'head' => self::POST_PARTS_COMMON_RULES['head'],
+            'foot' => self::POST_PARTS_COMMON_RULES['foot']
         ];
 
         $validator = Validator::make($allRequest, $rules);
@@ -169,8 +186,8 @@ class PostsValidation extends AbstractValidator
     public static function validateEditHashtagSearchValuesSave($allRequest) {
         $rules = [
             'id' => 'required',
-            'newAlias' => 'required|min:2|max:40',
-            'newName' => 'required|min:2|max:40',
+            'newAlias' => self::HASHTAG_COMMON_RULES['alias'],
+            'newName' => self::HASHTAG_COMMON_RULES['hashtag']
         ];
 
         $validator = Validator::make($allRequest, $rules);
@@ -184,8 +201,8 @@ class PostsValidation extends AbstractValidator
 
     public static function validateHashtagCreate($allRequest) {
         $rules = [
-            'hashtag_name' => 'required|min:2|max:40',
-            'hashtag_alias' => 'required|min:2|max:40',
+            'hashtag_alias' => self::HASHTAG_COMMON_RULES['alias'],
+            'hashtag_name' => self::HASHTAG_COMMON_RULES['hashtag']
         ];
 
         $validator = Validator::make($allRequest, $rules);
@@ -199,7 +216,7 @@ class PostsValidation extends AbstractValidator
 
     public static function validateHashtagDelete($allRequest) {
         $rules = [
-            'id' => 'required|max:10',
+            'id' => 'required|min:1|max:10',
         ];
 
         $validator = Validator::make($allRequest, $rules);
@@ -213,7 +230,7 @@ class PostsValidation extends AbstractValidator
 
     public static function postPartsAttachSave($allRequest) {
         $rules = [
-            'newPostId' => 'required|max:10',
+            'newPostId' => 'required|min:1|max:10',
         ];
 
         $validator = Validator::make($allRequest, $rules);

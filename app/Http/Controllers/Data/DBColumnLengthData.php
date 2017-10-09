@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 class DBColumnLengthData extends Controller
 {
     const CATEGORIES_TABLE = [
-      'alias' => 30,
-      'name' => 30
+        'alias' => 30,
+        'name' => 30
     ];
 
     const SUBCATEGORIES_TABLE = [
@@ -27,11 +27,11 @@ class DBColumnLengthData extends Controller
     const POST_PARTS_TABLE = [
         'head' => 500,
         'body' => 300,
-        'foot' => 500,
+        'foot' => 500
     ];
 
     const HASHTAG_TABLE = [
-        'hashtag' => 40,
         'alias' => 40,
+        'hashtag' => 40
     ];
 }

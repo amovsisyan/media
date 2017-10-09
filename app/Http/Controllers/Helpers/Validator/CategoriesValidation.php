@@ -2,16 +2,28 @@
 
 namespace App\Http\Controllers\Helpers\Validator;
 
+use App\Http\Controllers\Data\DBColumnLengthData;
 use Validator;
 
 class CategoriesValidation extends AbstractValidator
 {
+    const CATEGORY_COMMON_RULES = [
+        'alias' => 'required|min:2|max:' . DBColumnLengthData::CATEGORIES_TABLE['alias'],
+        'name' => 'required|min:2|max:' . DBColumnLengthData::CATEGORIES_TABLE['name']
+    ];
+
+    const SUBCATEGORY_COMMON_RULES = [
+        'alias' => 'required|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_TABLE['alias'],
+        'name' => 'required|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_TABLE['name']
+    ];
+
     public static function validateCategoryCreate($allRequest)
     {
         $rules = [
-            'category_name' => 'required|min:2|max:30',
-            'category_alias' => 'required|min:2|max:30',
+            'category_alias' => self::CATEGORY_COMMON_RULES['alias'],
+            'category_name' => self::CATEGORY_COMMON_RULES['name']
         ];
+
         $validator = Validator::make($allRequest, $rules);
 
         if ($validator->fails()) {
@@ -21,10 +33,11 @@ class CategoriesValidation extends AbstractValidator
         return self::_generateValidationSimpleOKResponse();
     }
 
-    public static function validateEditCategorySearchValues($allRequest) {
+    public static function validateEditCategorySearchValues($allRequest)
+    {
         $rules = [
             'searchType' => 'required',
-            'searchText' => 'required',
+            'searchText' => 'required'
         ];
 
         $validator = Validator::make($allRequest, $rules);
@@ -36,11 +49,12 @@ class CategoriesValidation extends AbstractValidator
         return self::_generateValidationSimpleOKResponse();
     }
 
-    public static function validateEditCategorySearchValuesSave($allRequest) {
+    public static function validateEditCategorySearchValuesSave($allRequest)
+    {
         $rules = [
             'id' => 'required',
-            'newAlias' => 'required|min:2|max:30',
-            'newName' => 'required|min:2|max:30',
+            'newAlias' => self::CATEGORY_COMMON_RULES['alias'],
+            'newName' => self::CATEGORY_COMMON_RULES['name']
         ];
 
         $validator = Validator::make($allRequest, $rules);
@@ -55,10 +69,11 @@ class CategoriesValidation extends AbstractValidator
     public static function validateSubcategoryCreate($allRequest)
     {
         $rules = [
-            'subcategory_name' => 'required|min:2|max:30',
-            'subcategory_alias' => 'required|min:2|max:30',
-            'categorySelect' => 'required|integer',
+            'subcategory_alias' => self::SUBCATEGORY_COMMON_RULES['alias'],
+            'subcategory_name' => self::SUBCATEGORY_COMMON_RULES['name'],
+            'categorySelect' => 'required|integer'
         ];
+
         $validator = Validator::make($allRequest, $rules);
 
         if ($validator->fails()) {
@@ -71,7 +86,7 @@ class CategoriesValidation extends AbstractValidator
     public static function validateSubcategoryDelete($allRequest)
     {
         $rules = [
-            'subcategoryId' => 'required|min:2|max:10',
+            'subcategoryId' => 'required|min:2|max:10'
         ];
         $validator = Validator::make($allRequest, $rules);
 
@@ -85,7 +100,7 @@ class CategoriesValidation extends AbstractValidator
     public static function validateEditSubcategorySearchValues($allRequest) {
         $rules = [
             'searchType' => 'required',
-            'searchText' => 'required',
+            'searchText' => 'required'
         ];
 
         $validator = Validator::make($allRequest, $rules);
@@ -101,8 +116,8 @@ class CategoriesValidation extends AbstractValidator
         $rules = [
             'id' => 'required',
             'newCategoryId' => 'required|min:1|max:10',
-            'newAlias' => 'required|min:2|max:30',
-            'newName' => 'required|min:2|max:30',
+            'newAlias' => self::SUBCATEGORY_COMMON_RULES['alias'],
+            'newName' => self::SUBCATEGORY_COMMON_RULES['name']
         ];
 
         $validator = Validator::make($allRequest, $rules);

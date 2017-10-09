@@ -95,11 +95,9 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 
 Auth::routes();
 
-// todo change Validator maximums to Data\DBColumnLengthData
 // todo overwrite DirectoryEditor to Abstract
 // todo DirectoryEditor create pathGetters f.e. pathTillSubplus(), PathTillPostplus()
 // todo reread all methods
-// todo make method instead of case in crud
 // todo make some helpers in models like getSubByPostId, getAllPostPartsByPostId ...
 // todo testIt part for all
 // todo seo optimization
