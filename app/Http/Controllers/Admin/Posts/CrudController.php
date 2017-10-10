@@ -255,6 +255,9 @@ class CrudController extends PostsController
                     'foot' => $postPart->foot,
                 ];
             }
+            $response['colLength'] = [
+                'parts' => DBColumnLengthData::POST_PARTS_TABLE,
+            ];
         } catch(\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }

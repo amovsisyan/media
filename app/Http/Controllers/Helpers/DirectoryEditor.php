@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Helpers;
 
+use App\Http\Controllers\Admin\Response\ResponseController;
 use File;
 use App\Category;
 use App\Subcategory;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class DirectoryEditor extends Controller
@@ -29,16 +29,14 @@ class DirectoryEditor extends Controller
                     $ids[] = $subcategory->id;
                 }
             }
-            self::clearAfterSubcategoryDelete($ids);
+            $error = self::clearAfterSubcategoryDelete($ids);
+
+            return ['error' => !$error];
         } catch (\Exception $e) {
-            return [
-                'error' => true,
-                'type' => 'Some Other Error',
-                'response' => [$e->getMessage()]
-            ];
+            ResponseController::_catchedResponse($e);
         }
 
-        return ['error' => false];
+        return ['error' => true];
     }
 
     /**
@@ -49,17 +47,17 @@ class DirectoryEditor extends Controller
     public static function clearAfterSubcategoryDelete($subcategoryIds)
     {
         try {
+            $error = false;
             $subcategories = Subcategory::whereIn('id', $subcategoryIds)->select('id', 'alias')->get();
             foreach ($subcategories as $subcategory) {
-                $directory = public_path() . DIRECTORY_SEPARATOR . self::IMGCATPATH .
-                    DIRECTORY_SEPARATOR . $subcategory->alias . '_' . $subcategory->id;
-                File::deleteDirectory($directory);
+                $pathTillSubCat = self::_getPathTillSubCatPlus($subcategory);
+                $error = File::deleteDirectory($pathTillSubCat);
             }
-        } catch (\Exception $e) {
-            return ['error' => true];
-        }
 
-        return ['error' => false];
+            return ['error' => !$error];
+        } catch (\Exception $e) {
+            return ResponseController::_catchedResponse($e);
+        }
     }
 
     /**
@@ -71,16 +69,15 @@ class DirectoryEditor extends Controller
     public static function updateAfterSubcategoryEdit($oldName, $newName)
     {
         try {
-            $prefix = public_path() . DIRECTORY_SEPARATOR . self::IMGCATPATH . DIRECTORY_SEPARATOR;
+            $prefix = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
             $oldDir = $prefix . $oldName;
             $newDir = $prefix . $newName;
-            // todo use File Facade
-            $error = !rename($oldDir, $newDir);
-        } catch (\Exception $e) {
-            return ['error' => true];
-        }
+            $error = File::move($oldDir, $newDir);
 
-        return ['error' => $error];
+            return ['error' => !$error];
+        } catch (\Exception $e) {
+            return ResponseController::_catchedResponse($e);
+        }
     }
 
     /** Moved all from OldName Subcategory folder into NewName Subcategory Folder
@@ -95,7 +92,7 @@ class DirectoryEditor extends Controller
             $oldName = $oldSubcat->alias . '_' . $oldSubcat->id;
             $newName = $newSubcat->alias . '_' . $newSubcat->id;
 
-            $prefix = public_path() . DIRECTORY_SEPARATOR . self::IMGCATPATH . DIRECTORY_SEPARATOR;
+            $prefix = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
             $oldDir = $prefix . $oldName;
             $newDir = $prefix . $newName;
             $postDir = $oldPost->alias . '_' . $oldPost->id;
@@ -104,12 +101,12 @@ class DirectoryEditor extends Controller
                 File::makeDirectory($newDir, 0777);
             }
             $postDestinationDir = $newDir . DIRECTORY_SEPARATOR . $postDir;
-            $error = !File::moveDirectory($postSourceDir, $postDestinationDir);
-        } catch (\Exception $e) {
-            return ['error' => true];
-        }
+            $error = File::moveDirectory($postSourceDir, $postDestinationDir);
 
-        return ['error' => $error];
+            return ['error' => !$error];
+        } catch (\Exception $e) {
+            return ResponseController::_catchedResponse($e);
+        }
     }
 
     /**
@@ -126,7 +123,7 @@ class DirectoryEditor extends Controller
             $oldName = $oldPost->alias . '_' . $oldPost->id;
             $newName = $post->alias . '_' . $post->id;
 
-            $subCategDir = public_path() . DIRECTORY_SEPARATOR . self::IMGCATPATH . DIRECTORY_SEPARATOR . $newSubCategName;
+            $subCategDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR . $newSubCategName;
 
             $oldDir = $subCategDir . DIRECTORY_SEPARATOR  . $oldName;
             $newDir = $subCategDir . DIRECTORY_SEPARATOR  . $newName;
@@ -134,12 +131,12 @@ class DirectoryEditor extends Controller
             $oldImg = $newDir . DIRECTORY_SEPARATOR . $oldPost->image;
             $newImg = $newDir . DIRECTORY_SEPARATOR . $post->image;
 
-            $error = !File::move($oldDir, $newDir) || !File::move($oldImg, $newImg);
-        } catch (\Exception $e) {
-            return ['error' => true];
-        }
+            $error = File::move($oldDir, $newDir) && File::move($oldImg, $newImg);
 
-        return ['error' => $error];
+            return ['error' => !$error];
+        } catch (\Exception $e) {
+            return ResponseController::_catchedResponse($e);
+        }
     }
 
     /**
@@ -153,26 +150,23 @@ class DirectoryEditor extends Controller
         try {
             $post = $postPart->post()->first();
             $subcat = $post->subcategory()->first();
-            $toMainDir = self::IMGCATPATH . DIRECTORY_SEPARATOR;
-            $toAddDir =  $subcat->alias . '_' . $subcat->id .  DIRECTORY_SEPARATOR .
-                $post->alias . '_' . $post->id . DIRECTORY_SEPARATOR .
-                DirectoryEditor::PARTS . DIRECTORY_SEPARATOR;
+            $toMainDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
+            $toAddDir =  self::_getPathFromSubTillPartsPlus($subcat, $post) . DIRECTORY_SEPARATOR;
             $oldImgDir = $toMainDir . $toAddDir . $oldPostPart->body;
             if (File::isFile($oldImgDir)) {
                 File::delete($oldImgDir);
             };
-            $error = false;
+
+            return [
+                'error' => false,
+                'toAddDir' => $toAddDir
+            ];
         } catch (\Exception $e) {
             return [
                 'error' => true,
                 'toAddDir' => ''
             ];
         }
-
-        return [
-            'error' => $error,
-            'toAddDir' => $toAddDir
-        ];
     }
 
     /**
@@ -185,26 +179,22 @@ class DirectoryEditor extends Controller
         try {
             $post = $postPart->post()->first();
             $subcat = $post->subcategory()->first();
-            $toMainDir = self::IMGCATPATH . DIRECTORY_SEPARATOR;
-            $toAddDir =  $subcat->alias . '_' . $subcat->id .  DIRECTORY_SEPARATOR .
-                $post->alias . '_' . $post->id . DIRECTORY_SEPARATOR .
-                DirectoryEditor::PARTS . DIRECTORY_SEPARATOR;
+            $toMainDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
+            $toAddDir =  self::_getPathFromSubTillPartsPlus($subcat, $post) . DIRECTORY_SEPARATOR;
             $imgDir = $toMainDir . $toAddDir . $postPart->body;
             if (File::isFile($imgDir)) {
                 File::delete($imgDir);
             };
-            $error = false;
+            return [
+                'error' => false,
+                'toAddDir' => $toAddDir
+            ];
         } catch (\Exception $e) {
             return [
                 'error' => true,
                 'toAddDir' => ''
             ];
         }
-
-        return [
-            'error' => $error,
-            'toAddDir' => $toAddDir
-        ];
     }
 
     /**
@@ -216,25 +206,23 @@ class DirectoryEditor extends Controller
     {
         try {
             $subcat = $post->subcategory()->first();
-            $toMainDir = self::IMGCATPATH . DIRECTORY_SEPARATOR;
-            $toAddDir =  $subcat->alias . '_' . $subcat->id .  DIRECTORY_SEPARATOR .
-                $post->alias . '_' . $post->id . DIRECTORY_SEPARATOR;
+            $toMainDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
+            $toAddDir =  self::_getPathFromSubTillPostsPlus($subcat, $post) . DIRECTORY_SEPARATOR;
             $postDir = $toMainDir . $toAddDir;
             if (File::isDirectory($postDir)) {
                 File::deleteDirectory($postDir);
             }
-            $error = false;
+
+            return [
+                'error' => false,
+                'toAddDir' => $toAddDir
+            ];
         } catch (\Exception $e) {
             return [
                 'error' => true,
                 'toAddDir' => ''
             ];
         }
-
-        return [
-            'error' => $error,
-            'toAddDir' => $toAddDir
-        ];
     }
 
     /**
@@ -250,41 +238,88 @@ class DirectoryEditor extends Controller
             $postParts = $newPost->postParts()->get();
 
             // this needs for update, it helps not overwrite existing images (image names)
-            $arrOfBusyNums = [];
-            if ($postParts->count()) {
-                foreach ($postParts as $part) {
-                    $explodedOnce =  explode('_', $part->body);
-                    $lastPart = end($explodedOnce);
-                    $arrOfBusyNums[] = explode('.', $lastPart)[0];
-                }
-            };
-            $bodyKey = max($arrOfBusyNums) + 1;
+            $bodyKey = self::_generateBodyKey($postParts);
+
             $partNameExplod = explode('.', $postPart->body);
             $extension = end($partNameExplod);
             $newName = $newPost->alias . '_' . $bodyKey . '.' . $extension;
 
             $subForOld = $oldPost->subcategory()->first();
             $subForNew = $newPost->subcategory()->first();
-            $toMainDir = self::IMGCATPATH . DIRECTORY_SEPARATOR;
-            $fromAddDir =  $subForOld->alias . '_' . $subForOld->id .  DIRECTORY_SEPARATOR .
-                $oldPost->alias . '_' . $oldPost->id . DIRECTORY_SEPARATOR .
-                self::PARTS . DIRECTORY_SEPARATOR . $postPart->body;
-            $toAddDir = $subForNew->alias . '_' . $subForNew->id .  DIRECTORY_SEPARATOR .
-                $newPost->alias . '_' . $newPost->id . DIRECTORY_SEPARATOR .
-                self::PARTS . DIRECTORY_SEPARATOR . $newName;
+
+            $toMainDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
+            $fromAddDir = self::_getPathFromSubTillPartsPlus($subForOld, $oldPost) . DIRECTORY_SEPARATOR . $postPart->body;
+            $toAddDir = self::_getPathFromSubTillPartsPlus($subForNew, $newPost) . DIRECTORY_SEPARATOR . $newName;
+
             $partOldFullDir = $toMainDir . $fromAddDir;
             $partNewFullDir = $toMainDir . $toAddDir;
-            $error = !File::move($partOldFullDir, $partNewFullDir);
+            $error = File::move($partOldFullDir, $partNewFullDir);
+
+            return [
+                'error' => !$error,
+                'newName' => $newName
+            ];
         } catch (\Exception $e) {
             return [
                 'error' => true,
-                'toAddDir' => ''
+                'newName' => ''
             ];
         }
+    }
 
-        return [
-            'error' => $error,
-            'newName' => $newName
-        ];
+    /**
+     * public/img/cat
+     * @return string
+     */
+    private static function _getPathTillCatPlus() {
+        return public_path() . DIRECTORY_SEPARATOR . self::IMGCATPATH;
+    }
+
+    /**
+     * public/img/cat/subCateg_id
+     * @param $subcategory
+     * @return string
+     */
+    private static function _getPathTillSubCatPlus($subcategory) {
+        return self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR . $subcategory->alias . '_' . $subcategory->id;
+    }
+
+    /**
+     * subCateg_id/post_id
+     * @param $subcat
+     * @param $post
+     * @return string
+     */
+    private static function _getPathFromSubTillPostsPlus($subcat, $post) {
+        return $subcat->alias . '_' . $subcat->id .  DIRECTORY_SEPARATOR
+            . $post->alias . '_' . $post->id;
+    }
+
+    /**
+     * subCateg_id/post_id/parts
+     * @param $subcat
+     * @param $post
+     * @return string
+     */
+    private static function _getPathFromSubTillPartsPlus($subcat, $post) {
+        return self::_getPathFromSubTillPostsPlus($subcat, $post) . DIRECTORY_SEPARATOR . self::PARTS;
+    }
+
+    /**
+     * We need to get some not 'busy' counter to not overwrite existing image
+     * cause part images are POST_ALIAS + SOME_COUNTER
+     * @param $postParts
+     * @return mixed
+     */
+    private static function _generateBodyKey($postParts) {
+        $arrOfBusyNums = [];
+        if ($postParts->count()) {
+            foreach ($postParts as $part) {
+                $explodedOnce =  explode('_', $part->body);
+                $lastPart = end($explodedOnce);
+                $arrOfBusyNums[] = explode('.', $lastPart)[0];
+            }
+        };
+        return max($arrOfBusyNums) + 1;
     }
 }
