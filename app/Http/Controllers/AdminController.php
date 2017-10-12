@@ -21,7 +21,7 @@ class AdminController extends Controller
 
     public function index()
     {
-        $response['leftNav'] = $this->getLeftNavbar();
+        $response['leftNav'] = AdminNavbar::prepareLeftNavbar();
 
         return response()
             -> view('admin.index', ['response' => $response]);
@@ -29,53 +29,10 @@ class AdminController extends Controller
 
     public function part(Request $request, $navbar, $part)
     {
-        $response['leftNav'] = $this->getLeftNavbar();
-        $response['panel'] = $this->getPanelNavbar($part);
+        $response['leftNav'] = AdminNavbar::prepareLeftNavbar();
+        $response['panel'] = AdminNavbarParts::preparePanelNavbar($part);
 
         return response()
             -> view('admin.index', ['response' => $response]);
-    }
-
-    public function getLeftNavbar()
-    {
-        $navbar = AdminNavbar::select('id', 'alias', 'name')->get();
-
-        $res = [];
-        foreach ($navbar as $key => $nav) {
-            $res[$key]['nav'] = [
-                'id'        => $nav->id,
-                'alias'     => $nav->alias,
-                'name'      => $nav->name,
-            ];
-            $navbar_parts = $nav->navbarParts()->get();
-            foreach ($navbar_parts as $parts) {
-                $res[$key]['part'][] = [
-                    'id'        => $parts->id,
-                    'alias'     => $parts->alias,
-                    'name'      => $parts->name,
-                ];
-            }
-        }
-
-        return $res;
-    }
-
-    public function getPanelNavbar($part = null)
-    {
-        $res = [];
-        if ($part !== null) {
-            $part = AdminNavbarParts::where('alias', $part)->first();
-            $panel_navbar = $part->panelParts()->get();
-            foreach ($panel_navbar as $key => $parts) {
-                $res[] = [
-                    'id'        => $parts->id,
-                    'alias'     => $parts->alias,
-                    'name'      => $parts->name,
-                ];
-
-            }
-        }
-
-        return $res;
     }
 }

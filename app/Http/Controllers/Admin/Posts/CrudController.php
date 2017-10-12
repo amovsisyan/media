@@ -60,12 +60,14 @@ class CrudController extends PostsController
 
         // Main fields Validation
         $mainValidation = PostsValidation::createPostMainFieldsValidations($requestAll);
+
         if ($mainValidation['error']) {
             return ResponseController::_validationResultResponse($mainValidation);
         }
 
         // Part fields Validation
         $partValidation = PostsValidation::createPostPartFieldsValidations($requestAll);
+
         if ($partValidation['error']) {
             return ResponseController::_validationResultResponse($partValidation);
         }
@@ -101,6 +103,7 @@ class CrudController extends PostsController
 
         // Part fields Validation
         $partValidation = PostsValidation::createPostPartFieldsValidations($requestAll);
+
         if ($partValidation['error']) {
             return ResponseController::_validationResultResponse($partValidation);
         }
@@ -134,6 +137,7 @@ class CrudController extends PostsController
     protected function updatePost_post(Request $request)
     {
         $validationResult = PostsValidation::validateEditPostSearchValues($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
@@ -168,7 +172,7 @@ class CrudController extends PostsController
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
         // todo not sure that we need try/catch here
         try {
-            $post = Post::where('id', $id)->first();
+            $post = Post::findOrFail($id);
             $response['post'] = [
                 "id" => $post->id,
                 "alias" => $post->alias,
@@ -213,6 +217,7 @@ class CrudController extends PostsController
 
         // Main fields Validation
         $mainValidation = PostsValidation::updatePostMainFieldsValidations($requestAll);
+
         if ($mainValidation['error']) {
             return ResponseController::_validationResultResponse($mainValidation);
         }
@@ -224,7 +229,7 @@ class CrudController extends PostsController
             self::_postMainPartEdited($request, $post);
 
             // Hashtag Attach
-            self::_postHashtagsEdited($request, $post);
+            Post::hashtagsEdited(json_decode($request->postHashtag), $post);
 
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
@@ -244,7 +249,8 @@ class CrudController extends PostsController
         $response = Helpers::prepareAdminNavbars(request()->segment(3));
         // todo not sure that we need try/catch here
         try {
-            $post = Post::where('id', $id)->first();
+            $post = Post::findOrFail($id);
+
             // Post Parts
             $postParts = $post->postParts()->select('post_parts.id', 'head', 'body', 'foot')->get();
             foreach ($postParts as $postPart) {
@@ -274,6 +280,7 @@ class CrudController extends PostsController
     protected function postPartsDetails_post(Request $request)
     {
         $validationResult = PostsValidation::validatePostPartsUpdate($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
@@ -322,6 +329,7 @@ class CrudController extends PostsController
     protected function postPartDelete_post(Request $request)
     {
         $validationResult = PostsValidation::validatePostPartDelete($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
@@ -344,6 +352,7 @@ class CrudController extends PostsController
     protected function postDelete_post(Request $request)
     {
         $validationResult = PostsValidation::validatePostDelete($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
@@ -390,13 +399,14 @@ class CrudController extends PostsController
     protected function postPartsAttachSave_post(Request $request, $id)
     {
         $validationResult = PostsValidation::postPartsAttachSave($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
         try {
-            $postPart = PostParts::where('id', $id)->first();
+            $postPart = PostParts::findOrFail($id);
             $oldPost = clone $postPart->post()->first();
-            $newPost = Post::where('id', $request->newPostId)->first();
+            $newPost = Post::findOrFail($request->newPostId);
             $dirEdited = DirectoryEditor::postPartAttachmentProcess($oldPost, $newPost, $postPart);
             $updateArr = [
                 'post_id' => $request->newPostId,
@@ -483,24 +493,12 @@ class CrudController extends PostsController
 
             if ($postMainImageCHANGED) {
                 $postPath = $newSubcat->alias . '_' . $newSubcat->id . DIRECTORY_SEPARATOR . $post->alias . '_' . $post->id;
-                $postFilesDir =  DIRECTORY_SEPARATOR . DirectoryEditor::IMGCATPATH . DIRECTORY_SEPARATOR . $postPath;
-                File::delete(File::files($postFilesDir));
+                DirectoryEditor::deleteImageByPostPath($postPath);
                 $file = $request->file('postMainImage');
                 $filename = $postPath . DIRECTORY_SEPARATOR . $post->image;
                 Storage::disk('public_posts')->put($filename, File::get($file));
             }
         }
-    }
-
-    /**
-     * Generate hashtags after post Main part edit
-     * @param $request
-     * @param $post
-     */
-    private static function _postHashtagsEdited($request, $post)
-    {
-        $post->hashtags()->detach();
-        $post->hashtags()->attach(json_decode($request->postHashtag));
     }
 
     /**
@@ -512,14 +510,14 @@ class CrudController extends PostsController
     {
         $subcategory = Subcategory::findOrFail($request->postSubcategory);
 
-        $post = $subcategory->posts()->create(
-            [
-                'alias' => $request->postAlias,
-                'header' => $request->postMainHeader,
-                'text' => $request->postMainText,
-                'image' => $request->postAlias . '.' . $request->file('postMainImage')->getClientOriginalExtension()
-            ]
-        );
+        $createArr = [
+            'alias' => $request->postAlias,
+            'header' => $request->postMainHeader,
+            'text' => $request->postMainText,
+            'image' => $request->postAlias . '.' . $request->file('postMainImage')->getClientOriginalExtension()
+        ];
+        $post = $subcategory->posts()->create($createArr);
+
         $mainPath = $subcategory->alias . '_' . $subcategory->id . DIRECTORY_SEPARATOR . $post->alias . '_' . $post->id;
         $file = $request->file('postMainImage');
         $filename = $mainPath . DIRECTORY_SEPARATOR . $post->image;
@@ -621,13 +619,16 @@ class CrudController extends PostsController
     protected static function _postBySearchType($request) {
         switch ($request->searchType) {
             case self::POSTEDITSEARCHTYPES['byID']:
-                return Post::where('id', $request->searchText);
+                return Post::getPostBuilderByID($request->searchText);
                 break;
             case self::POSTEDITSEARCHTYPES['byHeader']:
-                return Post::where('header', 'like', "%$request->searchText%");
+                return Post::getPostsBuilderLikeHeader("%$request->searchText%");
+                break;
+            case self::POSTEDITSEARCHTYPES['byAlias']:
+                return Post::getPostsBuilderLikeAlias("%$request->searchText%");
                 break;
             default:
-                return Post::where('alias', 'like', "%$request->searchText%");
+                throw new \Exception('Can not find. Wrong Post type');
         }
     }
 }

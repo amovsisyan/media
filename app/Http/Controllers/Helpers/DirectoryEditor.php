@@ -47,11 +47,13 @@ class DirectoryEditor extends Controller
     public static function clearAfterSubcategoryDelete($subcategoryIds)
     {
         try {
-            $error = false;
+            $error = true;
             $subcategories = Subcategory::whereIn('id', $subcategoryIds)->select('id', 'alias')->get();
             foreach ($subcategories as $subcategory) {
                 $pathTillSubCat = self::_getPathTillSubCatPlus($subcategory);
-                $error = File::deleteDirectory($pathTillSubCat);
+                if (File::isDirectory($pathTillSubCat)) {
+                    $error = File::deleteDirectory($pathTillSubCat);
+                }
             }
 
             return ['error' => !$error];
@@ -265,6 +267,24 @@ class DirectoryEditor extends Controller
                 'newName' => ''
             ];
         }
+    }
+
+    public static function deleteImageByPostPath($postPath)
+    {
+        try {
+            $postFilesDir =  self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR . $postPath;
+            File::delete(File::files($postFilesDir));
+
+            return [
+                'error' => false,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+            ];
+        }
+
+
     }
 
     /**

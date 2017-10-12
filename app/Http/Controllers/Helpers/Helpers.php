@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Helpers;
 
+use App\AdminNavbar;
+use App\AdminNavbarParts;
 use App\Post;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -30,9 +32,8 @@ class Helpers extends Controller
     public static function prepareAdminNavbars($part)
     {
         $response = [];
-        $adminController = new AdminController();
-        $response['leftNav'] = $adminController->getLeftNavbar();
-        $response['panel'] = $adminController->getPanelNavbar($part);
+        $response['leftNav'] = AdminNavbar::prepareLeftNavbar();
+        $response['panel'] = AdminNavbarParts::preparePanelNavbar($part);
         return $response;
     }
 

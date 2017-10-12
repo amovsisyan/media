@@ -28,9 +28,11 @@ class HashtagController extends PostsController
     protected function editHashtag_post(Request $request)
     {
         $validationResult = PostsValidation::validateEditHashtagSearchValues($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
+
         $hashtag = self::_hashtagBySearchType($request);
 
         $searchResult = $hashtag->select('id', 'hashtag', 'alias')->get();
@@ -55,6 +57,7 @@ class HashtagController extends PostsController
     protected function editHashtagSave_post(Request $request)
     {
         $validationResult = PostsValidation::validateEditHashtagSearchValuesSave($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
@@ -64,8 +67,7 @@ class HashtagController extends PostsController
                 'hashtag' => $request->newName,
                 'alias' => $request->newAlias
             ];
-            Hashtag::where('id', $request->id)
-                ->update($updateArr);
+            Hashtag::updHashtagById($request->id, $updateArr);
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -82,12 +84,13 @@ class HashtagController extends PostsController
     protected function editHashtagDelete_post(Request $request)
     {
         $validationResult = PostsValidation::validateHashtagDelete($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
-            Hashtag::where('id', $request->id)->delete();
+            Hashtag::delHashtagById($request->id);
         } catch(\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -108,6 +111,7 @@ class HashtagController extends PostsController
     protected function createHashtag_post(Request $request)
     {
         $validationResult = PostsValidation::validateHashtagCreate($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
@@ -117,7 +121,7 @@ class HashtagController extends PostsController
                 'hashtag' => $request->hashtag_name,
                 'alias' => $request->hashtag_alias
             ];
-            $hashtag = Hashtag::create($createArr);
+            Hashtag::create($createArr);
         } catch(\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -128,13 +132,16 @@ class HashtagController extends PostsController
     protected static function _hashtagBySearchType($request) {
         switch ($request->searchType) {
             case self::CATEGORYEDITSEARCHTYPES['byID']:
-                return Hashtag::where('id', $request->searchText);
+                return Hashtag::getHashtagBuilderByID($request->searchText);
                 break;
             case self::CATEGORYEDITSEARCHTYPES['byName']:
-                return Hashtag::where('hashtag', 'like', "%$request->searchText%");
+                return Hashtag::getHashtagsBuilderLikeHashtag("%$request->searchText%");
+                break;
+            case self::CATEGORYEDITSEARCHTYPES['byAlias']:
+                return Hashtag::getHashtagsBuilderLikeAlias("%$request->searchText%");
                 break;
             default:
-                return Hashtag::where('alias', 'like', "%$request->searchText%");
+                throw new \Exception('Can not find. Wrong hashtag type');
         }
     }
 }

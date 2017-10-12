@@ -37,6 +37,7 @@ class CategoriesController extends MainCategoriesController
     protected function createCategory_post(Request $request)
     {
         $validationResult = CategoriesValidation::validateCategoryCreate($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
@@ -46,7 +47,7 @@ class CategoriesController extends MainCategoriesController
                 'name' => $request->category_name,
                 'alias' => $request->category_alias
             ];
-            $category = Category::create($createArr);
+            Category::create($createArr);
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -76,8 +77,9 @@ class CategoriesController extends MainCategoriesController
             }
 
             $deleteDir = DirectoryEditor::clearAfterCategoryDelete($ids);
+
             if (!$deleteDir['error']) {
-                if (Category::whereIn('id', $ids)->delete()) {
+                if (Category::delCategoriesByIDs($ids)) {
                     return response(
                         [
                             'error' => false,
@@ -104,33 +106,41 @@ class CategoriesController extends MainCategoriesController
     protected function editCategory_post(Request $request)
     {
         $validationResult = CategoriesValidation::validateEditCategorySearchValues($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
-        $category = self::_categoryBySearchType($request);
 
-        $searchResult = $category->select('id', 'name', 'alias')->get();
-        $response = [];
-        if (!empty($searchResult)) {
-            foreach ($searchResult as $item) {
-                $response[] = [
-                    'id' => $item->id,
-                    'alias' => $item->alias,
-                    'name' => $item->name
-                ];
+        try {
+            $category = self::_categoryBySearchType($request);
+
+            $searchResult = $category->select('id', 'name', 'alias')->get();
+            $response = [];
+
+            if (!empty($searchResult)) {
+                foreach ($searchResult as $item) {
+                    $response[] = [
+                        'id' => $item->id,
+                        'alias' => $item->alias,
+                        'name' => $item->name
+                    ];
+                }
             }
+            return response(
+                [
+                    'error' => false,
+                    'response' => $response
+                ]
+            );
+        } catch (\Exception $e) {
+            return ResponseController::_catchedResponse($e);
         }
-        return response(
-            [
-                'error' => false,
-                'response' => $response
-            ]
-        );
     }
 
     protected function editCategorySave_post(Request $request)
     {
         $validationResult = CategoriesValidation::validateEditCategorySearchValuesSave($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
@@ -140,8 +150,7 @@ class CategoriesController extends MainCategoriesController
                 'name' => $request->newName,
                 'alias' => $request->newAlias
             ];
-            Category::where('id', $request->id)
-                ->update($updateArr);
+            Category::updCategoryByID($request->id, $updateArr);
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -152,13 +161,16 @@ class CategoriesController extends MainCategoriesController
     protected static function _categoryBySearchType($request) {
         switch ($request->searchType) {
             case self::CATEGORYEDITSEARCHTYPES['byID']:
-                return Category::where('id', $request->searchText);
+                return Category::getCategoryBuilderByID($request->searchText);
                 break;
             case self::CATEGORYEDITSEARCHTYPES['byName']:
-                return Category::where('name', 'like', "%$request->searchText%");
+                return Category::getCategoriesBuilderLikeName($request->searchText);
+                break;
+            case self::CATEGORYEDITSEARCHTYPES['byAlias']:
+                return Category::getCategoriesBuilderLikeAlias($request->searchText);
                 break;
             default:
-                return Category::where('alias', 'like', "%$request->searchText%");
+                throw new \Exception('Can not find. Wrong category type');
         }
     }
 }

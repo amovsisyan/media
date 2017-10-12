@@ -15,4 +15,23 @@ class AdminNavbarParts extends Model
     public function panelParts(){
         return $this->hasMany('App\AdminPanelNavbar', 'admin_navbar_part_id', 'id');
     }
+
+    public static function preparePanelNavbar($part = null)
+    {
+        $res = [];
+        if ($part !== null) {
+            $part = self::where('alias', $part)->first();
+            $panel_navbar = $part->panelParts()->get();
+            foreach ($panel_navbar as $key => $parts) {
+                $res[] = [
+                    'id'        => $parts->id,
+                    'alias'     => $parts->alias,
+                    'name'      => $parts->name,
+                ];
+
+            }
+        }
+
+        return $res;
+    }
 }

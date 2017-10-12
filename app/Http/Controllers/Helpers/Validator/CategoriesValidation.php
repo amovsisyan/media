@@ -86,7 +86,7 @@ class CategoriesValidation extends AbstractValidator
     public static function validateSubcategoryDelete($allRequest)
     {
         $rules = [
-            'subcategoryId' => 'required|min:2|max:10'
+            'subcategoryId' => 'required|min:1|max:10'
         ];
         $validator = Validator::make($allRequest, $rules);
 

@@ -85,7 +85,9 @@
             makeParts: function(response) {
                 var self = this;
                 self.searchResultContainer.innerHTML = '';
-                if (response.response && response.response.categories.length && response.response.subcategories.length) {
+                if (response.response &&
+                    response.response.categories && response.response.categories.length &&
+                    response.response.subcategories && response.response.subcategories.length) {
                     Array.prototype.forEach.call(response.response.subcategories, (function (element, index, array) {
                         var clone = self.partTemplate.cloneNode(true),
                             _options = '',

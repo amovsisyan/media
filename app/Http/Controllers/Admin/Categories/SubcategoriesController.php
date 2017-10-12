@@ -39,17 +39,17 @@ class SubcategoriesController extends MainCategoriesController
     protected function createSubcategory_post(Request$request)
     {
         $validationResult = CategoriesValidation::validateSubcategoryCreate($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
-            $category = Category::findOrFail($request->categorySelect);
             $createArr = [
                 'name' => $request->subcategory_name,
                 'alias' => $request->subcategory_alias
             ];
-            $subcategory = $category->subcategories()->create($createArr);
+            Category::createSubCategoryByID($request->categorySelect, $createArr);
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -79,6 +79,7 @@ class SubcategoriesController extends MainCategoriesController
     protected function deleteSubcategory_post(Request $request)
     {
         $validationResult = CategoriesValidation::validateSubcategoryDelete($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
@@ -87,7 +88,7 @@ class SubcategoriesController extends MainCategoriesController
 
             $deleteDir = DirectoryEditor::clearAfterSubcategoryDelete($ids);
             if (!$deleteDir['error']) {
-                if (Subcategory::whereIn('id', $ids)->delete()) {
+                if (Subcategory::delSubCategoriesByIDs($ids)) {
                     return response(
                         [
                             'error' => false,
@@ -114,6 +115,7 @@ class SubcategoriesController extends MainCategoriesController
     public function editSubcategory_post(Request $request)
     {
         $validationResult = CategoriesValidation::validateEditSubcategorySearchValues($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
@@ -123,6 +125,7 @@ class SubcategoriesController extends MainCategoriesController
         $searchResult = $subcategory->select('id', 'name', 'alias', 'categ_id')->get();
         $response = [];
         $response['categories'] = Category::select('id', 'name')->get();
+
         if (!empty($searchResult)) {
             foreach ($searchResult as $item) {
                 $categ = $item->category()->select('id')->first();
@@ -145,12 +148,13 @@ class SubcategoriesController extends MainCategoriesController
     protected function editSubcategorySave_post(Request $request)
     {
         $validationResult = CategoriesValidation::validateEditSubcategorySearchValuesSave($request->all());
+
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
-            $subcategoryBuilder = Subcategory::where('id', $request->id);
+            $subcategoryBuilder = Subcategory::getSubCategoryBuilderByID($request->id);
 
             $subcat = $subcategoryBuilder->select('id', 'alias', 'categ_id')->first();
             $posts = $subcat->posts();
@@ -186,13 +190,16 @@ class SubcategoriesController extends MainCategoriesController
     protected static function _subcategoryBySearchType($request) {
         switch ($request->searchType) {
             case self::CATEGORYEDITSEARCHTYPES['byID']:
-                return Subcategory::where('id', $request->searchText);
+                return Subcategory::getSubCategoryBuilderByID($request->searchText);
                 break;
             case self::CATEGORYEDITSEARCHTYPES['byName']:
-                return Subcategory::where('name', 'like', "%$request->searchText%");
+                return Subcategory::getSubCategoriesBuilderLikeName($request->searchText);
+                break;
+            case self::CATEGORYEDITSEARCHTYPES['byAlias']:
+                return Subcategory::getSubCategoriesBuilderLikeAlias($request->searchText);
                 break;
             default:
-                return Subcategory::where('alias', 'like', "%$request->searchText%");
+                throw new \Exception('Can not find. Wrong subCategory type');
         }
     }
 }

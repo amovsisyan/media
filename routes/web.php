@@ -95,7 +95,6 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 
 Auth::routes();
 
-// todo make some helpers in models like getSubByPostId, getAllPostPartsByPostId ...
 // todo make sure back and front works syncronally
 // todo work on design, especially on photoes
 // todo hashtag and most in front side doesn't return correct images
