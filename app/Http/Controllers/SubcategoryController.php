@@ -13,7 +13,7 @@ class SubcategoryController extends CategoryController
         parent::__construct();
     }
 
-    protected function getSubCategory (Request $request, $category, $subcategory)
+    protected function getSubCategory(Request $request, $category, $subcategory)
     {
         $expl_subcat = explode('_', $subcategory);
         $sub_cat_id = $expl_subcat[count($expl_subcat)-1];
@@ -31,22 +31,32 @@ class SubcategoryController extends CategoryController
 
     public function getByHashtag(Request $request, $alias)
     {
-        // ToDo Rewrite this method I think it is not fast
-        $hashtag = Hashtag::where('alias', $alias)->get();
+        $hashtag = Hashtag::where('alias', $alias)->first();
+        $posts = $hashtag->posts()->get();
 
-        $posts = $hashtag[0]->posts()->get();
-
+        // the same part written in \App\Http\Controllers\CategoryController::getCategory
+        $respPosts = [];
         foreach($posts as $key => $post){
-            $sub_category = $post->subcategory()->select('id', 'alias', 'categ_id')->first();
-            $posts[$key]['sub_alias'] = $sub_category->alias;
-            $posts[$key]['sub_id'] = $sub_category->id;
-            $posts[$key]['cat_alias'] = $sub_category->category()->select('alias')->first()->alias;
+            $subCategory = $post->subcategory()->select('alias', 'categ_id')->first();
+            $category = $subCategory->category()->select('alias')->first();
+
+            $respPosts[] = [
+                'id'        => $post->id,
+                'alias'     => $post->alias,
+                'header'    => $post->header,
+                'text'      => $post->text,
+                'image'     => $post->image,
+                'sub_id'    => $post->subcateg_id,
+                'sub_alias' => $subCategory->alias,
+                'categ_id'  => $subCategory->categ_id,
+                'cat_alias' => $category->alias
+            ];
         }
 
         $response = [
             'navbar'    => $this->getNavbar(),
-            'posts'     => $posts,
-            'hashtag'   => $hashtag[0]->hashtag
+            'posts'     => $respPosts,
+            'hashtag'   => $hashtag->hashtag
         ];
 
         return response()

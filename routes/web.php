@@ -85,6 +85,7 @@ Route::group(['prefix' => 'qwentin'], function () {
 Route::get('/', ['uses'=>'CategoryController@getCategory','as'=>'category']);
 Route::get('/home', ['uses'=>'CategoryController@getCategory','as'=>'category'])->where('home', 'home');
 
+// todo make separate controller for hashtag ))
 Route::get('/hashtag/{alias}', ['uses'=>'SubcategoryController@getByHashtag','as'=>'byHashtag']);
 
 Route::get('/{category}/{subcategory}', ['uses'=>'SubcategoryController@getSubCategory','as'=>'subcategory'])
@@ -97,15 +98,14 @@ Auth::routes();
 
 // todo make sure back and front works syncronally
 // todo work on design, especially on photoes
-// todo hashtag and most in front side doesn't return correct images
-// todo add main page slider capability, by default false , but configurable from Admin
 // todo reread all front classes , make some corrections if needs
-// todo reread all methods
-// todo testIt part for all
-// todo seo optimization
 // todo user registration, password dont remember, reset, email sending
 // todo users can comment under posts
+// todo add main page slider capability, by default false , but configurable from Admin
+// todo seo optimization
 // todo after post Part delete update number
 // todo read yahoo front optimization and make them
+// todo reread all methods
+// todo testIt part for all
 // ToDo Archive posts
 // Todo numbers under text(DONE), but it doesn't work when we add dynamically

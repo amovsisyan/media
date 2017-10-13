@@ -8,24 +8,37 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    const RECENT_POSTS_COUNT = 5;
+
     public function __construct()
     {
     }
 
-    protected function getCategory (Request $request)
+    protected function getCategory(Request $request)
     {
-        $posts = Post::orderBy('created_at', 'desc')->take(5)->get();
+        $posts = Post::orderBy('created_at', 'desc')->take(self::RECENT_POSTS_COUNT)->get();
 
+        // the same part written in \App\Http\Controllers\SubcategoryController::getByHashtag
+        $respPosts = [];
         foreach($posts as $key => $post){
-            $sub_category = $post->subcategory()->select('id', 'alias', 'categ_id')->first();
-            $posts[$key]['sub_alias'] = $sub_category->alias;
-            $posts[$key]['sub_id'] = $sub_category->id;
-            $posts[$key]['cat_alias'] = $sub_category->category()->select('alias')->first()->alias;
+            $subCategory = $post->subcategory()->select('alias', 'categ_id')->first();
+            $category = $subCategory->category()->select('alias')->first();
+            $respPosts[] = [
+                'id'        => $post->id,
+                'alias'     => $post->alias,
+                'header'    => $post->header,
+                'text'      => $post->text,
+                'image'     => $post->image,
+                'sub_id'    => $post->subcateg_id,
+                'sub_alias' => $subCategory->alias,
+                'categ_id'  => $subCategory->categ_id,
+                'cat_alias' => $category->alias
+            ];
         }
 
         $response = [
             'navbar'    => $this->getNavbar(),
-            'posts'     => $posts,
+            'posts'     => $respPosts,
         ];
 
         return response()
