@@ -96,13 +96,13 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 
 Auth::routes();
 
-// todo make sure back and front works syncronally
-// todo work on design, especially on photoes
+// todo change alias_id route to alias
+// todo localization
 // todo reread all front classes , make some corrections if needs
 // todo user registration, password dont remember, reset, email sending
 // todo users can comment under posts
 // todo add main page slider capability, by default false , but configurable from Admin
-// todo seo optimization
+// todo seo optimization , add alt's for images
 // todo after post Part delete update number
 // todo read yahoo front optimization and make them
 // todo reread all methods

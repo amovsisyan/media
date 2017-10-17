@@ -97,6 +97,9 @@
 @endsection
 
 @section('script')
+    {{--require imageStandards --}}
+    <script src="/js/admin/imageStandards.js"></script>
+
     <script>
         $(document).ready(function(){
             $('#subcategory_select').material_select();
@@ -108,13 +111,25 @@
             updatePostBtn: document.getElementById('update_post'),
             postMainDetails: document.getElementById('post-main-details'),
             confirmMainUpdate: document.getElementById('confirm-main-update'),
+            postMainImage: document.getElementById('main_image'),
+
+            _init: function () {
+                this.postMainImage.addEventListener('change',
+                    this.imageSizeWarningLocal.bind(self)
+                );
+            },
+
+            imageSizeWarningLocal: function(e) {
+                var el = e.target,
+                    files = el.files;
+                imageSizeWarning(files, imageStandards.mainImageStandard);
+            },
 
             confirmMainUpdateRequest: function () {
                 var updateBtns = [this.confirmMainUpdate, this.updatePostBtn];
                 updateAddConfirmButtons(updateBtns, true);
 
-                var self = this,
-                    hashtags = [],
+                var hashtags = [],
                     xhr = new XMLHttpRequest(),
                     hashtagContainer = document.getElementById('hashtag_select_container'),
                     mainAlias = document.getElementById('alias'),
@@ -162,5 +177,6 @@
             }
         };
         PostMainUpdate.confirmMainUpdate.addEventListener('click', PostMainUpdate.confirmMainUpdateRequest.bind(PostMainUpdate));
+        PostMainUpdate._init();
     </script>
 @endsection

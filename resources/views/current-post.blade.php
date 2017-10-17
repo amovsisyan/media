@@ -4,12 +4,13 @@
     <section id="current-post">
         <div class="container">
             <div class="row">
-                <div class="col s12 current-post-header left-align">
-                    <h4>
-                        {{$response['post_header']}}
-                    </h4>
-                </div>
-                @foreach ($response['post_parts'] as $post_part)
+                <div class="col s10">
+                    <div class="col s12 current-post-header left-align">
+                        <h4>
+                            {{$response['post_header']}}
+                        </h4>
+                    </div>
+                    @foreach ($response['post_parts'] as $post_part)
                     <div class="col s12 left-align">
                         <div class="post-part">
                             <h5 class="head">
@@ -25,7 +26,8 @@
                             </h6>
                         </div>
                     </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
             <div class="row">
                 <div class="col s12">

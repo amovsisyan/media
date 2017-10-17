@@ -48,6 +48,9 @@
 @endsection
 
 @section('script')
+    {{--require imageStandards --}}
+    <script src="/js/admin/imageStandards.js"></script>
+
     <script>
         $(document).ready(function(){
             $('#subcategory_select').material_select();
@@ -60,6 +63,7 @@
                 partTemplateCounter: 0,
                 basicPartTemplate: document.getElementsByClassName('post-part')[0]
             },
+
             addButton: document.getElementById('add_post'),
             confirmButton: document.getElementById('confirm_post'),
             postAlias: document.getElementById('alias'),
@@ -74,11 +78,28 @@
             deletePostPartModal: document.getElementById('deletePostPartModal'),
 
             _init: function() {
+                var self = this;
                 this.renderPartTemplate();
+                
+                this.postMainImage.addEventListener('change',
+                    this.imageSizeWarningLocal.bind(self)
+                );
+            },
+
+            imageSizeWarningLocal: function(e) {
+                var el = e.target,
+                    files = el.files,
+                    standard = this.getStandard(el);
+                imageSizeWarning(files, standard);
+            },
+
+            getStandard: function (element) {
+                return element.classList.contains('part-image') ? imageStandards.partsImageStandard : imageStandards.mainImageStandard
             },
 
             renderPartTemplate: function() {
-                var num = this.defaultProperties.partTemplateCounter++,
+                var self = this,
+                    num = this.defaultProperties.partTemplateCounter++,
                     currTempl = document.getElementsByClassName('post-part')[num];
                 this._regeneratePostPartIds(currTempl);
 
@@ -88,6 +109,10 @@
 
                 currTempl.getElementsByClassName('part-delete-button')[0].addEventListener('click',
                     this.createModelPartDelete
+                );
+
+                currTempl.getElementsByClassName('part-image')[0].addEventListener('change',
+                    this.imageSizeWarningLocal.bind(self)
                 );
             },
 

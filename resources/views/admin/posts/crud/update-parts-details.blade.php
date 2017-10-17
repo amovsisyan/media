@@ -133,6 +133,9 @@
 @endsection
 
 @section('script')
+    {{--require imageStandards --}}
+    <script src="/js/admin/imageStandards.js"></script>
+
     <script>
         $('.modal').modal();
         PostPartDetails = {
@@ -147,16 +150,39 @@
             partDeleteBtns:document.getElementsByClassName('part-delete-btn'),
             postPartConfirmDelete:document.getElementById('post-part-confirm-delete'),
 
+            postPartImageInputs:document.getElementsByClassName('part-image'),
+
             partsContainer: document.getElementById('parts-container'),
             postPart:document.getElementsByClassName('post-part')[0],
             partDeleteBtn:document.getElementsByClassName('part-delete-button')[0],
 
             confirmPostPartsAdditionBtn: document.getElementById('confirm-post-parts-addition'),
 
-            init: function() {
+            _init: function() {
+                this.makeListenersForExistedParts();
                 document.getElementsByClassName('post-number')[0].innerHTML = this.newPartCount;
                 this.postPart.id = 'post-part-id-' + this.newPartCount;
                 this.postPart.dataset.num = this.newPartCount;
+            },
+
+            makeListenersForExistedParts: function () {
+                var self = this;
+
+                Array.prototype.forEach.call(self.partSaveBtns, (function (element, index, array) {
+                    element.addEventListener('click', self.sendIdToUpdateModal.bind(self));
+                }));
+                Array.prototype.forEach.call(self.partDeleteBtns, (function (element, index, array) {
+                    element.addEventListener('click', self.sendIdToDeleteModal.bind(self));
+                }));
+                Array.prototype.forEach.call(self.postPartImageInputs, (function (element, index, array) {
+                    element.addEventListener('change', self.imageSizeWarningLocal.bind(self));
+                }));
+            },
+
+            imageSizeWarningLocal: function(e) {
+                var el = e.target,
+                    files = el.files;
+                imageSizeWarning(files, imageStandards.partsImageStandard);
             },
 
             sendIdToUpdateModal: function (e) {
@@ -259,6 +285,9 @@
                 currTempl.getElementsByClassName('part-delete-button')[0].addEventListener('click',
                     this.partDelEvent.bind(this)
                 );
+                currTempl.getElementsByClassName('part-image')[0].addEventListener('change',
+                    this.imageSizeWarningLocal.bind(self)
+                );
             },
 
             _regeneratePostPartIds: function(element) {
@@ -351,19 +380,12 @@
             }
         };
 
-        Array.prototype.forEach.call(PostPartDetails.partSaveBtns, (function (element, index, array) {
-            element.addEventListener('click', PostPartDetails.sendIdToUpdateModal.bind(PostPartDetails));
-        }));
-        Array.prototype.forEach.call(PostPartDetails.partDeleteBtns, (function (element, index, array) {
-            element.addEventListener('click', PostPartDetails.sendIdToDeleteModal.bind(PostPartDetails));
-        }));
-
         PostPartDetails.postPartConfirmUpdate.addEventListener('click', PostPartDetails.updatePostPartRequest.bind(PostPartDetails));
         PostPartDetails.postPartConfirmDelete.addEventListener('click', PostPartDetails.deletePostPartRequest.bind(PostPartDetails));
         PostPartDetails.postPartDelete.addEventListener('click', PostPartDetails.generatePartDelBtnListener.bind(PostPartDetails));
         PostPartDetails.partDeleteBtn.addEventListener('click', PostPartDetails.partDelEvent.bind(PostPartDetails));
         PostPartDetails.postPartAddBtn.addEventListener('click', PostPartDetails.addPostPart.bind(PostPartDetails));
         PostPartDetails.confirmPostPartsAdditionBtn.addEventListener('click', PostPartDetails.addPostPartsRequest.bind(PostPartDetails));
-        PostPartDetails.init();
+        PostPartDetails._init();
     </script>
 @endsection

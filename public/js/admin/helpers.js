@@ -71,7 +71,7 @@ function handleResponseToast (response, status, text) {
         style = 'status_warning';
     }
     Materialize.toast(_html, 5000, 'rounded');
-    var toasts = document.getElementById("toast-container").getElementsByClassName("toast "),
+    var toasts = document.getElementById("toast-container").getElementsByClassName("toast"),
         toast = toasts[toasts.length-1];
 
     toast.classList.add(style);
@@ -93,7 +93,7 @@ function explodeGetLast(string, separator) {
  * for true, remove disabled from btns array
  * @param add
  */
-function updateAddConfirmButtons (btns, add) {
+function updateAddConfirmButtons(btns, add) {
     if (add) {
         Array.prototype.forEach.call(btns, (function (element, index, array) {
             element.classList.add('disabled');
@@ -102,5 +102,55 @@ function updateAddConfirmButtons (btns, add) {
         Array.prototype.forEach.call(btns, (function (element, index, array) {
             element.classList.remove('disabled');
         }));
+    }
+}
+
+/**
+ * generate Image size Warning if image sizes doesn't in standards
+ * @param files
+ * @param standards
+ */
+function imageSizeWarning(files, standards) {
+    if (files.length) {
+        var dmsRatio = getPostMainImageStandardRatio(standards),
+            imgRatio = 0,
+            fr = new FileReader;
+        fr.onload = function() {
+            var img = new Image;
+            img.onload = function() {
+                imgRatio = img.width/img.height;
+                var biggerThanBottom = imgRatio >= dmsRatio.ratioBottom,
+                    smallerThanTop = imgRatio <= dmsRatio.ratioTop;
+
+                if (!(biggerThanBottom && smallerThanTop)) {
+                    response = {
+                        response: ['Size Ratio must be from '
+                        + Math.round(dmsRatio.ratioBottom * 100)/100 +
+                        ' to ' + Math.round(dmsRatio.ratioTop * 100)/100],
+                        type: 'Image size Warning'
+                    };
+                    handleResponseToast(response, false);
+                }
+            };
+            img.src = fr.result;
+        };
+        fr.readAsDataURL(files[0]);
+    }
+}
+
+/**
+ * generate Ratio for comparison via standards
+ * @param standards
+ * @returns {{ratioBottom: number, ratioTop: number}}
+ */
+function getPostMainImageStandardRatio(standards) {
+    var stdW = standards.width,
+        stdH = standards.height,
+        stdRation = stdW/stdH,
+        stdDiverg = standards.diverg,
+        diverg = stdRation * stdDiverg;
+    return {
+        ratioBottom: stdRation - diverg,
+        ratioTop: stdRation + diverg
     }
 }

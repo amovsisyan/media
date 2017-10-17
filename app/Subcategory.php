@@ -35,7 +35,6 @@ class Subcategory extends Model
      */
     public static function getSubCategoriesBuilderLikeName($name)
     {
-        dd(self::where('name', 'like', "%$name%"));
         return self::where('name', 'like', "%$name%");
     }
 

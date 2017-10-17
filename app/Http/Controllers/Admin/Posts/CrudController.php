@@ -300,12 +300,11 @@ class CrudController extends PostsController
                 $imgName = explode('.', $oldPostPart->body);
                 $ext = end($imgName);
                 if ($ext !== $file->getClientOriginalExtension()) {
-                    $newName = [
-                        $imgName[0],  $file->getClientOriginalExtension()
-                    ];
-                    $updateArr['body'] = implode('.', $newName);
+                    $newName = implode('.', [$imgName[0],  $file->getClientOriginalExtension()]);
+                    $updateArr['body'] = $newName;
                 }
             }
+
             $postPart->update($updateArr);
             if ($imgUpdated) {
                 $getRes = DirectoryEditor::postPartImageEdit($postPart, $oldPostPart);

@@ -119,6 +119,12 @@ footer .footer-navbar ul li:first-child{
 	font-size: 18px;
 }
 
+/*		POST PART		*/
+.post-part img{
+	max-width: 100%;
+	max-height: 700px;
+}
+
 /*		MEDIA		*/
 @media only screen and (max-width: 992px){
 	nav .brand-logo {
