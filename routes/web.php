@@ -96,9 +96,12 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 
 Auth::routes();
 
-// todo change alias_id route to alias
+// todo see what do Laravel WITH with models, it could be very helpfull
+// todo standardization the var names from front side and validation part standardization
+// todo response prepare helper, standardize using it
 // todo localization
 // todo reread all front classes , make some corrections if needs
+// todo not only db length, but also names should be in Settings
 // todo user registration, password dont remember, reset, email sending
 // todo users can comment under posts
 // todo add main page slider capability, by default false , but configurable from Admin

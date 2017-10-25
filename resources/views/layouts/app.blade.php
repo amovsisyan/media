@@ -35,7 +35,7 @@
 			@if(!empty($navbar['subcategory']))
 				<ul id="{{$navbar['category']['alias']}}" class="dropdown-content">
 					@foreach ($navbar['subcategory'] as $subcat)
-						<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
+						<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'])}}">{{$subcat['name']}}</a></li>
 					@endforeach
 				</ul>
 			@endif
@@ -96,7 +96,7 @@
 						<ul class="col s4">
 							<li>{{$navbar['category']['name']}}</li>
 							@foreach ($navbar['subcategory'] as $subcat)
-								<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias'] . '_' . $subcat['id']) }}">{{$subcat['name']}}</a></li>
+								<li><a href="{{ url('/' . $navbar['category']['alias'] . '/' . $subcat['alias']) }}">{{$subcat['name']}}</a></li>
 							@endforeach
 						</ul>
 					@endif

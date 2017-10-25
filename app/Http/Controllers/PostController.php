@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Helpers\Helpers;
-
+use App\Http\Controllers\Helpers\ResponsePrepareHelper;
+use App\Post;
+use Illuminate\Http\Request;
 
 class PostController extends SubcategoryController
 {
@@ -15,16 +16,16 @@ class PostController extends SubcategoryController
 
     public function getPost(Request $request, $category, $subcategory, $post)
     {
-        $post = Helpers::getPostByRequest($post);
-        if ($post) {
-            $post_parts = $post->postParts()->get();
-            $hashtags = $post->hashtags()->get();
+        $post = Post::where('alias', $post)->first();
+        if (!empty($post)) {
+            $postParts = ResponsePrepareHelper::PR_partsGetPost($post);
+            $postHashtags = ResponsePrepareHelper::PR_hashtagsGetPost($post);
 
             $response = [
-                'navbar'      => $this->getNavbar(),
+                'navbar'      => Helpers::getNavbar(),
                 'post_header' => $post->header,
-                'post_parts'  => $post_parts,
-                'hashtags'    => $hashtags
+                'post_parts'  => $postParts,
+                'hashtags'    => $postHashtags
             ];
         }
 

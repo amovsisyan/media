@@ -111,7 +111,7 @@ class CrudController extends PostsController
         try {
             $post = Post::findOrFail($id);
             $subcategory = $post->subcategory()->first();
-            $mainPath = $subcategory->alias . '_' . $subcategory->id . DIRECTORY_SEPARATOR . $post->alias . '_' . $post->id;
+            $mainPath = $subcategory->alias . DIRECTORY_SEPARATOR . $post->alias;
 
             // Post Parts Creation
             self::_createPostParts($request, $post, $mainPath);
@@ -491,7 +491,7 @@ class CrudController extends PostsController
             }
 
             if ($postMainImageCHANGED) {
-                $postPath = $newSubcat->alias . '_' . $newSubcat->id . DIRECTORY_SEPARATOR . $post->alias . '_' . $post->id;
+                $postPath = $newSubcat->alias . DIRECTORY_SEPARATOR . $post->alias;
                 DirectoryEditor::deleteImageByPostPath($postPath);
                 $file = $request->file('postMainImage');
                 $filename = $postPath . DIRECTORY_SEPARATOR . $post->image;
@@ -517,7 +517,7 @@ class CrudController extends PostsController
         ];
         $post = $subcategory->posts()->create($createArr);
 
-        $mainPath = $subcategory->alias . '_' . $subcategory->id . DIRECTORY_SEPARATOR . $post->alias . '_' . $post->id;
+        $mainPath = $subcategory->alias . DIRECTORY_SEPARATOR . $post->alias;
         $file = $request->file('postMainImage');
         $filename = $mainPath . DIRECTORY_SEPARATOR . $post->image;
         Storage::disk('public_posts')->put($filename, File::get($file));

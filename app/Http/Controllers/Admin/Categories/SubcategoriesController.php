@@ -162,8 +162,8 @@ class SubcategoriesController extends MainCategoriesController
             // PART -> SUBCATEGORY DIRECTORY CHANGES
             // if there is even one post means there is directory with subcategory alias_id
             if ($posts->count() > 0 && $subcat->alias !== $request->newAlias) {
-                $oldName = $subcat->alias . '_' . $subcat->id;
-                $newName = $request->newAlias . '_' . $subcat->id;
+                $oldName = $subcat->alias;
+                $newName = $request->newAlias;
                 DirectoryEditor::updateAfterSubcategoryEdit($oldName, $newName);
             }
 

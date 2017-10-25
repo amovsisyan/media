@@ -48,7 +48,7 @@ class DirectoryEditor extends Controller
     {
         try {
             $error = true;
-            $subcategories = Subcategory::whereIn('id', $subcategoryIds)->select('id', 'alias')->get();
+            $subcategories = Subcategory::whereIn('id', $subcategoryIds)->select('alias')->get();
             foreach ($subcategories as $subcategory) {
                 $pathTillSubCat = self::_getPathTillSubCatPlus($subcategory);
                 if (File::isDirectory($pathTillSubCat)) {
@@ -91,13 +91,13 @@ class DirectoryEditor extends Controller
     public static function updateAfterSubcategoryEditforPost($oldSubcat, $newSubcat, $oldPost)
     {
         try {
-            $oldName = $oldSubcat->alias . '_' . $oldSubcat->id;
-            $newName = $newSubcat->alias . '_' . $newSubcat->id;
+            $oldName = $oldSubcat->alias;
+            $newName = $newSubcat->alias;
 
             $prefix = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
             $oldDir = $prefix . $oldName;
             $newDir = $prefix . $newName;
-            $postDir = $oldPost->alias . '_' . $oldPost->id;
+            $postDir = $oldPost->alias;
             $postSourceDir = $oldDir . DIRECTORY_SEPARATOR . $postDir;
             if (!File::isDirectory($newDir)) {
                 File::makeDirectory($newDir, 0777);
@@ -121,9 +121,9 @@ class DirectoryEditor extends Controller
     public static function updateAfterAliasEditedforPost($newSubcat, $oldPost, $post)
     {
         try {
-            $newSubCategName = $newSubcat->alias . '_' . $newSubcat->id;
-            $oldName = $oldPost->alias . '_' . $oldPost->id;
-            $newName = $post->alias . '_' . $post->id;
+            $newSubCategName = $newSubcat->alias;
+            $oldName = $oldPost->alias;
+            $newName = $post->alias;
 
             $subCategDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR . $newSubCategName;
 
@@ -301,7 +301,7 @@ class DirectoryEditor extends Controller
      * @return string
      */
     private static function _getPathTillSubCatPlus($subcategory) {
-        return self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR . $subcategory->alias . '_' . $subcategory->id;
+        return self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR . $subcategory->alias;
     }
 
     /**
@@ -311,8 +311,7 @@ class DirectoryEditor extends Controller
      * @return string
      */
     private static function _getPathFromSubTillPostsPlus($subcat, $post) {
-        return $subcat->alias . '_' . $subcat->id .  DIRECTORY_SEPARATOR
-            . $post->alias . '_' . $post->id;
+        return $subcat->alias .  DIRECTORY_SEPARATOR . $post->alias;
     }
 
     /**

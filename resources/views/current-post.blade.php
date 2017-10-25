@@ -16,7 +16,7 @@
                             <h5 class="head">
                                 {{$post_part['head']}}
                             </h5>
-                            @if(!is_null($post_part['body']))
+                            @if(!empty($post_part['body']))
                                 <div class="body">
                                     <img src="/img/cat/{{Request::segment(2)}}/{{Request::segment(3)}}/parts/{{$post_part['body']}}" alt="">
                                 </div>
