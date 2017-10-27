@@ -14,5 +14,6 @@ class DatabaseSeeder extends Seeder
          $this->call(FillAdminNavbarSeeder::class);
          $this->call(FillAdminNavbarPartsSeeder::class);
          $this->call(FillAdminPanelNavbarSeeder::class);
+         $this->call(FillLocale::class);
     }
 }

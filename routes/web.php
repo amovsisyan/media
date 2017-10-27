@@ -96,10 +96,10 @@ Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost'
 
 Auth::routes();
 
+// todo localization
 // todo see what do Laravel WITH with models, it could be very helpfull
 // todo standardization the var names from front side and validation part standardization
 // todo response prepare helper, standardize using it
-// todo localization
 // todo reread all front classes , make some corrections if needs
 // todo not only db length, but also names should be in Settings
 // todo user registration, password dont remember, reset, email sending

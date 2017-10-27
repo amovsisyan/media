@@ -7,18 +7,31 @@ use App\Http\Controllers\Controller;
 
 class DBColumnLengthData extends Controller
 {
+    const LOCALE = [
+        'name' => 2
+    ];
+
     const CATEGORIES_TABLE = [
-        'alias' => 30,
+        'alias' => 30
+    ];
+
+    const CATEGORIES_LOCALE_TABLE = [
         'name' => 30
     ];
 
     const SUBCATEGORIES_TABLE = [
-        'alias' => 30,
+        'alias' => 30
+    ];
+
+    const SUBCATEGORIES_LOCAL_TABLE = [
         'name' => 30
     ];
 
     const POSTS_TABLE = [
-        'alias' => 30,
+        'alias' => 30
+    ];
+
+    const POSTS_LOCALE_TABLE = [
         'header' => 60,
         'text' => 80,
         'image' => 35
@@ -31,7 +44,10 @@ class DBColumnLengthData extends Controller
     ];
 
     const HASHTAG_TABLE = [
-        'alias' => 40,
+        'alias' => 40
+    ];
+
+    const HASHTAG_LOCALE_TABLE = [
         'hashtag' => 40
     ];
 }

@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use \App\Http\Controllers\Data\DBColumnLengthData;
 
-class CreatTablePosts extends Migration
+class CreateTableSubCategoriesLocale1 extends Migration
 {
     /**
      * Run the migrations.
@@ -14,11 +14,14 @@ class CreatTablePosts extends Migration
      */
     public function up()
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('subcategories_locale', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('alias', DBColumnLengthData::POSTS_TABLE['alias'])->unique();
+            $table->string('name', DBColumnLengthData::CATEGORIES_LOCALE_TABLE['name'])->unique();
             $table->integer('subcateg_id')->unsigned();
             $table->foreign('subcateg_id')->references('id')->on('subcategories')->onDelete('cascade');
+            $table->integer('locale_id')->unsigned();
+            $table->foreign('locale_id')->references('id')->on('locale')->onDelete('cascade');
+
             $table->timestamps();
         });
     }
@@ -30,6 +33,6 @@ class CreatTablePosts extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('subcategories_locale');
     }
 }

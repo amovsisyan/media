@@ -16,7 +16,6 @@ class CreateTableHashtags extends Migration
     {
         Schema::create('hashtags', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('hashtag',DBColumnLengthData::HASHTAG_TABLE['hashtag'])->unique();
             $table->string('alias',DBColumnLengthData::HASHTAG_TABLE['alias'])->unique();
         });
     }
