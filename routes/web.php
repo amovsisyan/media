@@ -81,6 +81,8 @@ Route::group(['prefix' => 'qwentin'], function () {
     Route::get('/', ['uses'=>'AdminController@index','as'=>'adminDashboard']);
 });
 
+Route::get('/', ['middleware' => 'locale', 'uses' => 'CategoryController@getCategory']);
+
 Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
     Route::get('/', ['uses' => 'CategoryController@getCategory', 'as' => 'category']);
 

@@ -24,6 +24,19 @@ class Subcategory extends Model
         return $this->hasMany('App\SubcategoryLocale', 'subcateg_id', 'id');
     }
 
+    public static function getSubcategoryPostsLocaledByAlias($alias, $localeId)
+    {
+        $result = self::where('alias', $alias)
+            ->with(['posts' => function ($query) use ($localeId) {
+                $query->with(['postLocale'=> function ($query) use ($localeId) {
+                    $query->where('locale_id', $localeId);
+                }]);
+            }])
+            ->get();
+
+        return $result;
+    }
+
     /**
      * @param $id
      * @return mixed

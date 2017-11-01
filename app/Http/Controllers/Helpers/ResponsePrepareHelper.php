@@ -46,24 +46,33 @@ class ResponsePrepareHelper extends Controller
         $postHashtags = [];
         foreach ($hashtags as $hashtag) {
             $postHashtags[] = [
-                'alias' => $hashtag->alias
+                  'alias'   => $hashtag->alias
                 , 'hashtag' => $hashtag->hashtag
             ];
         }
         return $postHashtags;
     }
 
-    public static function PR_GetSubCategory($posts)
+    public static function PR_GetSubCategory($subcategoryPostsLocale)
     {
         $respPosts = [];
-        foreach ($posts as $post) {
-            $respPosts[] = [
-                  'alias'  => $post->alias
-                , 'image'  => $post->image
-                , 'header' => $post->header
-                , 'text'   => $post->text
-            ];
+        foreach ($subcategoryPostsLocale as $subcategory) {
+            $posts = $subcategory['posts'];
+
+            foreach ($posts as $post) {
+                $postsLocale = $post['postLocale'];
+
+                foreach ($postsLocale as $postLocale) {
+                    $respPosts[] = [
+                        'alias'  => $post->alias
+                        , 'image'  => $postLocale->image
+                        , 'header' => $postLocale->header
+                        , 'text'   => $postLocale->text
+                    ];
+                }
+            }
         }
+
         return $respPosts;
     }
 }

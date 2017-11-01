@@ -15,12 +15,15 @@ class SubcategoryController extends CategoryController
         parent::__construct();
     }
 
-    protected function getSubCategory(Request $request, $category, $subcategory)
+    protected function getSubCategory(Request $request, $locale, $category, $subcategory)
     {
-        $posts = Subcategory::where('alias', $subcategory)
-            ->first()->posts()->get();
+        $localeId = session()->get('localeId', 1); // todo should make some locale helper
+        // todo or this should go to model controller main
 
-        $respPosts = ResponsePrepareHelper::PR_GetSubCategory($posts);
+        $alias = $subcategory;
+        $subcategoryPostsLocale = Subcategory::getSubcategoryPostsLocaledByAlias($alias, $localeId);
+
+        $respPosts = ResponsePrepareHelper::PR_GetSubCategory($subcategoryPostsLocale);
 
         $response = [
             'navbar'    => Helpers::getNavbar(),

@@ -20,7 +20,7 @@ class LocaleMiddleware
         $localeSettings  = LocaleSettings::createArr;
         $existingLocales = array_keys($localeSettings);
 
-        if (in_array($request->segment(1), $existingLocales)) {
+        if ($requestedLocale && in_array($requestedLocale, $existingLocales)) {
             if ($requestedLocale !== $locale) {
                 $locale = $requestedLocale;
                 $localeId = $localeSettings[$locale]['id'];
