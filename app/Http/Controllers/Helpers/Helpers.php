@@ -4,11 +4,8 @@ namespace App\Http\Controllers\Helpers;
 
 use App\AdminNavbar;
 use App\AdminNavbarParts;
-use App\Category;
-use App\Post;
-use Illuminate\Http\Request;
+use App\CategoryLocale;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\AdminController;
 
 class Helpers extends Controller
 {
@@ -27,21 +24,29 @@ class Helpers extends Controller
      */
     public static function getNavbar ()
     {
-        $categories = Category::select('id', 'alias', 'name')->get();
+        $localeId = session()->get('localeId', 1); // todo should make some locale helper
+
+        $categoriesLocale = CategoryLocale::getCategorySubcategoryLocalized($localeId);
 
         $response = [];
-        foreach ($categories as $key => $category) {
+        foreach ($categoriesLocale as $key => $categoryLocale) {
             $response[$key]['category'] = [
-                'alias'     => $category->alias,
-                'name'      => $category->name,
+                'alias' => $categoryLocale['category']->alias
+                , 'name'  => $categoryLocale->name,
             ];
-            $subcategories = $category->subcategories()->get();
+
+            $subcategories = $categoryLocale['category']['subcategories'];
+
             foreach ($subcategories as $subcategory) {
-                $response[$key]['subcategory'][] = [
-                    'id'        => $subcategory->id,
-                    'alias'     => $subcategory->alias,
-                    'name'      => $subcategory->name,
-                ];
+                $subcategoryLocale = $subcategory['subcategoriesLocale'];
+
+                foreach ($subcategoryLocale as $localeSub) {
+                    $response[$key]['subcategory'][] = [
+                        'id' => $localeSub->id
+                        , 'alias' => $subcategory->alias
+                        , 'name' => $localeSub->name
+                    ];
+                }
             }
         }
 

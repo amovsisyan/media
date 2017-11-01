@@ -9,7 +9,7 @@ class Subcategory extends Model
     protected $table = 'subcategories';
 
     protected $fillable = [
-        'name', 'alias', 'categ_id'
+        'alias', 'categ_id'
     ];
 
     public function category(){
@@ -18,6 +18,10 @@ class Subcategory extends Model
 
     public function posts(){
         return $this->hasMany('App\Post', 'subcateg_id', 'id');
+    }
+
+    public function subcategoriesLocale(){
+        return $this->hasMany('App\SubcategoryLocale', 'subcateg_id', 'id');
     }
 
     /**

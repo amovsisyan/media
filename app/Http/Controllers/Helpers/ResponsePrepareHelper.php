@@ -6,20 +6,21 @@ use App\Http\Controllers\Controller;
 
 class ResponsePrepareHelper extends Controller
 {
-    public static function PR_GetCategory($posts)
+    public static function PR_GetCategory($postsLocale)
     {
         $respPosts = [];
-        foreach($posts as $key => $post) {
-            $subCategory = $post->subcategory()->select('alias', 'categ_id')->first();
-            $category = $subCategory->category()->select('alias')->first();
+        foreach($postsLocale as $key => $postLocale) {
+            $subCategory = $postLocale['post']['subcategory'];
+            $category = $subCategory['category'];
+
             $respPosts[] = [
-                'id'        => $post->id,
-                'alias'     => $post->alias,
-                'header'    => $post->header,
-                'text'      => $post->text,
-                'image'     => $post->image,
-                'sub_alias' => $subCategory->alias,
-                'cat_alias' => $category->alias
+                  'id'        => $postLocale->id
+                , 'alias'     => $postLocale['post']->alias
+                , 'header'    => $postLocale->header
+                , 'text'      => $postLocale->text
+                , 'image'     => $postLocale->image
+                , 'sub_alias' => $subCategory->alias
+                , 'cat_alias' => $category->alias
             ];
         }
         return $respPosts;
@@ -31,9 +32,9 @@ class ResponsePrepareHelper extends Controller
         $postParts = [];
         foreach ($parts as $part) {
             $postParts[] = [
-                'head' => $part->head,
-                'body' => $part->body,
-                'foot' => $part->foot
+                  'head' => $part->head
+                , 'body' => $part->body
+                , 'foot' => $part->foot
             ];
         }
         return $postParts;
@@ -45,8 +46,8 @@ class ResponsePrepareHelper extends Controller
         $postHashtags = [];
         foreach ($hashtags as $hashtag) {
             $postHashtags[] = [
-                'alias' => $hashtag->alias,
-                'hashtag' => $hashtag->hashtag
+                'alias' => $hashtag->alias
+                , 'hashtag' => $hashtag->hashtag
             ];
         }
         return $postHashtags;
@@ -57,10 +58,10 @@ class ResponsePrepareHelper extends Controller
         $respPosts = [];
         foreach ($posts as $post) {
             $respPosts[] = [
-                'alias'  => $post->alias,
-                'image'  => $post->image,
-                'header' => $post->header,
-                'text'   => $post->text
+                  'alias'  => $post->alias
+                , 'image'  => $post->image
+                , 'header' => $post->header
+                , 'text'   => $post->text
             ];
         }
         return $respPosts;

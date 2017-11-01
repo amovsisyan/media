@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use App\Http\Controllers\Services\Locale\LocaleSettings;
 
 class FillLocale extends Seeder
 {
@@ -14,16 +15,16 @@ class FillLocale extends Seeder
 
         $createArr = [
             [
-                'id' => 1,
-                'name' => 'en'
+                'id'   => LocaleSettings::createArr['en']['id'],
+                'name' => LocaleSettings::createArr['en']['name']
             ],
             [
-                'id' => 2,
-                'name' => 'ru'
+                'id'   => LocaleSettings::createArr['ru']['id'],
+                'name' => LocaleSettings::createArr['ru']['name']
             ],
             [
-                'id' => 3,
-                'name' => 'am'
+                'id'   => LocaleSettings::createArr['am']['id'],
+                'name' => LocaleSettings::createArr['am']['name']
             ]
         ];
 

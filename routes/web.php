@@ -81,23 +81,25 @@ Route::group(['prefix' => 'qwentin'], function () {
     Route::get('/', ['uses'=>'AdminController@index','as'=>'adminDashboard']);
 });
 
+Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
+    Route::get('/', ['uses' => 'CategoryController@getCategory', 'as' => 'category']);
 
-Route::get('/', ['uses'=>'CategoryController@getCategory','as'=>'category']);
-Route::get('/home', ['uses'=>'CategoryController@getCategory','as'=>'category'])->where('home', 'home');
+    Route::get('/home', ['uses'=>'CategoryController@getCategory','as'=>'category'])->where('home', 'home');
 
 // todo make separate controller for hashtag ))
-Route::get('/hashtag/{alias}', ['uses'=>'SubcategoryController@getByHashtag','as'=>'byHashtag']);
+    Route::get('/hashtag/{alias}', ['uses'=>'SubcategoryController@getByHashtag','as'=>'byHashtag']);
 
-Route::get('/{category}/{subcategory}', ['uses'=>'SubcategoryController@getSubCategory','as'=>'subcategory'])
+    Route::get('/{category}/{subcategory}', ['uses'=>'SubcategoryController@getSubCategory','as'=>'subcategory'])
         ->where(['category' => '^[a-zA-Z0-9_]*$', 'subcategory' => '^[a-zA-Z0-9_]*$']);
 
-Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost','as'=>'post'])
+    Route::get('/{category}/{subcategory}/{post}', ['uses'=>'PostController@getPost','as'=>'post'])
         ->where(['category' => '^[a-zA-Z0-9_]*$', 'subcategory' => '^[a-zA-Z0-9_]*$', 'post' => '^[a-zA-Z0-9_]*$']);
 
-Auth::routes();
+    Auth::routes();
+});
+
 
 // todo localization
-// todo see what do Laravel WITH with models, it could be very helpfull
 // todo standardization the var names from front side and validation part standardization
 // todo response prepare helper, standardize using it
 // todo reread all front classes , make some corrections if needs

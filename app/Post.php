@@ -9,8 +9,12 @@ class Post extends Model
     protected $table = 'posts';
 
     protected $fillable = [
-        'alias', 'header', 'text', 'image', 'subcateg_id'
+        'alias', 'subcateg_id'
     ];
+
+    public function postLocale(){
+        return $this->hasMany('App\PostLocale', 'post_id', 'id');
+    }
 
     public function subcategory(){
         return $this->belongsTo('App\Subcategory', 'subcateg_id');

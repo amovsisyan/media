@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\ResponsePrepareHelper;
-use App\Post;
+use App\PostLocale;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -17,13 +17,15 @@ class CategoryController extends Controller
 
     protected function getCategory(Request $request)
     {
-        $posts = Post::orderBy('created_at', 'desc')->take(self::RECENT_POSTS_COUNT)->get();
+        $localeId = session()->get('localeId', 1); // todo should make some locale helper
 
-        $respPosts = ResponsePrepareHelper::PR_GetCategory($posts);
+        $postsLocale = PostLocale::getLimitedLocalizedPosts($localeId, self::RECENT_POSTS_COUNT);
+
+        $respPostsLocale = ResponsePrepareHelper::PR_GetCategory($postsLocale);
 
         $response = [
-            'navbar'    => Helpers::getNavbar(),
-            'posts'     => $respPosts,
+            'navbar' => Helpers::getNavbar()
+            , 'posts' => $respPostsLocale
         ];
 
         return response()

@@ -9,11 +9,15 @@ class Category extends Model
     protected $table = 'categories';
 
     protected $fillable = [
-        'name', 'alias'
+        'alias'
     ];
 
     public function subcategories(){
         return $this->hasMany('App\Subcategory', 'categ_id', 'id');
+    }
+
+    public function categoriesLocale(){
+        return $this->hasMany('App\CategoryLocale', 'categ_id', 'id');
     }
 
     /**
