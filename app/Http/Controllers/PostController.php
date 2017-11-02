@@ -14,22 +14,25 @@ class PostController extends SubcategoryController
         parent::__construct();
     }
 
-    public function getPost(Request $request, $category, $subcategory, $post)
+    public function getPost(Request $request, $locale, $category, $subcategory, $post)
     {
-        $post = Post::where('alias', $post)->first();
+        $response = [];
+        $localeId = session()->get('localeId', 1); // todo should make some locale helper
+
+        $postPartsLocale = Post::postPartsWithHashtagsLocale($post, $localeId);
+
         if (!empty($post)) {
-            $postParts = ResponsePrepareHelper::PR_partsGetPost($post);
-            $postHashtags = ResponsePrepareHelper::PR_hashtagsGetPost($post);
+            $postPartsResponse = ResponsePrepareHelper::PR_partsGetPost($postPartsLocale);
 
             $response = [
-                'navbar'      => Helpers::getNavbar(),
-                'post_header' => $post->header,
-                'post_parts'  => $postParts,
-                'hashtags'    => $postHashtags
+                  'navbar'      => Helpers::getNavbar()
+                , 'post_header' => $postPartsResponse['postHeader']
+                , 'post_parts'  => $postPartsResponse['data']['postParts']
+                , 'hashtags'    => $postPartsResponse['data']['postHashtags']
             ];
         }
 
         return response()
-            -> view('current-post', ['response' => $response]);
+            ->view('current-post', ['response' => $response]);
     }
 }

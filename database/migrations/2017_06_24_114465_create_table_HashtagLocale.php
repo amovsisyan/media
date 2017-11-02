@@ -19,6 +19,8 @@ class CreateTableHashtagLocale extends Migration
             $table->string('hashtag',DBColumnLengthData::HASHTAG_LOCALE_TABLE['hashtag'])->unique();
             $table->integer('hashtag_id')->unsigned();
             $table->foreign('hashtag_id')->references('id')->on('hashtags')->onDelete('cascade');
+            $table->integer('locale_id')->unsigned();
+            $table->foreign('locale_id')->references('id')->on('locale')->onDelete('cascade');
         });
     }
 

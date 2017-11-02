@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PostLocale extends Model
 {
-    protected $table = 'post_locale';
+    protected $table = 'posts_locale';
 
     protected $fillable = [
         'header', 'text', 'image', 'post_id', 'locale_id'
@@ -18,6 +18,10 @@ class PostLocale extends Model
 
     public function locale(){
         return $this->belongsTo('App\Locale', 'locale_id');
+    }
+
+    public function postParts(){
+        return $this->hasMany('App\PostParts', 'posts_locale_id');
     }
 
     public static function getLimitedLocalizedPosts($localeId, $recentPostCount)

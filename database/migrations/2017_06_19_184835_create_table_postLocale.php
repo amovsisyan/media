@@ -14,7 +14,7 @@ class CreateTablePostLocale extends Migration
      */
     public function up()
     {
-        Schema::create('post_locale', function (Blueprint $table) {
+        Schema::create('posts_locale', function (Blueprint $table) {
             $table->increments('id');
             $table->string('header', DBColumnLengthData::POSTS_LOCALE_TABLE['header']);
             $table->string('text', DBColumnLengthData::POSTS_LOCALE_TABLE['text']);

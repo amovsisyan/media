@@ -25,7 +25,27 @@ class Post extends Model
     }
 
     public function hashtags(){
-        return $this->belongsToMany('App\Hashtag', 'post_hashtag', 'post_id');
+        return $this->belongsToMany('App\Hashtag', 'post_hashtag', 'post_id', 'hashtags_id');
+    }
+
+    public static function postPartsWithHashtagsLocale($postAlias, $localeId)
+    {
+        $result = self::where('alias', $postAlias)
+            ->with(
+                [
+                    'postLocale' => function ($query) use ($localeId) {
+                        $query->where('locale_id', $localeId)
+                            ->with(['postParts']);
+                    },
+                    'hashtags' => function ($query) use ($localeId) {
+                        $query->with(['hashtagsLocale' => function ($query) use ($localeId) {
+                            $query->where('locale_id', $localeId);
+                        }]);
+                    }
+                ]
+            )->get();
+
+        return $result;
     }
 
     /**

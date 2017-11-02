@@ -26,31 +26,36 @@ class ResponsePrepareHelper extends Controller
         return $respPosts;
     }
 
-    public static function PR_partsGetPost($post)
+    public static function PR_partsGetPost($postPartsLocale)
     {
-        $parts = $post->postParts()->get();
-        $postParts = [];
-        foreach ($parts as $part) {
-            $postParts[] = [
-                  'head' => $part->head
-                , 'body' => $part->body
-                , 'foot' => $part->foot
-            ];
-        }
-        return $postParts;
-    }
+        $postPartsResponse = [];
+        $postHeader = null;
 
-    public static function PR_hashtagsGetPost($post)
-    {
-        $hashtags = $post->hashtags()->get();
-        $postHashtags = [];
-        foreach ($hashtags as $hashtag) {
-            $postHashtags[] = [
-                  'alias'   => $hashtag->alias
-                , 'hashtag' => $hashtag->hashtag
-            ];
+        foreach ($postPartsLocale as $postPartLocale) {
+            foreach ($postPartLocale['postLocale'] as $postsLocale) {
+                $postHeader = $postsLocale->header;
+                foreach ($postsLocale['postParts'] as $part) {
+                    $postPartsResponse['data']['postParts'][] = [
+                          'head' => $part->head
+                        , 'body' => $part->body
+                        , 'foot' => $part->foot
+                    ];
+                }
+            }
+
+            foreach ($postPartLocale['hashtags'] as $hashtag) {
+                foreach ($hashtag['hashtagsLocale'] as $hashtagLocale) {
+                    $postPartsResponse['data']['postHashtags'][] = [
+                          'alias'   => $hashtag->alias
+                        , 'hashtag' => $hashtagLocale->hashtag
+                    ];
+                }
+            }
         }
-        return $postHashtags;
+
+        $postPartsResponse['postHeader'] = $postHeader;
+
+        return $postPartsResponse;
     }
 
     public static function PR_GetSubCategory($subcategoryPostsLocale)

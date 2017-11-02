@@ -10,11 +10,15 @@ class Hashtag extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'hashtag', 'alias'
+        'alias'
     ];
 
     public function posts(){
-        return $this->belongsToMany('App\Post', 'post_hashtag', 'hashtag_id');
+        return $this->belongsToMany('App\Post', 'post_hashtag', 'hashtags_id', 'post_id');
+    }
+
+    public function hashtagsLocale(){
+        return $this->hasMany('App\HashtagLocale', 'hashtag_id', 'id');
     }
 
     /**
