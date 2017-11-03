@@ -17,9 +17,7 @@ class CategoryController extends Controller
 
     protected function getCategory(Request $request)
     {
-        $localeId = session()->get('localeId', 1); // todo should make some locale helper
-
-        $postsLocale = PostLocale::getLimitedLocalizedPosts($localeId, self::RECENT_POSTS_COUNT);
+        $postsLocale = PostLocale::getLimitedLocalizedPosts(self::RECENT_POSTS_COUNT);
 
         $respPostsLocale = ResponsePrepareHelper::PR_GetCategory($postsLocale);
 

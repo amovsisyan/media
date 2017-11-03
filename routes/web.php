@@ -89,7 +89,7 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
     Route::get('/home', ['uses'=>'CategoryController@getCategory','as'=>'category'])->where('home', 'home');
 
 // todo make separate controller for hashtag ))
-    Route::get('/hashtag/{alias}', ['uses'=>'SubcategoryController@getByHashtag','as'=>'byHashtag']);
+    Route::get('/hashtag/{alias}', ['uses'=>'HashtagController@getByHashtag','as'=>'byHashtag']);
 
     Route::get('/{category}/{subcategory}', ['uses'=>'SubcategoryController@getSubCategory','as'=>'subcategory'])
         ->where(['category' => '^[a-zA-Z0-9_]*$', 'subcategory' => '^[a-zA-Z0-9_]*$']);

@@ -26,6 +26,36 @@ class ResponsePrepareHelper extends Controller
         return $respPosts;
     }
 
+    public static function PR_GetByHashtag($postsLocaleByHashtagAlias)
+    {
+        $respPosts = [];
+        $hashtagLocale = null;
+
+        foreach($postsLocaleByHashtagAlias as $key => $hashtag) {
+            $hashtagLocale = $hashtag['hashtagsLocale'][0]->hashtag;
+            $posts = $hashtag['posts'];
+            foreach ($posts as $post) {
+                $postsLocale = $post['postLocale'];
+                $subcategory = $post['subcategory'];
+                $category = $subcategory['category'];
+
+                foreach ($postsLocale as $postLocale) {
+                    $respPosts['data'][] = [
+                          'id'        => $postLocale->id
+                        , 'alias'     => $postLocale['post']->alias
+                        , 'header'    => $postLocale->header
+                        , 'text'      => $postLocale->text
+                        , 'image'     => $postLocale->image
+                        , 'sub_alias' => $subcategory->alias
+                        , 'cat_alias' => $category->alias
+                    ];
+                }
+            }
+        }
+        $respPosts['hashtagsLocale'] = $hashtagLocale;
+        return $respPosts;
+    }
+
     public static function PR_partsGetPost($postPartsLocale)
     {
         $postPartsResponse = [];

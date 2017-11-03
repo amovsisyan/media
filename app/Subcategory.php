@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Http\Controllers\Helpers\Helpers;
 use Illuminate\Database\Eloquent\Model;
 
 class Subcategory extends Model
@@ -24,8 +25,10 @@ class Subcategory extends Model
         return $this->hasMany('App\SubcategoryLocale', 'subcateg_id', 'id');
     }
 
-    public static function getSubcategoryPostsLocaledByAlias($alias, $localeId)
+    public static function getSubcategoryPostsLocaledByAlias($alias)
     {
+        $localeId = Helpers::getLocaleIdFromSession();
+
         $result = self::where('alias', $alias)
             ->with(['posts' => function ($query) use ($localeId) {
                 $query->with(['postLocale'=> function ($query) use ($localeId) {

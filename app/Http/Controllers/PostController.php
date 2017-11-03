@@ -17,9 +17,8 @@ class PostController extends SubcategoryController
     public function getPost(Request $request, $locale, $category, $subcategory, $post)
     {
         $response = [];
-        $localeId = session()->get('localeId', 1); // todo should make some locale helper
 
-        $postPartsLocale = Post::postPartsWithHashtagsLocale($post, $localeId);
+        $postPartsLocale = Post::postPartsWithHashtagsLocale($post);
 
         if (!empty($post)) {
             $postPartsResponse = ResponsePrepareHelper::PR_partsGetPost($postPartsLocale);

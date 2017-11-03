@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Http\Controllers\Helpers\Helpers;
 use Illuminate\Database\Eloquent\Model;
 
 class Hashtag extends Model
@@ -19,6 +20,33 @@ class Hashtag extends Model
 
     public function hashtagsLocale(){
         return $this->hasMany('App\HashtagLocale', 'hashtag_id', 'id');
+    }
+
+    public static function getPostsLocaledByHashtagAlias($alias)
+    {
+        $localeId = Helpers::getLocaleIdFromSession();
+
+        $result = self::where('alias', $alias)
+            ->with(['posts' => function ($query) use ($localeId) {
+                $query->with(
+                    [
+                        'postLocale' => function ($query) use ($localeId) {
+                            $query->where('locale_id', $localeId);
+                        },
+                        'subcategory' => function ($query) {
+                            $query->with(['category' => function ($query) {
+                            }]);
+                        }
+                    ]
+                );
+            },
+                'hashtagsLocale' => function ($query) use ($localeId) {
+                    $query->where('locale_id', $localeId);
+                }
+            ])
+            ->get();
+
+        return $result;
     }
 
     /**

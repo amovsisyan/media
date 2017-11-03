@@ -33,7 +33,7 @@
                 <div class="col s12">
                     <div class="hashtags">
                         @foreach ($response['hashtags'] as $hashtag)
-                            <a href="{{url('/hashtag/' . $hashtag['alias'])}}">
+                            <a href="{{url('/' . Request::segment(1) . '/hashtag/' . $hashtag['alias'])}}">
                                 <div class="chip">
                                     #{{$hashtag['hashtag']}}
                                 </div>

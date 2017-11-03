@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Http\Controllers\Helpers\Helpers;
 use Illuminate\Database\Eloquent\Model;
 
 class CategoryLocale extends Model
@@ -25,8 +26,10 @@ class CategoryLocale extends Model
      * @param $localeId
      * @return mixed
      */
-    public static function getCategorySubcategoryLocalized($localeId)
+    public static function getCategorySubcategoryLocalized()
     {
+        $localeId = Helpers::getLocaleIdFromSession();
+
         $result = self::select('id', 'name', 'categ_id')
             ->where('locale_id', $localeId)
             ->with(['category' => function ($query) use ($localeId) {

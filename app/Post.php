@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Http\Controllers\Helpers\Helpers;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
@@ -28,8 +29,10 @@ class Post extends Model
         return $this->belongsToMany('App\Hashtag', 'post_hashtag', 'post_id', 'hashtags_id');
     }
 
-    public static function postPartsWithHashtagsLocale($postAlias, $localeId)
+    public static function postPartsWithHashtagsLocale($postAlias)
     {
+        $localeId = Helpers::getLocaleIdFromSession();
+
         $result = self::where('alias', $postAlias)
             ->with(
                 [

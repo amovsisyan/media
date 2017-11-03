@@ -24,9 +24,7 @@ class Helpers extends Controller
      */
     public static function getNavbar ()
     {
-        $localeId = session()->get('localeId', 1); // todo should make some locale helper
-
-        $categoriesLocale = CategoryLocale::getCategorySubcategoryLocalized($localeId);
+        $categoriesLocale = CategoryLocale::getCategorySubcategoryLocalized();
 
         $response = [];
         foreach ($categoriesLocale as $key => $categoryLocale) {
@@ -52,4 +50,10 @@ class Helpers extends Controller
 
         return  $response;
     }
+
+    public static function getLocaleIdFromSession()
+    {
+        return session()->get('localeId', 1);
+    }
+
 }

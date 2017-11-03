@@ -17,11 +17,8 @@ class SubcategoryController extends CategoryController
 
     protected function getSubCategory(Request $request, $locale, $category, $subcategory)
     {
-        $localeId = session()->get('localeId', 1); // todo should make some locale helper
-        // todo or this should go to model controller main
-
         $alias = $subcategory;
-        $subcategoryPostsLocale = Subcategory::getSubcategoryPostsLocaledByAlias($alias, $localeId);
+        $subcategoryPostsLocale = Subcategory::getSubcategoryPostsLocaledByAlias($alias);
 
         $respPosts = ResponsePrepareHelper::PR_GetSubCategory($subcategoryPostsLocale);
 
@@ -32,22 +29,5 @@ class SubcategoryController extends CategoryController
 
         return response()
             -> view('category', ['response' => $response]);
-    }
-
-    public function getByHashtag(Request $request, $alias)
-    {
-        $hashtag = Hashtag::where('alias', $alias)->first();
-        $posts = $hashtag->posts()->get();
-
-        $respPosts = ResponsePrepareHelper::PR_GetCategory($posts);
-
-        $response = [
-            'navbar'    => Helpers::getNavbar(),
-            'posts'     => $respPosts,
-            'hashtag'   => $hashtag->hashtag
-        ];
-
-        return response()
-            -> view('by-hashtag', ['response' => $response]);
     }
 }
