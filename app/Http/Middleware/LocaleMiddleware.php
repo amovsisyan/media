@@ -8,13 +8,10 @@ use App\Http\Controllers\Services\Locale\LocaleSettings;
 
 class LocaleMiddleware
 {
-    const DEFAULT_LOCALE = LocaleSettings::createArr['en']['name'];
-    const DEFAULT_LOCALE_ID = 1;
-
     public function handle($request, Closure $next)
     {
-        $locale   = self::DEFAULT_LOCALE;
-        $localeId = self::DEFAULT_LOCALE_ID;
+        $locale   = LocaleSettings::getDefaultLocale();
+        $localeId = LocaleSettings::getDefaultLocaleID();
 
         $requestedLocale = strtolower($request->segment(1));
         $localeSettings  = LocaleSettings::createArr;
@@ -27,7 +24,10 @@ class LocaleMiddleware
                 \App::setLocale($locale);
             }
         } else {
-            return redirect('/' . self::DEFAULT_LOCALE);
+            if ($requestedLocale === 'login' || $requestedLocale === 'logout' || $requestedLocale === 'qwentin') {
+                return redirect('/' . $locale . '/' . $requestedLocale);
+            }
+            return redirect('/' . $locale);
         }
 
         Session::put('localeId', $localeId);

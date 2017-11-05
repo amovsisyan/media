@@ -44,7 +44,7 @@
 										@if (!empty($navbar['part']))
 											@foreach ($navbar['part'] as $part)
 												<li data-id="{{ $part['id'] }}">
-													<a href="{{ url('/qwentin/' . $navbar['nav']['alias'] . '/' . $part['alias']) }}">{{ $part['name'] }}</a>
+													<a href="{{ url(Request::segment(1) . '/qwentin/' . $navbar['nav']['alias'] . '/' . $part['alias']) }}">{{ $part['name'] }}</a>
 												</li>
 											@endforeach
 										@endif

@@ -50,7 +50,7 @@ class AdminLoginController extends Controller
         ];
 
         if (Auth::guard('admin')->attempt($credentials, $request->remember)) {
-            return redirect(route('adminDashboard'));
+            return redirect(route('adminDashboard', ['locale' => \App::getLocale()]));
         }
 
         return redirect()->back()->withInput($request->only('email', 'remember'));

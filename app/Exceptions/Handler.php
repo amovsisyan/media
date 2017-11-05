@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Session;
 
 class Handler extends ExceptionHandler
 {
@@ -64,7 +65,8 @@ class Handler extends ExceptionHandler
         $route = 'login';
         $guard = array_get($exception->guards(), 0);
         if ($guard === 'admin') {
-            $route = '/qwentin/login';
+            $locale = strtolower($request->segment(1));
+            $route = "$locale/qwentin/login";
         }
 
         return redirect()->guest($route);

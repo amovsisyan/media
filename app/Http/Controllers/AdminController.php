@@ -27,7 +27,7 @@ class AdminController extends Controller
             -> view('admin.index', ['response' => $response]);
     }
 
-    public function part(Request $request, $navbar, $part)
+    public function part(Request $request, $locale, $navbar, $part)
     {
         $response['leftNav'] = AdminNavbar::prepareLeftNavbar();
         $response['panel'] = AdminNavbarParts::preparePanelNavbar($part);

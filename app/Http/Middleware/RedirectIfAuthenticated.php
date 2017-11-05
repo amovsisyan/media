@@ -22,7 +22,7 @@ class RedirectIfAuthenticated
             $route = 'adminDashboard';
         }
         if (Auth::guard($guard)->check()) {
-            return redirect()->route($route);
+            return redirect()->route($route, ['locale' => \App::getLocale()]);
         }
 
         return $next($request);

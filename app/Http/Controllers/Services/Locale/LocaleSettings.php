@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 
 class LocaleSettings extends Controller
 {
+    const DEFAULT_LOCALE = self::createArr['en']['name'];
+    const DEFAULT_LOCALE_ID = 1;
+
     const createArr = [
         'en' => [
             'id' => 1,
@@ -21,4 +24,14 @@ class LocaleSettings extends Controller
             'name' => 'am'
         ]
     ];
+
+    public static function getDefaultLocale()
+    {
+        return self::DEFAULT_LOCALE;
+    }
+
+    public static function getDefaultLocaleID()
+    {
+        return self::DEFAULT_LOCALE_ID;
+    }
 }
