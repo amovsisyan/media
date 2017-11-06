@@ -50,4 +50,12 @@ class DBColumnLengthData extends Controller
     const HASHTAG_LOCALE_TABLE = [
         'hashtag' => 40
     ];
+
+    public static function getCategoryLenghts()
+    {
+        return [
+            'alias' => self::CATEGORIES_TABLE['alias']
+            , 'name' => self::CATEGORIES_LOCALE_TABLE['name']
+        ];
+    }
 }

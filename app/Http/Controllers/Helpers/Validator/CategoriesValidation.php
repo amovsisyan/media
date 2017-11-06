@@ -9,20 +9,22 @@ class CategoriesValidation extends AbstractValidator
 {
     const CATEGORY_COMMON_RULES = [
         'alias' => 'required|min:2|max:' . DBColumnLengthData::CATEGORIES_TABLE['alias'],
-        'name' => 'required|min:2|max:' . DBColumnLengthData::CATEGORIES_TABLE['name']
+        'name' => 'required|min:2|max:' . DBColumnLengthData::CATEGORIES_LOCALE_TABLE['name']
     ];
 
     const SUBCATEGORY_COMMON_RULES = [
         'alias' => 'required|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_TABLE['alias'],
-        'name' => 'required|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_TABLE['name']
+        'name' => 'required|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_LOCAL_TABLE['name']
     ];
 
     public static function validateCategoryCreate($allRequest)
     {
-        $rules = [
-            'category_alias' => self::CATEGORY_COMMON_RULES['alias'],
-            'category_name' => self::CATEGORY_COMMON_RULES['name']
-        ];
+        // todo bad validation, very bad
+        foreach ($allRequest['categories_names'] as $key => $value) {
+            $idValidation = "categories_names." . $key;
+            $rules[$idValidation] = 'required';
+        };
+        $rules['category_alias'] = self::CATEGORY_COMMON_RULES['alias'];
 
         $validator = Validator::make($allRequest, $rules);
 

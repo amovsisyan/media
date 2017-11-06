@@ -10,7 +10,7 @@ class CategoryLocale extends Model
     protected $table = 'categories_locale';
 
     protected $fillable = [
-        'name'
+        'name', 'locale_id'
     ];
 
     public function category(){

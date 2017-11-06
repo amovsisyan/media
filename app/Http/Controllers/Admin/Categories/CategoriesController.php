@@ -7,7 +7,9 @@ use App\Http\Controllers\Admin\Response\ResponseController;
 use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
+use App\Http\Controllers\Helpers\ResponsePrepareHelper;
 use App\Http\Controllers\Helpers\Validator\CategoriesValidation;
+use App\Http\Controllers\Services\Locale\LocaleSettings;
 use Illuminate\Http\Request;
 
 class CategoriesController extends MainCategoriesController
@@ -26,9 +28,10 @@ class CategoriesController extends MainCategoriesController
 
     protected function createCategory_get()
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
 
-        $response['colLength'] = DBColumnLengthData::CATEGORIES_TABLE;
+        $response['colLength'] = DBColumnLengthData::getCategoryLenghts();
+        $response['activeLocales'] = LocaleSettings::getActiveLocales();
 
         return response()
             -> view('admin.categories.categories.create', ['response' => $response]);
@@ -36,18 +39,29 @@ class CategoriesController extends MainCategoriesController
 
     protected function createCategory_post(Request $request)
     {
-        $validationResult = CategoriesValidation::validateCategoryCreate($request->all());
+        $allRequest = $request->all();
+        $allRequest['categories_names'] = json_decode($allRequest['categories_names']);
+
+        $validationResult = CategoriesValidation::validateCategoryCreate($allRequest);
 
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
-            $createArr = [
-                'name' => $request->category_name,
-                'alias' => $request->category_alias
-            ];
-            Category::create($createArr);
+            $alias = Helpers::removeSpaces($request->category_alias);
+            $category = Category::create(['alias' => $alias]);
+
+            $createArr = [];
+            foreach ($allRequest['categories_names'] as $cat) {
+                $createArr[] = [
+                    'name' => $cat->name
+                    , 'locale_id' => $cat->locale_id
+                ];
+            }
+
+            $categoryLocale = $category->categoriesLocale()
+                ->createMany($createArr);
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -57,9 +71,17 @@ class CategoriesController extends MainCategoriesController
 
     protected function deleteCategory_get()
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
+        $locale_id = Helpers::getLocaleIdFromSession();
 
-        $response['categories'] = Category::select('id', 'name')->get();
+        $response['categories'] = Category::select('id')
+            ->with(['categoriesLocale' => function ($query) use ($locale_id) {
+                $query->select('name', 'categ_id')
+                    ->where('locale_id', $locale_id);
+            }])
+            ->get();
+
+        $response['categories'] = ResponsePrepareHelper::PR_DeleteCategory($response['categories']);
 
         return response()
             -> view('admin.categories.categories.delete', ['response' => $response]);

@@ -110,4 +110,20 @@ class ResponsePrepareHelper extends Controller
 
         return $respPosts;
     }
+
+    public static function PR_DeleteCategory($categories)
+    {
+        $response = [];
+        foreach ($categories as $category) {
+            $categoriesLocale = $category['categoriesLocale'];
+            foreach ($categoriesLocale as $categoryLocale) {
+                $response[] = [
+                    'id' => $category->id
+                    , 'name' => $categoryLocale->name
+                ];
+            }
+        }
+        return $response;
+    }
+
 }

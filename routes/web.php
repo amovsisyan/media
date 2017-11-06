@@ -103,6 +103,8 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 
 
 // todo localization
+// todo language changer for user and admin
+// todo language active status changer in admin part
 // todo standardization the var names from front side and validation part standardization
 // todo response prepare helper, standardize using it
 // todo reread all front classes , make some corrections if needs

@@ -23,6 +23,7 @@ class AdminNavbar extends Model
                 'alias'     => $nav->alias,
                 'name'      => $nav->name,
             ];
+            // todo cange into with
             $navbar_parts = $nav->navbarParts()->get();
             foreach ($navbar_parts as $parts) {
                 $res[$key]['part'][] = [

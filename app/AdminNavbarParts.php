@@ -21,6 +21,7 @@ class AdminNavbarParts extends Model
         $res = [];
         if ($part !== null) {
             $part = self::where('alias', $part)->first();
+            // todo change into with
             $panel_navbar = $part->panelParts()->get();
             foreach ($panel_navbar as $key => $parts) {
                 $res[] = [

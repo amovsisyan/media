@@ -11,15 +11,25 @@
                 <div class="col m6 s12">
                     <div class="input-field col s8">
                         <input id="category_alias" name="alias" type="text" class="validate" data-length={{$response['colLength']['alias']}}>
-                        <label for="alias">Alias(English)</label>
+                        <label for="alias">Alias(English, without spaces)</label>
                     </div>
                 </div>
-                <div class="col m6 s12">
-                    <div class="input-field col s8">
-                        <input id="category_name" name="name" type="text" class="validate" data-length={{$response['colLength']['name']}}>
-                        <label for="name">Name(Russian)</label>
-                    </div>
-                </div>
+
+            </div>
+            <div class="row">
+                @if (!empty($response['activeLocales']))
+                    @foreach($response['activeLocales'] as $locale)
+                        <div class="col s1">
+                            <img src="/img/flags/{{$locale['name']}}.svg" alt="">
+                        </div>
+                        <div class="col s11">
+                            <div class="input-field col s8">
+                                <input data-localeid="{{$locale['id']}}" name="name" type="text" class="category-name validate" data-length={{$response['colLength']['name']}}>
+                                <label for="name">Name( {{$locale['name']}} )</label>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
             </div>
             <div class="row right-align m_t_50">
                 <a class="waves-effect waves-light btn">test it</a>
@@ -28,7 +38,6 @@
                 <div id="modal_add_category" class="modal">
                     <div class="modal-content left-align">
                         <h4>Are You Sure You Want Create Category?</h4>
-                        <p></p>
                     </div>
                     <div class="modal-footer">
                         <a id='confirm_category' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
@@ -49,7 +58,7 @@
         CategoryCreate = {
             addButton: document.getElementById('add_category'),
             confirmButton: document.getElementById('confirm_category'),
-            categoryName: document.getElementById('category_name'),
+            categoriesNames: document.getElementsByClassName('category-name'),
             categoryAlias: document.getElementById('category_alias'),
             modalAddCategory: document.getElementById('modal_add_category'),
 
@@ -58,7 +67,7 @@
                 updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
-                    data = 'category_name=' + this.categoryName.value + '&category_alias=' + this.categoryAlias.value,
+                    data = 'categories_names=' + this.getCategoriesNames() + '&category_alias=' + this.categoryAlias.value,
                     xhr = new XMLHttpRequest();
 
                 xhr.open('POST', location.pathname);
@@ -68,8 +77,7 @@
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
                         handleResponseToast(response, true, 'Added New Category');
-                        self.categoryName.value = '';
-                        self.categoryAlias.value = '';
+                        self.cleanInputs();
                     } else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
@@ -78,14 +86,25 @@
                 xhr.send(encodeURI(data));
             },
 
-            createModalContent: function() {
-                var content = this.modalAddCategory.getElementsByClassName('modal-content')[0],
-                    paragraph = content.getElementsByTagName('p')[0],
-                    _html = '<p>Name: ' + this.categoryName.value + '</p><p>Alias: ' + this.categoryAlias.value + '</p>';
-                paragraph.innerHTML = _html;
+            getCategoriesNames: function () {
+                var categoriesNames = [];
+                Array.prototype.forEach.call(this.categoriesNames, (function (element, index, array) {
+                    var names = {
+                        locale_id: element.dataset.localeid,
+                        name: element.value
+                    };
+                    categoriesNames.push(names);
+                }));
+                return JSON.stringify(categoriesNames);
+            },
+
+            cleanInputs: function () {
+                this.categoryAlias.value = '';
+                Array.prototype.forEach.call(this.categoriesNames, (function (element, index, array) {
+                    element.value = '';
+                }));
             }
         };
         CategoryCreate.confirmButton.addEventListener('click', CategoryCreate.confirmCategory.bind(CategoryCreate));
-        CategoryCreate.addButton.addEventListener('click', CategoryCreate.createModalContent.bind(CategoryCreate));
     </script>
 @endsection

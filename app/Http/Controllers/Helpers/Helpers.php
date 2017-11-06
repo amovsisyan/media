@@ -10,9 +10,10 @@ use App\Http\Controllers\Controller;
 class Helpers extends Controller
 {
     // ToDo Should here add CACHE part logic. Change , when PC will be 64 ))
-    public static function prepareAdminNavbars($part)
+    public static function prepareAdminNavbars()
     {
         $response = [];
+        $part = self::getSegmentForAdminNavbar();
         $response['leftNav'] = AdminNavbar::prepareLeftNavbar();
         $response['panel'] = AdminNavbarParts::preparePanelNavbar($part);
         return $response;
@@ -56,4 +57,17 @@ class Helpers extends Controller
         return session()->get('localeId', 1);
     }
 
+    /**
+     * Admin navbar segment for preparing Admin Navbar
+     * @return null|string
+     */
+    public static function getSegmentForAdminNavbar()
+    {
+        return request()->segment(4);
+    }
+
+    public static function removeSpaces($var)
+    {
+        return preg_replace('/\s+/', '', $var);
+    }
 }
