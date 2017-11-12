@@ -54,8 +54,16 @@ class DBColumnLengthData extends Controller
     public static function getCategoryLenghts()
     {
         return [
-            'alias' => self::CATEGORIES_TABLE['alias']
-            , 'name' => self::CATEGORIES_LOCALE_TABLE['name']
+            'alias' => self::CATEGORIES_TABLE['alias'],
+            'name' => self::CATEGORIES_LOCALE_TABLE['name']
+        ];
+    }
+
+    public static function getSubCategoryLenghts()
+    {
+        return [
+            'alias' => self::SUBCATEGORIES_TABLE['alias'],
+            'name' => self::SUBCATEGORIES_LOCAL_TABLE['name']
         ];
     }
 }

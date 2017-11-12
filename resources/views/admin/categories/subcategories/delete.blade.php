@@ -8,9 +8,9 @@
                     <select id="subcategory_select">
                         @if ($response && isset($response['categories']) && !empty($response['categories']))
                             @foreach ($response['categories'] as $category)
-                                <optgroup label="{{ $category[0]['name'] }}">
+                                <optgroup label="{{ $category[0]['alias'] }}">
                                     @foreach ($category['subcategory'] as $subcategory)
-                                        <option value="{{ $subcategory['id'] }}">{{ $subcategory['name'] }}</option>
+                                        <option value="{{ $subcategory['id'] }}">{{ $subcategory['alias'] }}</option>
                                     @endforeach
                                 </optgroup>
                             @endforeach
@@ -24,7 +24,6 @@
                     <div id="modal_delete_subcategory" class="modal">
                         <div class="modal-content left-align">
                             <h4>Are You Sure You Want Delete Subcategory?</h4>
-                            <p></p>
                         </div>
                         <div class="modal-footer">
                             <a id='confirm_delete_subcategory' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
@@ -50,18 +49,6 @@
             modalDeleteSubcategory: document.getElementById('modal_delete_subcategory'),
             subcategorySelect: document.getElementById('subcategory_select'),
 
-            createModalContent: function() {
-                var paragraph = this.modalDeleteSubcategory.getElementsByTagName('p')[0],
-                    selectedOption = this.subcategorySelect.options[this.subcategorySelect.selectedIndex],
-                    _html = '<p>SubcategoryId: ' + selectedOption.value + '</p>' +
-                        '<p>SubcategoryName: ' + selectedOption.innerHTML + '</p>';
-
-                paragraph.innerHTML = _html;
-                this.confirmButton.addEventListener('click',
-                    this.deleteSubcategoryRequest.bind(this)
-                );
-            },
-
             deleteSubcategoryRequest: function() {
                 var updateBtns = [this.deleteBtn, this.confirmButton];
                 updateAddConfirmButtons(updateBtns, true);
@@ -78,15 +65,7 @@
                     if (xhr.status === 200 && response.error !== true) {
                         handleResponseToast(response, true, 'Deleted Subcategory');
                         if (response.ids && response.ids.length) {
-                            var options = self.subcategorySelect.getElementsByTagName('option');
-                            response.ids.forEach(function (element, index, array) {
-                                Array.prototype.forEach.call(options,(function (el, i, arr){
-                                    if(el.value === element) {
-                                        el.remove();
-                                    }
-                                }));
-                            });
-                            $('#subcategory_select').material_select();
+                            self.regenerateAfterDelete(response.ids);
                         }
                     }
                     else if (xhr.status !== 200 || response.error === true) {
@@ -95,8 +74,20 @@
                     updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(encodeURI(data));
+            },
+
+            regenerateAfterDelete: function (ids) {
+                var options = this.subcategorySelect.getElementsByTagName('option');
+                ids.forEach(function (element, index, array) {
+                    Array.prototype.forEach.call(options,(function (el, i, arr){
+                        if(el.value === element) {
+                            el.remove();
+                        }
+                    }));
+                });
+                $('#subcategory_select').material_select();
             }
         };
-        SubcategoryDelete.deleteBtn.addEventListener('click', SubcategoryDelete.createModalContent.bind(SubcategoryDelete));
+        SubcategoryDelete.confirmButton.addEventListener('click', SubcategoryDelete.deleteSubcategoryRequest.bind(SubcategoryDelete));
     </script>
 @endsection

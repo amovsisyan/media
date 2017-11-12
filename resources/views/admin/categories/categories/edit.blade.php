@@ -138,18 +138,9 @@
                     localesInfo = [],
                     xhr = new XMLHttpRequest();
 
-                Array.prototype.forEach.call(localeInnerContainers, (function (element, index, array) {
-                    // todo standardizatoin needed 1-1 -->2
-                    var info = {
-                        locale_id: element.dataset.id,
-                        name: element.getElementsByTagName('input')[0].value
-                    };
-                    localesInfo.push(info);
-                }));
-
                 var data = 'catId=' + catId
                         + '&catAlias=' + catAlias
-                        + '&localesInfo=' + JSON.stringify(localesInfo);
+                        + '&localesInfo=' + this.getCategoriesNames(localeInnerContainers);
 
                 xhr.open('POST', location.pathname + '/save');
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -164,6 +155,19 @@
                     updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(encodeURI(data));
+            },
+
+            getCategoriesNames: function (categories) {
+                var categoriesNames = [];
+                Array.prototype.forEach.call(categories, (function (element, index, array) {
+                    // todo standardizatoin needed 1-1 -->1
+                    var info = {
+                        locale_id: element.dataset.id,
+                        name: element.getElementsByTagName('input')[0].value
+                    };
+                    categoriesNames.push(info);
+                }));
+                return JSON.stringify(categoriesNames);
             }
         };
         CategoryEdit.searchButton.addEventListener('click', CategoryEdit.searchCategoryRequest.bind(CategoryEdit));

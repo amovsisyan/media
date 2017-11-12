@@ -9,7 +9,7 @@ class SubcategoryLocale extends Model
     protected $table = 'subcategories_locale';
 
     protected $fillable = [
-        'name'
+        'name', 'locale_id'
     ];
 
     public function subcategory(){

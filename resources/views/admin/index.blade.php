@@ -11,7 +11,7 @@
                                 <ul id="nav-mobile" class="right hide-on-med-and-down">
                                     @if (!empty($response) && !empty($response['panel']))
                                         @foreach ($response['panel'] as $navbar)
-                                            <li><a href=" {{ url(Request::segment(1) . '/qwentin/' . Request::segment(3) . '/' . Request::segment(3) . '/' . $navbar['alias']) }}">{{ $navbar['name'] }}</a></li>
+                                            <li><a href=" {{ url(Request::segment(1) . '/qwentin/' . Request::segment(3) . '/' . Request::segment(4) . '/' . $navbar['alias']) }}">{{ $navbar['name'] }}</a></li>
                                         @endforeach
                                     @endif
                                 </ul>

@@ -97,10 +97,17 @@ class CategoriesValidation extends AbstractValidator
     public static function validateSubcategoryCreate($allRequest)
     {
         $rules = [
-            'subcategory_alias' => self::SUBCATEGORY_COMMON_RULES['alias'],
-            'subcategory_name' => self::SUBCATEGORY_COMMON_RULES['name'],
-            'categorySelect' => 'required|integer'
+            'subcategoryAlias' => self::SUBCATEGORY_COMMON_RULES['alias'],
+            'categoryId' => 'required|integer'
         ];
+        // todo standardizatoin needed  1-2 -->3
+        foreach ($allRequest['subcategoryNames'] as $key => $value) {
+            $idValidation = "subcategoryNames." . $key . '.locale_id';
+            $nameValidation = "subcategoryNames." . $key . '.name';
+            $rules[$idValidation] = 'required';
+            $rules[$nameValidation] = self::SUBCATEGORY_COMMON_RULES['name'];
+        };
+
 
         $validator = Validator::make($allRequest, $rules);
 

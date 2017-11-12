@@ -77,4 +77,13 @@ class Category extends Model
     {
         return self::getCategoryBuilderByID($id)->first()->subcategories()->create($createArr);
     }
+
+    public static function getCategoriesWithSubcategories()
+    {
+        return self::select('id', 'alias')->orderBy('alias')
+            ->with(['subcategories' => function ($query) {
+                $query->select('id', 'alias', 'categ_id');
+            }])
+            ->get();
+    }
 }

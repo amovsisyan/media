@@ -8,6 +8,7 @@ use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validator\CategoriesValidation;
+use App\Http\Controllers\Services\Locale\LocaleSettings;
 use App\Subcategory;
 use Illuminate\Http\Request;
 
@@ -27,10 +28,10 @@ class SubcategoriesController extends MainCategoriesController
 
     protected function createSubcategory_get()
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
-
-        $response['categories'] = Category::select('id', 'name')->get();
-        $response['colLength'] = DBColumnLengthData::SUBCATEGORIES_TABLE;
+        $response = Helpers::prepareAdminNavbars();
+        $response['categories'] = Category::select('id', 'alias')->get();
+        $response['colLength'] = DBColumnLengthData::getSubCategoryLenghts();
+        $response['activeLocales'] = LocaleSettings::getActiveLocales();
 
         return response()
             -> view('admin.categories.subcategories.create', ['response' => $response]);
@@ -38,7 +39,10 @@ class SubcategoriesController extends MainCategoriesController
 
     protected function createSubcategory_post(Request$request)
     {
-        $validationResult = CategoriesValidation::validateSubcategoryCreate($request->all());
+        $allRequest = $request->all();
+        $allRequest['subcategoryNames'] = Helpers::jsonObjList2arrayList($allRequest['subcategoryNames']);
+
+        $validationResult = CategoriesValidation::validateSubcategoryCreate($allRequest);
 
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
@@ -46,10 +50,20 @@ class SubcategoriesController extends MainCategoriesController
 
         try {
             $createArr = [
-                'name' => $request->subcategory_name,
-                'alias' => $request->subcategory_alias
+                'alias' =>$allRequest['subcategoryAlias']
             ];
-            Category::createSubCategoryByID($request->categorySelect, $createArr);
+            $subCategory = Category::createSubCategoryByID($allRequest['categoryId'], $createArr);
+
+            $localeCreateArr = [];
+            foreach ($allRequest['subcategoryNames'] as $cat) {
+                $localeCreateArr[] = [
+                    'name' => $cat['name'],
+                    'locale_id' => $cat['locale_id']
+                ];
+            }
+
+            $categoryLocale = $subCategory->subcategoriesLocale()
+                ->createMany($localeCreateArr);
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -59,14 +73,15 @@ class SubcategoriesController extends MainCategoriesController
 
     public function deleteSubcategory_get()
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
 
         //  CATEGORY    &   SUBCATEGORY
-        $categories = Category::select('id', 'name')->orderBy('name')->get();
+        $categories = Category::getCategoriesWithSubcategories();
+
         foreach ($categories as $key => $category) {
             $response['categories'][$key][] = $category;
             $response['categories'][$key]['subcategory'] = [];
-            $subcategories = $category->subcategories()->select('id', 'name')->get();
+            $subcategories = $category['subcategories'];
             foreach ($subcategories as $subcategory) {
                 $response['categories'][$key]['subcategory'][] = $subcategory;
             }
@@ -86,17 +101,26 @@ class SubcategoriesController extends MainCategoriesController
         try {
             $ids[] = $request->subcategoryId;
 
-            $deleteDir = DirectoryEditor::clearAfterSubcategoryDelete($ids);
-            if (!$deleteDir['error']) {
-                if (Subcategory::delSubCategoriesByIDs($ids)) {
-                    return response(
-                        [
-                            'error' => false,
-                            'ids' => $ids
-                        ]
-                    );
-                };
-            }
+            // todo part
+//             $deleteDir = DirectoryEditor::clearAfterSubcategoryDelete($ids);
+//            if (!$deleteDir['error']) {
+//                if (Subcategory::delSubCategoriesByIDs($ids)) {
+//                    return response(
+//                        [
+//                            'error' => false,
+//                            'ids' => $ids
+//                        ]
+//                    );
+//                };
+//            }
+            if (Subcategory::delSubCategoriesByIDs($ids)) {
+                return response(
+                    [
+                        'error' => false,
+                        'ids' => $ids
+                    ]
+                );
+            };
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -106,7 +130,7 @@ class SubcategoriesController extends MainCategoriesController
 
     public function editSubcategory_get()
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
 
         return response()
             -> view('admin.categories.subcategories.edit', ['response' => $response]);
