@@ -3,23 +3,24 @@
 namespace App\Http\Controllers\Admin\Posts;
 
 use App\Hashtag;
+use App\HashtagLocale;
 use App\Http\Controllers\Admin\Response\ResponseController;
 use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validator\PostsValidation;
+use App\Http\Controllers\Services\Locale\LocaleSettings;
 use Illuminate\Http\Request;
 
 class HashtagController extends PostsController
 {
     const CATEGORYEDITSEARCHTYPES = [
         'byID' => '1',
-        'byName' => '2',
-        'byAlias' => '3',
+        'byAlias' => '2'
     ];
 
     protected function editHashtag_get()
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
 
         return response()
             -> view('admin.posts.hashtag.edit', ['response' => $response]);
@@ -35,17 +36,34 @@ class HashtagController extends PostsController
 
         $hashtag = self::_hashtagBySearchType($request);
 
-        $searchResult = $hashtag->select('id', 'hashtag', 'alias')->get();
+        $searchResult = $hashtag->select('id', 'alias')
+            ->with(['hashtagsLocale' => function ($query) {
+                $query->select('id', 'hashtag', 'hashtag_id', 'locale_id');
+            }])
+            ->get();
+
         $response['hashtags'] = [];
+        // todo make prepare
         if (!empty($searchResult)) {
-            foreach ($searchResult as $item) {
+            foreach ($searchResult as $hashtag) {
+                $localeArr = [];
+                $hashtagLocale = $hashtag['hashtagsLocale'];
+                foreach ($hashtagLocale as $locale) {
+                    $abbr = LocaleSettings::getLocaleNameById($locale->locale_id);
+                    $localeArr[] = [
+                        'id' => $locale->id,
+                        'hashtag' => $locale->hashtag,
+                        'abbr' => $abbr
+                    ];
+                }
                 $response['hashtags'][] = [
-                    'id' => $item->id,
-                    'alias' => $item->alias,
-                    'name' => $item->hashtag
+                    'id' => $hashtag->id,
+                    'alias' => $hashtag->alias,
+                    'locale' => $localeArr
                 ];
             }
         }
+
         return response(
             [
                 'error' => false,
@@ -56,29 +74,34 @@ class HashtagController extends PostsController
 
     protected function editHashtagSave_post(Request $request)
     {
-        $validationResult = PostsValidation::validateEditHashtagSearchValuesSave($request->all());
+        $allRequest = $request->all();
+        $allRequest['hashtagNames'] = Helpers::jsonObjList2arrayList($allRequest['hashtagNames']);
+
+        $validationResult = PostsValidation::validateEditHashtagSearchValuesSave($allRequest);
 
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
+            // Hashtag Main update
             $updateArr = [
-                'hashtag' => $request->newName,
-                'alias' => $request->newAlias
+                'alias' => $allRequest['hashtagAlias']
             ];
-            Hashtag::updHashtagById($request->id, $updateArr);
+            $hashtaqg = Hashtag::updHashtagById($allRequest['id'], $updateArr);
+
+            // Hashtag Locale update
+            foreach ($allRequest['hashtagNames'] as $locale) {
+                $localeUpdateArr = [
+                    'hashtag' => $locale['name']
+                ];
+                HashtagLocale::updLocaleHashtagByID($locale['locale_id'], $localeUpdateArr);
+            }
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
 
         return response(['error' => false]);
-    }
-
-    protected function attachHashtag()
-    {
-        return response()
-            -> view('admin.posts.hashtag.attach');
     }
 
     protected function editHashtagDelete_post(Request $request)
@@ -100,9 +123,10 @@ class HashtagController extends PostsController
 
     protected function createHashtag_get()
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
 
-        $response['colLength'] = DBColumnLengthData::HASHTAG_TABLE;
+        $response['colLength'] = DBColumnLengthData::getHashtagLenghts();
+        $response['activeLocales'] = LocaleSettings::getActiveLocales();
 
         return response()
             -> view('admin.posts.hashtag.create', ['response' => $response]);
@@ -110,7 +134,10 @@ class HashtagController extends PostsController
 
     protected function createHashtag_post(Request $request)
     {
-        $validationResult = PostsValidation::validateHashtagCreate($request->all());
+        $allRequest = $request->all();
+        $allRequest['hashtagNames'] = Helpers::jsonObjList2arrayList($allRequest['hashtagNames']);
+
+        $validationResult = PostsValidation::validateHashtagCreate($allRequest);
 
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
@@ -118,10 +145,20 @@ class HashtagController extends PostsController
 
         try {
             $createArr = [
-                'hashtag' => $request->hashtag_name,
-                'alias' => $request->hashtag_alias
+                'alias' => $allRequest['hashtagAlias']
             ];
-            Hashtag::create($createArr);
+            $hashtag = Hashtag::create($createArr);
+
+            $localeCreateArr = [];
+            foreach ($allRequest['hashtagNames'] as $cat) {
+                $localeCreateArr[] = [
+                    'hashtag' => $cat['name'],
+                    'locale_id' => $cat['locale_id']
+                ];
+            }
+
+            $hashtagLocale = $hashtag->hashtagsLocale()
+                ->createMany($localeCreateArr);
         } catch(\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -133,9 +170,6 @@ class HashtagController extends PostsController
         switch ($request->searchType) {
             case self::CATEGORYEDITSEARCHTYPES['byID']:
                 return Hashtag::getHashtagBuilderByID($request->searchText);
-                break;
-            case self::CATEGORYEDITSEARCHTYPES['byName']:
-                return Hashtag::getHashtagsBuilderLikeHashtag("%$request->searchText%");
                 break;
             case self::CATEGORYEDITSEARCHTYPES['byAlias']:
                 return Hashtag::getHashtagsBuilderLikeAlias("%$request->searchText%");

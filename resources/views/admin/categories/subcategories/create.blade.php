@@ -14,6 +14,7 @@
                     </div>
                 </div>
             </div>
+            @if (!empty($response['activeLocales']))
             @foreach ($response['activeLocales'] as $locale)
             <div class="row">
                 <div class="col m1 s12">
@@ -22,11 +23,11 @@
                 <div class="col m7 s12">
                     <div class="input-field">
                         <input data-localeid="{{$locale['id']}}" class="subcategory_name" name="name" type="text" class="validate" data-length={{$response['colLength']['name']}}>
-                        <label for="name">Name(Russian)</label>
                     </div>
                 </div>
             </div>
             @endforeach
+            @endif
             <div class="row">
                 <div class="col m4 s12">
                     <div class="input-field col s10">

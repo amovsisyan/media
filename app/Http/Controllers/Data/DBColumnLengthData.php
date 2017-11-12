@@ -66,4 +66,12 @@ class DBColumnLengthData extends Controller
             'name' => self::SUBCATEGORIES_LOCAL_TABLE['name']
         ];
     }
+
+    public static function getHashtagLenghts()
+    {
+        return [
+            'alias' => self::HASHTAG_TABLE['alias'],
+            'hashtag' => self::HASHTAG_LOCALE_TABLE['hashtag']
+        ];
+    }
 }

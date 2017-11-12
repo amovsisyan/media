@@ -103,6 +103,7 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 
 
 // todo localization
+// todo add change category in subcategory edit
 // todo subcategory edit after post localization will be finish
 // todo after subcategory delete delete all subcategory directories (folders)
 // todo after category delete delete all subcategory directories (folders)

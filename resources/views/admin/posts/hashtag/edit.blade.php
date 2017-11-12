@@ -12,8 +12,7 @@
                     <select id="search-type">
                         <option value="" disabled selected>Search type</option>
                         <option value="1">by ID</option>
-                        <option value="2">by Name</option>
-                        <option value="3">by Alias</option>
+                        <option value="2">by Alias</option>
                     </select>
                 </div>
                 <div class="input-field col m7 s12">
@@ -32,10 +31,9 @@
         <div class="modal" id="saveConfirmModal">
             <div class="modal-content left-align">
                 <h4>Are You Sure You Want Make This Changes?</h4>
-                <p></p>
             </div>
             <div class="modal-footer">
-                <a class="modal-action modal-close waves-effect waves-green btn-flat confirm-changes">Save</a>
+                <a class="modal-action modal-close waves-effect waves-green btn-flat" id="confirm-changes">Save</a>
                 <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
             </div>
         </div>
@@ -43,10 +41,9 @@
         <div class="modal" id="deleteConfirmModal">
             <div class="modal-content left-align">
                 <h4>Are You Sure You Want Delete This Hashtag?</h4>
-                <p></p>
             </div>
             <div class="modal-footer">
-                <a class="modal-action modal-close waves-effect waves-green btn-flat confirm-delete">Delete</a>
+                <a class="modal-action modal-close waves-effect waves-green btn-flat" id="confirm-delete">Delete</a>
                 <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
             </div>
         </div>
@@ -65,12 +62,14 @@
             searchTypeSelect: document.getElementById('search-type'),
             searchText: document.getElementById('search-text'),
             partTemplate: document.getElementsByClassName('part-template')[0],
+            partTemplateLi: document.getElementsByClassName('part-template')[0].getElementsByTagName('li')[0],
+            partTemplateCollapsible: document.getElementsByClassName('part-template')[0].getElementsByClassName('collapsible')[0],
             partNoResult: document.getElementsByClassName('part-no-result')[0],
             searchResultContainer: document.getElementById('search-result'),
-            saveConfirmModal: document.getElementById('saveConfirmModal'),
-            deleteConfirmModal: document.getElementById('deleteConfirmModal'),
+            confirmChangesBtn: document.getElementById('confirm-changes'),
+            confirmDeleteBtn: document.getElementById('confirm-delete'),
 
-            searchHashtagRequest: function(){
+            searchHashtagRequest: function() {
                 var updateBtns = [this.searchButton];
                 updateAddConfirmButtons(updateBtns, true);
 
@@ -96,23 +95,39 @@
 
             makeParts: function(response) {
                 var self = this;
-                self.searchResultContainer.innerHTML = '';
+                self.partTemplateCollapsible.innerHTML = '';
+                self.partNoResult.classList.add('hide');
+
                 if (response.response && response.response.hashtags && response.response.hashtags.length) {
                     Array.prototype.forEach.call(response.response.hashtags, (function (element, index, array) {
-                        var clone = self.partTemplate.cloneNode(true);
+                        var clone = self.partTemplateLi.cloneNode(true);
+                        clone.getElementsByClassName('hashtag-id')[0].innerHTML = element.id;
+                        clone.getElementsByClassName('hashtag-alias')[0].innerHTML = element.alias;
+                        clone.getElementsByClassName('alias-input')[0].value = element.alias;
 
-                        clone.getElementsByClassName('part-number')[0].innerHTML = ++index;
-                        clone.getElementsByClassName('part-alias')[0].value = element.alias;
-                        clone.getElementsByClassName('part-name')[0].value = element.name;
+                        // Locale Part
+                        var localeTemplate = clone.getElementsByClassName('hashtag-locale')[0],
+                            localeTemplateInput = localeTemplate.getElementsByClassName('inner-container')[0];
+                        localeTemplate.innerHTML = '';
+                        Array.prototype.forEach.call(element.locale, (function (el, i, arr) {
+                            var localeClone = localeTemplateInput.cloneNode(true);
+                            localeClone.getElementsByTagName('input')[0].value = el.hashtag;
+                            localeClone.getElementsByTagName('img')[0].src = '/img/flags/' + el.abbr + '.svg';
+                            localeClone.dataset.id = el.id;
+                            localeTemplate.appendChild(localeClone);
+                        }));
+                        // --endLocale Part
+
                         clone.id = 'search-part-id-' + element.id;
                         clone.dataset.id = element.id;
-                        self.searchResultContainer.appendChild(clone);
-                        clone.classList.remove('hide');
+                        self.partTemplateCollapsible.appendChild(clone);
+                        self.partTemplateCollapsible.classList.remove('hide');
+
                         clone.getElementsByClassName('save-confirm-button')[0].addEventListener('click',
-                            self.createSaveModelPartConfirm
+                            self.passIdToSaveModal.bind(self)
                         );
                         clone.getElementsByClassName('delete-confirm-button')[0].addEventListener('click',
-                            self.createDeleteModelPartConfirm
+                            self.passIdToDeleteModal.bind(self)
                         );
                     }));
                 } else {
@@ -121,41 +136,25 @@
                 }
             },
 
-            createSaveModelPartConfirm: function(e) {
-                var self = HashtagEdit,
-                    currElem = getClosest(e.target, '.part-template'),
-                    paragraph = self.saveConfirmModal.getElementsByTagName('p')[0],
-                    _html = '<p>ID: <span class="red-text part-id">' + currElem.dataset.id + '</span></p>' +
-                        '<p>New Hashtag Alias: <span class="red-text part-alias">' + currElem.getElementsByClassName('part-alias')[0].value + '</span></p>' +
-                        '<p>New Hashtag Name: <span class="red-text part-name">' + currElem.getElementsByClassName('part-name')[0].value + '</span></p>';
-                paragraph.innerHTML = _html;
-                self.saveConfirmModal.getElementsByClassName('confirm-changes')[0].addEventListener('click',
-                    self.createSaveModelSearchConfirm
-                );
+            passIdToSaveModal: function (e) {
+                var currItem = getClosest(e.target, '.collapsible-item');
+                this.confirmChangesBtn.dataset.id = currItem.dataset.id;
             },
 
-            createDeleteModelPartConfirm: function(e) {
-                var self = HashtagEdit,
-                    currElem = getClosest(e.target, '.part-template'),
-                    paragraph = self.deleteConfirmModal.getElementsByTagName('p')[0],
-                    _html = '<p>ID: <span class="red-text part-id">' + currElem.dataset.id + '</span></p>' +
-                        '<p>Hashtag Alias: <span class="red-text part-alias">' + currElem.getElementsByClassName('part-alias')[0].value + '</span></p>' +
-                        '<p>Hashtag Name: <span class="red-text part-name">' + currElem.getElementsByClassName('part-name')[0].value + '</span></p>';
-                paragraph.innerHTML = _html;
-                self.deleteConfirmModal.getElementsByClassName('confirm-delete')[0].addEventListener('click',
-                    self.createDeleteModelSearchConfirm
-                );
+            passIdToDeleteModal: function (e) {
+                var currItem = getClosest(e.target, '.collapsible-item');
+                this.confirmDeleteBtn.dataset.id = currItem.dataset.id;
             },
 
             createSaveModelSearchConfirm: function(e) {
                 var updateBtns = [this];
                 updateAddConfirmButtons(updateBtns, true);
-                var self = HashtagEdit,
-                    elThis = this,
-                    currElem = getClosest(e.target, '.modal'),
-                    data = 'id=' + currElem.getElementsByClassName('part-id')[0].innerHTML
-                        + '&newAlias=' + currElem.getElementsByClassName('part-alias')[0].innerHTML
-                        + '&newName=' + currElem.getElementsByClassName('part-name')[0].innerHTML,
+                var hashtagId = e.target.dataset.id,
+                    currElem = document.getElementById('search-part-id-' + hashtagId),
+                    localeInnerContainers = currElem.getElementsByClassName('inner-container'),
+                    data = 'id=' + hashtagId
+                        + '&hashtagAlias=' + currElem.getElementsByClassName('alias-input')[0].value
+                        + '&hashtagNames=' +  this.getHashtagsNames(localeInnerContainers);
                     xhr = new XMLHttpRequest();
 
                 xhr.open('POST', location.pathname + '/save');
@@ -173,13 +172,23 @@
                 xhr.send(encodeURI(data));
             },
 
+            getHashtagsNames: function (hashtags) {
+                var hashtagsNames = [];
+                Array.prototype.forEach.call(hashtags, (function (element, index, array) {
+                    // todo standardizatoin needed 1-1 -->5
+                    var names = {
+                        locale_id: element.dataset.id,
+                        name: element.getElementsByTagName('input')[0].value
+                    };
+                    hashtagsNames.push(names);
+                }));
+                return JSON.stringify(hashtagsNames);
+            },
+
             createDeleteModelSearchConfirm: function(e) {
-                var updateBtns = [this];
+                var updateBtns = [e.target];
                 updateAddConfirmButtons(updateBtns, true);
-                var self = HashtagEdit,
-                    elThis = this,
-                    currElem = getClosest(e.target, '.modal'),
-                    id = currElem.getElementsByClassName('part-id')[0].innerHTML,
+                var id = e.target.dataset.id
                     data = 'id=' + id,
                     xhr = new XMLHttpRequest();
 
@@ -200,5 +209,7 @@
             }
         };
         HashtagEdit.searchButton.addEventListener('click', HashtagEdit.searchHashtagRequest.bind(HashtagEdit));
+        HashtagEdit.confirmChangesBtn.addEventListener('click', HashtagEdit.createSaveModelSearchConfirm.bind(HashtagEdit));
+        HashtagEdit.confirmDeleteBtn.addEventListener('click', HashtagEdit.createDeleteModelSearchConfirm.bind(HashtagEdit));
     </script>
 @endsection

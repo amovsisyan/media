@@ -18,7 +18,7 @@
                         <div class="inner-container col s12">
                             <div class="row">
                                 <div class="col s1">
-                                    <img src="/img/flags/en.svg" alt="">
+                                    <img src="" alt="">
                                 </div>
                                 <div class="input-field col s11">
                                     <input type="text" class="validate">

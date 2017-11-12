@@ -7,26 +7,33 @@
                 <h4>Create Hashtag</h4>
             </div>
             <div class="row">
-                <div class="col m6 s12">
-                    <div class="input-field col s8">
-                        <input id="hashtag_alias" name="alias" type="text" class="validate" data-length={{$response['colLength']['alias']}}>
+                <div class="col m8 s12">
+                    <div class="input-field">
+                        <input id="hashtag_alias" type="text" class="validate" data-length={{$response['colLength']['alias']}}>
                         <label for="alias">Alias(English)</label>
                     </div>
                 </div>
-                <div class="col m6 s12">
-                    <div class="input-field col s8">
-                        <input id="hashtag_name" name="name" type="text" class="validate" data-length={{$response['colLength']['hashtag']}}>
-                        <label for="name">Name(Russian)</label>
-                    </div>
-                </div>
             </div>
+            @if (!empty($response['activeLocales']))
+                @foreach ($response['activeLocales'] as $locale)
+                    <div class="row">
+                        <div class="col m1 s12">
+                            <img src="/img/flags/{{$locale['name']}}.svg" alt="">
+                        </div>
+                        <div class="col m7 s12">
+                            <div class="input-field">
+                                <input data-localeid="{{$locale['id']}}" class="hashtag_name" type="text" class="validate" data-length={{$response['colLength']['hashtag']}}>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
             <div class="row right-align m_t_50">
                 <!-- Modal -->
                 <a id='add_hashtag' class="waves-effect waves-light btn modal-trigger" href="#modal_add_hashtag">Add</a>
                 <div id="modal_add_hashtag" class="modal">
                     <div class="modal-content left-align">
                         <h4>Are You Sure You Want Create Hashtag?</h4>
-                        <p></p>
                     </div>
                     <div class="modal-footer">
                         <a id='confirm_hashtag' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
@@ -47,7 +54,7 @@
         HashtagCreate = {
             addButton: document.getElementById('add_hashtag'),
             confirmButton: document.getElementById('confirm_hashtag'),
-            hashtagName: document.getElementById('hashtag_name'),
+            hashtagNames: document.getElementsByClassName('hashtag_name'),
             hashtagAlias: document.getElementById('hashtag_alias'),
             modalAddHashtag: document.getElementById('modal_add_hashtag'),
 
@@ -56,7 +63,8 @@
                 updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
-                    data = 'hashtag_name=' + this.hashtagName.value + '&hashtag_alias=' + this.hashtagAlias.value,
+                    data = 'hashtagAlias=' + this.hashtagAlias.value
+                        + '&hashtagNames=' + this.getHashtagNames(),
                     xhr = new XMLHttpRequest();
 
                 xhr.open('POST', location.pathname);
@@ -66,8 +74,7 @@
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
                         handleResponseToast(response, true, 'Added New Hashtag');
-                        self.hashtagName.value = '';
-                        self.hashtagAlias.value = '';
+                        self.regenerateAfterDelete();
                     }
                     else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
@@ -77,14 +84,26 @@
                 xhr.send(encodeURI(data));
             },
 
-            createModalContent: function() {
-                var content = this.modalAddHashtag.getElementsByClassName('modal-content')[0],
-                    paragraph = content.getElementsByTagName('p')[0],
-                    _html = '<p>Name: ' + this.hashtagName.value + '</p><p>Alias: ' + this.hashtagAlias.value + '</p>';
-                paragraph.innerHTML = _html;
+            getHashtagNames: function () {
+                var hashtagNames = [];
+                Array.prototype.forEach.call(this.hashtagNames, (function (element, index, array) {
+                    // todo standardizatoin needed 1-1 -->4
+                    var names = {
+                        locale_id: element.dataset.localeid,
+                        name: element.value
+                    };
+                    hashtagNames.push(names);
+                }));
+                return JSON.stringify(hashtagNames);
+            },
+
+            regenerateAfterDelete: function () {
+                Array.prototype.forEach.call(this.hashtagNames, (function (element, index, array) {
+                    element.value = ''
+                }));
+                this.hashtagAlias.value = '';
             }
         };
         HashtagCreate.confirmButton.addEventListener('click', HashtagCreate.confirmHashtag.bind(HashtagCreate));
-        HashtagCreate.addButton.addEventListener('click', HashtagCreate.createModalContent.bind(HashtagCreate));
     </script>
 @endsection
