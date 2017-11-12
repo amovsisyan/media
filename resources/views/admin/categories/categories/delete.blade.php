@@ -8,7 +8,7 @@
                     <select multiple id="category_select">
                             <option value="" disabled selected>Delete Category</option>
                         @foreach ($response['categories'] as $category)
-                            <option value="{{ $category['id'] }}">{{ $category['name'] }}</option>
+                            <option>{{ $category['alias'] }}_{{ $category['id'] }}</option>
                         @endforeach
                     </select>
                     <label>You can choose multiple options</label>
@@ -67,7 +67,6 @@
                     list = this.getDeleteList(),
                     xhr = new XMLHttpRequest();
 
-                // todo change and get value, why explode and get last ?
                 Array.prototype.forEach.call(list, (function (element, index, array) {
                     var elementContent = element.getElementsByTagName('span')[0].textContent;
                     prepData.push(explodeGetLast(elementContent, '_'));

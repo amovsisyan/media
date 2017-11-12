@@ -19,14 +19,33 @@ class CategoriesValidation extends AbstractValidator
 
     public static function validateCategoryCreate($allRequest)
     {
-        // todo bad validation, very bad
+        // todo standardizatoin needed 1-2 -->1
         foreach ($allRequest['categories_names'] as $key => $value) {
-            $idValidation = "categories_names." . $key;
+            $idValidation = "categories_names." . $key . '.locale_id';
+            $nameValidation = "categories_names." . $key . '.name';
             $rules[$idValidation] = 'required';
+            $rules[$nameValidation] = self::CATEGORY_COMMON_RULES['name'];
         };
+
         $rules['category_alias'] = self::CATEGORY_COMMON_RULES['alias'];
 
         $validator = Validator::make($allRequest, $rules);
+
+        if ($validator->fails()) {
+            return self::_generateValidationErrorResponse($validator);
+        };
+
+        return self::_generateValidationSimpleOKResponse();
+    }
+
+    public static function validateCategoryDelete($validateData)
+    {
+        foreach ($validateData as $key => $value) {
+            $idValidation = $key;
+            $rules[$idValidation] = 'required';
+        };
+
+        $validator = Validator::make($validateData, $rules);
 
         if ($validator->fails()) {
             return self::_generateValidationErrorResponse($validator);
@@ -54,10 +73,17 @@ class CategoriesValidation extends AbstractValidator
     public static function validateEditCategorySearchValuesSave($allRequest)
     {
         $rules = [
-            'id' => 'required',
-            'newAlias' => self::CATEGORY_COMMON_RULES['alias'],
-            'newName' => self::CATEGORY_COMMON_RULES['name']
+            'catId' => 'required',
+            'catAlias' => self::CATEGORY_COMMON_RULES['alias'],
         ];
+
+        // todo standardizatoin needed  1-2 -->1
+        foreach ($allRequest['localesInfo'] as $key => $value) {
+            $idValidation = "localesInfo." . $key . '.locale_id';
+            $nameValidation = "localesInfo." . $key . '.name';
+            $rules[$idValidation] = 'required';
+            $rules[$nameValidation] = self::CATEGORY_COMMON_RULES['name'];
+        };
 
         $validator = Validator::make($allRequest, $rules);
 

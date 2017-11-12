@@ -115,13 +115,10 @@ class ResponsePrepareHelper extends Controller
     {
         $response = [];
         foreach ($categories as $category) {
-            $categoriesLocale = $category['categoriesLocale'];
-            foreach ($categoriesLocale as $categoryLocale) {
-                $response[] = [
-                    'id' => $category->id
-                    , 'name' => $categoryLocale->name
-                ];
-            }
+            $response[] = [
+                'id' => $category->id,
+                'alias' => $category->alias
+            ];
         }
         return $response;
     }

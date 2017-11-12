@@ -70,4 +70,15 @@ class Helpers extends Controller
     {
         return preg_replace('/\s+/', '', $var);
     }
+
+    public static function jsonObjList2arrayList($obj2array)
+    {
+        $decodedObj = json_decode($obj2array);
+
+        foreach ($decodedObj as &$item) {
+            $item = (array) $item;
+        }
+
+        return $decodedObj;
+    }
 }

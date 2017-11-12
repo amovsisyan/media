@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Categories;
 
 use App\Category;
+use App\CategoryLocale;
 use App\Http\Controllers\Admin\Response\ResponseController;
 use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\DirectoryEditor;
@@ -16,8 +17,7 @@ class CategoriesController extends MainCategoriesController
 {
     const CATEGORYEDITSEARCHTYPES = [
         'byID' => '1',
-        'byName' => '2',
-        'byAlias' => '3',
+        'byAlias' => '2'
     ];
 
     protected function change()
@@ -40,7 +40,7 @@ class CategoriesController extends MainCategoriesController
     protected function createCategory_post(Request $request)
     {
         $allRequest = $request->all();
-        $allRequest['categories_names'] = json_decode($allRequest['categories_names']);
+        $allRequest['categories_names'] = Helpers::jsonObjList2arrayList($allRequest['categories_names']);
 
         $validationResult = CategoriesValidation::validateCategoryCreate($allRequest);
 
@@ -55,8 +55,8 @@ class CategoriesController extends MainCategoriesController
             $createArr = [];
             foreach ($allRequest['categories_names'] as $cat) {
                 $createArr[] = [
-                    'name' => $cat->name
-                    , 'locale_id' => $cat->locale_id
+                    'name' => $cat['name'],
+                    'locale_id' => $cat['locale_id']
                 ];
             }
 
@@ -72,16 +72,10 @@ class CategoriesController extends MainCategoriesController
     protected function deleteCategory_get()
     {
         $response = Helpers::prepareAdminNavbars();
-        $locale_id = Helpers::getLocaleIdFromSession();
 
-        $response['categories'] = Category::select('id')
-            ->with(['categoriesLocale' => function ($query) use ($locale_id) {
-                $query->select('name', 'categ_id')
-                    ->where('locale_id', $locale_id);
-            }])
-            ->get();
+        $categories = Category::select('id', 'alias')->get();
 
-        $response['categories'] = ResponsePrepareHelper::PR_DeleteCategory($response['categories']);
+        $response['categories'] = ResponsePrepareHelper::PR_DeleteCategory($categories);
 
         return response()
             -> view('admin.categories.categories.delete', ['response' => $response]);
@@ -89,9 +83,15 @@ class CategoriesController extends MainCategoriesController
 
     protected function deleteCategory_post(Request $request)
     {
-        // couldn't validate category IDs cause response is json
-        $ids = [];
+        $validateData = json_decode($request->data);
+        $validationResult = CategoriesValidation::validateCategoryDelete($validateData);
+
+        if ($validationResult['error']) {
+            return ResponseController::_validationResultResponse($validationResult);
+        }
+
         try {
+            $ids = [];
             if ($request->data) {
                 foreach (json_decode($request->data) as $id) {
                     $ids[] = $id;
@@ -119,7 +119,7 @@ class CategoriesController extends MainCategoriesController
 
     protected function editCategory_get()
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
 
         return response()
             -> view('admin.categories.categories.edit', ['response' => $response]);
@@ -136,18 +136,31 @@ class CategoriesController extends MainCategoriesController
         try {
             $category = self::_categoryBySearchType($request);
 
-            $searchResult = $category->select('id', 'name', 'alias')->get();
+            $searchResult = $category->select('id', 'alias')
+                ->with(['categoriesLocale' => function ($query) {
+                    $query->select('id', 'name', 'categ_id');
+                }])
+                ->get();
             $response = [];
 
             if (!empty($searchResult)) {
-                foreach ($searchResult as $item) {
+                foreach ($searchResult as $category) {
+                    $categoriesLocale = [];
+                    foreach ($category['categoriesLocale'] as $categoryLocale) {
+                        $categoriesLocale[] = [
+                            'id' => $categoryLocale->id,
+                            'name' => $categoryLocale->name,
+                            'localeAbbr' => LocaleSettings::getLocaleNameById($categoryLocale->id)
+                        ];
+                    }
                     $response[] = [
-                        'id' => $item->id,
-                        'alias' => $item->alias,
-                        'name' => $item->name
+                        'id' => $category->id,
+                        'alias' => $category->alias,
+                        'categoriesLocale' => $categoriesLocale
                     ];
                 }
             }
+
             return response(
                 [
                     'error' => false,
@@ -161,18 +174,29 @@ class CategoriesController extends MainCategoriesController
 
     protected function editCategorySave_post(Request $request)
     {
-        $validationResult = CategoriesValidation::validateEditCategorySearchValuesSave($request->all());
+        $allRequest = $request->all();
+        $allRequest['localesInfo'] = Helpers::jsonObjList2arrayList($allRequest['localesInfo']);
+
+        $validationResult = CategoriesValidation::validateEditCategorySearchValuesSave($allRequest);
 
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
+            // Category Main update
             $updateArr = [
-                'name' => $request->newName,
-                'alias' => $request->newAlias
+                'alias' => $allRequest['catAlias']
             ];
-            Category::updCategoryByID($request->id, $updateArr);
+            Category::updCategoryByID($allRequest['catId'], $updateArr);
+
+            // Category Locale update
+            foreach ($allRequest['localesInfo'] as $locale) {
+                $localeUpdateArr = [
+                    'name' => $locale['name']
+                ];
+                CategoryLocale::updLocaleCategoryByID($locale['locale_id'], $localeUpdateArr);
+            }
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -184,9 +208,6 @@ class CategoriesController extends MainCategoriesController
         switch ($request->searchType) {
             case self::CATEGORYEDITSEARCHTYPES['byID']:
                 return Category::getCategoryBuilderByID($request->searchText);
-                break;
-            case self::CATEGORYEDITSEARCHTYPES['byName']:
-                return Category::getCategoriesBuilderLikeName($request->searchText);
                 break;
             case self::CATEGORYEDITSEARCHTYPES['byAlias']:
                 return Category::getCategoriesBuilderLikeAlias($request->searchText);

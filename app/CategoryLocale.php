@@ -43,4 +43,15 @@ class CategoryLocale extends Model
 
         return $result;
     }
+
+    /**
+     * Update CategoryLocale selecting by ID and updating by updateArr
+     * @param $id
+     * @param $updateArr
+     * @return mixed
+     */
+    public static function updLocaleCategoryByID($id, $updateArr)
+    {
+        return self::where('id', $id)->update($updateArr);
+    }
 }

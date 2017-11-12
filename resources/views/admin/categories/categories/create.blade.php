@@ -89,6 +89,7 @@
             getCategoriesNames: function () {
                 var categoriesNames = [];
                 Array.prototype.forEach.call(this.categoriesNames, (function (element, index, array) {
+                    // todo standardizatoin needed 1-1 -->1
                     var names = {
                         locale_id: element.dataset.localeid,
                         name: element.value

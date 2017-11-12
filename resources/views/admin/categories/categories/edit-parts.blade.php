@@ -1,18 +1,38 @@
-<div class="row hide part-template">
-    <div class="col m1 s12">
-        <h5 class="part-number"></h5>
-    </div>
-    <div class="input-field col m5 s12">
-        <input type="text" class="part-alias validate">
-        <label for="search-input">Alias</label>
-    </div>
-    <div class="input-field col m5 s12">
-        <input type="text" class="part-name validate">
-        <label for="search-input">Name</label>
-    </div>
-    <div class="col m1 s12">
-        <a class="btn-floating waves-effect waves-light modal-trigger part-confirm-button" href="#changesConfirmModal"><i class="material-icons">check</i></a>
-    </div>
+<div class="part-template">
+    <ul class="collapsible popout hide" data-collapsible="accordion">
+        <li class="collapsible-item">
+            <div class="collapsible-header">
+                <div>
+                    <span class="category-id"></span>
+                    <span class="category-alias"></span>
+                </div>
+            </div>
+            <div class="collapsible-body">
+                <div class="alias-container">
+                    <div class="input-field col s11">
+                        <input type="text" class="alias-input validate">
+                    </div>
+                </div>
+                <div class="category-locale-container">
+                    <div class="category-locale">
+                        <div class="inner-container col s12">
+                            <div class="row">
+                                <div class="col s1">
+                                    <img src="/img/flags/en.svg" alt="">
+                                </div>
+                                <div class="input-field col s11">
+                                    <input type="text" class="validate">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="right-align col m1 s2">
+                    <a class="btn-floating waves-effect waves-light modal-trigger part-confirm-button" href="#changesConfirmModal"><i class="material-icons">check</i></a>
+                </div>
+            </div>
+        </li>
+    </ul>
 </div>
 
 <div class="row hide part-no-result">

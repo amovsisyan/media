@@ -13,18 +13,27 @@ class LocaleSettings extends Controller
 
     protected static $activeLocales = null;
 
+    const EN_ID = 1;
+    const EN_NAME = 'en';
+
+    const RU_ID = 2;
+    const RU_NAME = 'ru';
+
+    const AM_ID = 3;
+    const AM_NAME = 'am';
+
     const createArr = [
-        'en' => [
-            'id' => 1,
-            'name' => 'en'
+        self::EN_NAME => [
+            'id' => self::EN_ID,
+            'name' => self::EN_NAME
         ],
-        'ru' => [
-            'id' => 2,
-            'name' => 'ru'
+        self::RU_NAME => [
+            'id' => self::RU_ID,
+            'name' => self::RU_NAME
         ],
-        'am' => [
-            'id' => 3,
-            'name' => 'am'
+        self::AM_NAME => [
+            'id' => self::AM_ID,
+            'name' => self::AM_NAME
         ]
     ];
 
@@ -50,6 +59,17 @@ class LocaleSettings extends Controller
             ];
         }
         return $response;
+    }
+
+    public static function getLocaleNameById($id)
+    {
+        foreach (self::createArr as $locale) {
+            if($locale['id'] === $id) {
+                return $locale['name'];
+                break;
+            }
+        }
+        return self::DEFAULT_LOCALE;
     }
 
     protected static function getActiveLocalesFromDB()

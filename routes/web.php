@@ -103,8 +103,10 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 
 
 // todo localization
+// todo after category delete delete all subcategory directories (folders)
 // todo language changer for user and admin
 // todo language active status changer in admin part
+// todo dropdowns for admin navs, for working with separate locales, if there is need
 // todo standardization the var names from front side and validation part standardization
 // todo response prepare helper, standardize using it
 // todo reread all front classes , make some corrections if needs
