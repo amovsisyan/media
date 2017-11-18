@@ -13,7 +13,6 @@
                 <div id="modal_add_post" class="modal">
                     <div class="modal-content left-align">
                         <h4>Are You Sure You Want Create Post?</h4>
-                        <p></p>
                     </div>
                     <div class="modal-footer">
                         <a id='confirm_post' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
@@ -22,25 +21,12 @@
                 </div>
             </div>
         </div>
-        <!-- Modal -->
-        <div class="modal" id="saveConfirmModal">
-            <div class="modal-content left-align">
-                <h4>Are You Sure You Want Save This Changes?</h4>
-                <p></p>
-            </div>
-            <div class="modal-footer">
-                <a class="modal-action modal-close waves-effect waves-green btn-flat confirm-save-changes">Save</a>
-                <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
-            </div>
-        </div>
-        <!-- Modal -->
         <div class="modal" id="deletePostPartModal">
             <div class="modal-content left-align">
                 <h4>Are You Sure You Want Delete This Part?</h4>
-                <p></p>
             </div>
             <div class="modal-footer">
-                <a class="modal-action modal-close waves-effect waves-green btn-flat confirm-delete">Delete</a>
+                <a class="modal-action modal-close waves-effect waves-green btn-flat" id="confirm-part-delete">Delete</a>
                 <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
             </div>
         </div>
@@ -60,222 +46,231 @@
 
         PostCreate = {
             defaultProperties: {
-                partTemplateCounter: 0,
+                partTemplateCounter: {},
                 basicPartTemplate: document.getElementsByClassName('post-part')[0]
             },
 
-            addButton: document.getElementById('add_post'),
-            confirmButton: document.getElementById('confirm_post'),
-            postAlias: document.getElementById('alias'),
-            postMainHeader: document.getElementById('main_header'),
-            postMainText: document.getElementById('main_text'),
-            postMainImage: document.getElementById('main_image'),
-            postSubcategory: document.getElementById('subcategory_select'),
-            hashtagSelect: document.getElementById('hashtag_select'),
-            modalAddPost: document.getElementById('modal_add_post'),
-            postPartAddButton: document.getElementById('post-part-add-button'),
-            postCreateParts: document.getElementById('post-create-parts'),
-            deletePostPartModal: document.getElementById('deletePostPartModal'),
+            postMainImages: document.getElementsByClassName('main_image'),
+            postPartAddButtons: document.getElementsByClassName('post-part-add-button'),
+            localeSwitchInputs: document.getElementsByClassName('locale-switch-input'),
 
-            _init: function() {
-                var self = this;
-                this.renderPartTemplate();
-                
-                this.postMainImage.addEventListener('change',
-                    this.imageSizeWarningLocal.bind(self)
-                );
+            confirmPartDeleteBtn: document.getElementById('confirm-part-delete'),
+
+            _init: function () {
+                this.addListeners();
+                this.firstRenderPartTemplate();
             },
 
-            imageSizeWarningLocal: function(e) {
+            addListeners: function () {
+                var self = this;
+
+                // add button listener
+                Array.prototype.forEach.call(this.postPartAddButtons, (function (element, index, array) {
+                        element.addEventListener('click', self.addPostPart.bind(self));
+                    })
+                );
+                // main image listener
+                Array.prototype.forEach.call(this.postMainImages, (function (element, index, array) {
+                        element.addEventListener('change', self._imageSizeWarningLocal.bind(self));
+                    })
+                );
+                // locale switcher generation and listeners
+                Array.prototype.forEach.call(this.localeSwitchInputs, (function (element, index, array) {
+                        element.addEventListener('change', self.localeSwitcher.bind(self));
+                        element.classList.add('checked');
+                        $(element).prop('checked', true)
+                    })
+                );
+                //modal btn listeners
+                this.confirmPartDeleteBtn.addEventListener('click', self.removePostPart.bind(self));
+            },
+
+            firstRenderPartTemplate: function () {
+                this._initDefaultCounter();
+                var self = this,
+                    parts = document.getElementsByClassName('post-part');
+                // render post parts at first
+                Array.prototype.forEach.call(parts, (function (postPart, index, array) {
+                    self.renderPartTemplate(postPart)
+                }));
+            },
+
+            addPostPart: function(e) {
+                // make clone and append
+                var container = getClosest(e.target, '.part-locale-container'),
+                    locale = container.dataset.localename,
+                    innerContainer = container.getElementsByClassName('part-locale-inner-container')[0],
+                    clone = this.defaultProperties.basicPartTemplate.cloneNode(true);
+
+                innerContainer.appendChild(clone);
+
+                var num = this.defaultProperties.partTemplateCounter[locale]++, // increase counter
+                    lastAddedPostPart = innerContainer.getElementsByClassName('post-part')[num];
+                this.renderPartTemplate(lastAddedPostPart);
+            },
+
+            renderPartTemplate: function (postPart) {
+                // empty postPart
+                this._emptyPostPart(postPart);
+                // add ids
+                this._makePostPartIds(postPart);
+                // add post part listeners
+                this._addPostPartListeners(postPart);
+            },
+
+            localeSwitcher: function (e) {
+                var el = e.target;
+                this._toggleSwitcher(el);
+                this._proceedLocalePartEnablingDisabling(el);
+            },
+
+            passIdToPostPartDeleteModal: function (e) {
+                var postPartLocaleContainer = getClosest(e.target, '.part-locale-container'),
+                    postPart = getClosest(e.target, '.post-part'),
+                    locale = postPartLocaleContainer.dataset.localename,
+                    num = postPart.dataset.partnumber;
+
+                this.confirmPartDeleteBtn.dataset.locale = locale;
+                this.confirmPartDeleteBtn.dataset.partnumber = num;
+            },
+
+            removePostPart: function () {
+                var locale = this.confirmPartDeleteBtn.dataset.locale,
+                    num = this.confirmPartDeleteBtn.dataset.partnumber,
+                    id = 'post-part-' + locale + '-' + num,
+                    deletingPart = document.getElementById(id);
+
+                if (this.defaultProperties.partTemplateCounter[locale] === 1) {
+                    return false
+                } else {
+                    var postPartLocaleContainer = getClosest(deletingPart, '.part-locale-container');
+                    deletingPart.remove();
+                    this.defaultProperties.partTemplateCounter[locale] = num;
+                    this._regenerateAfterPartDelete(postPartLocaleContainer);
+                }
+            },
+
+            _initDefaultCounter: function () {
+                var self = this,
+                    partLocaleContainers = document.getElementsByClassName('part-locale-container');
+                Array.prototype.forEach.call(partLocaleContainers, (function (currContainer, index, array) {
+                    var starter = currContainer.getElementsByClassName('post-part').length, // int 1
+                        localeName = currContainer.dataset.localename;
+
+                    self.defaultProperties.partTemplateCounter[localeName] = starter;
+                }));
+            },
+
+            _imageSizeWarningLocal: function(e) {
                 var el = e.target,
                     files = el.files,
-                    standard = this.getStandard(el);
+                    standard = this._getStandard(el);
                 imageSizeWarning(files, standard);
             },
 
-            getStandard: function (element) {
+            _getStandard: function (element) {
                 return element.classList.contains('part-image') ? imageStandards.partsImageStandard : imageStandards.mainImageStandard
             },
 
-            renderPartTemplate: function() {
-                var self = this,
-                    num = this.defaultProperties.partTemplateCounter++,
-                    currTempl = document.getElementsByClassName('post-part')[num];
-                this._regeneratePostPartIds(currTempl);
+            _emptyPostPart: function (postPart) {
+                postPart.getElementsByClassName('part-header')[0].value = '';
+                postPart.getElementsByClassName('part-footer')[0].value = '';
+                postPart.getElementsByClassName('part-image')[0].value = '';
+                postPart.getElementsByClassName('file-path ')[0].value = '';
+            },
 
-                currTempl.getElementsByClassName('part-header')[0].value = '';
-                currTempl.getElementsByClassName('part-footer')[0].value = '';
-                currTempl.getElementsByClassName('file-path ')[0].value = '';
+            _makePostPartIds: function (postPart) {
+                var postPartLocaleContainer = getClosest(postPart, '.part-locale-container'),
+                    locale = postPartLocaleContainer.dataset.localename,
+                    num = this.defaultProperties.partTemplateCounter[locale],
+                    postNumber = postPartLocaleContainer.getElementsByClassName('post-number')[num - 1];
 
-                currTempl.getElementsByClassName('part-delete-button')[0].addEventListener('click',
-                    this.createModelPartDelete
+                postPart.id = 'post-part-' + locale + '-' + num;
+                postPart.dataset.partnumber = num;
+                postNumber.innerHTML = num;
+            },
+
+            _addPostPartListeners: function (postPart) {
+                postPart
+                    .getElementsByClassName('part-delete-button')[0]
+                    .getElementsByClassName('modal-trigger')[0]
+                    .addEventListener('click', this.passIdToPostPartDeleteModal.bind(this));
+
+                postPart.getElementsByClassName('part-image')[0].addEventListener('change',
+                    this._imageSizeWarningLocal.bind(this)
                 );
-
-                currTempl.getElementsByClassName('part-image')[0].addEventListener('change',
-                    this.imageSizeWarningLocal.bind(self)
-                );
             },
 
-            confirmPost: function(){
-                var updateBtns = [this.addButton, this.confirmButton];
-                updateAddConfirmButtons(updateBtns, true);
-
-                var self = this,
-                    hashtags = [],
-                    xhr = new XMLHttpRequest(),
-                    allPostParts = document.getElementsByClassName('post-part'),
-                    formData = new FormData();
-
-                Array.prototype.forEach.call(this.getHashtagList(), (function (element, index, array) {
-                    var elementContent = element.getElementsByTagName('span')[0].textContent;
-                    hashtags.push(explodeGetLast(elementContent, '_'))
-                }));
-
-                // Main
-                formData.append("postAlias", this.postAlias.value);
-                formData.append("postMainHeader", this.postMainHeader.value);
-                formData.append("postMainText", this.postMainText.value);
-                formData.append("postMainImage", this.postMainImage.files[0]);
-                formData.append("postSubcategory", this.postSubcategory.options[this.postSubcategory.selectedIndex].value);
-                formData.append("postHashtag", JSON.stringify(hashtags));
-
-                // Parts
-                Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
-                    formData.append('partHeader[]', element.getElementsByClassName('part-header')[0].value);
-
-                    var fileContainer = element.getElementsByClassName('part-image')[0].files,
-                        file = [];
-                    if (fileContainer.length) {
-                        file = element.getElementsByClassName('part-image')[0].files[0]
-                    }
-                    formData.append('partImage[' + index + ']', file);
-                    formData.append('partFooter[]', element.getElementsByClassName('part-footer')[0].value);
-                }));
-
-                xhr.open('POST', location.pathname, true);
-                xhr.setRequestHeader('X-CSRF-TOKEN', getCSRFToken());
-
-                xhr.onload = function() {
-                    var response = JSON.parse(xhr.responseText);
-                    if (xhr.status === 200 && response.error !== true) {
-                        handleResponseToast(response, true, 'Added New Post');
-                        self._regenerateAfterNewCreation();
-                    }
-                    else if (xhr.status !== 200 || response.error === true) {
-                        handleResponseToast(response, false);
-                    }
-                    updateAddConfirmButtons(updateBtns, false);
-                };
-                xhr.send(formData);
-            },
-
-            confirmPartRemove: function(e) {
-                var self = PostCreate,
-                    id = self.deletePostPartModal.getElementsByClassName('confirm-delete')[0].getAttribute('data-id'),
-                    currElem = document.getElementById('post-id-'+id);
-
-
-                if(self.defaultProperties.partTemplateCounter == 1 && id) {return false};
-                self.defaultProperties.partTemplateCounter = id;
-
-                currElem.remove();
-                self.regenerateAfterPartDelete();
-            },
-
-            regenerateAfterPartDelete: function() {
-                var self = this,
-                    allPostParts = document.getElementsByClassName('post-part');
-
-                Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
-                    var arr = element.id.split('-'),
-                        id = arr[arr.length-1];
-                    if (id > self.defaultProperties.partTemplateCounter) {
-                        self._regeneratePostPartIds(element);
-                        self.defaultProperties.partTemplateCounter++;
-                    }
-                }));
-
-                self.defaultProperties.partTemplateCounter--;
-            },
-
-            _regeneratePostPartIds: function(element) {
-                element.dataset.id = this.defaultProperties.partTemplateCounter;
-                element.id = 'post-id-' + this.defaultProperties.partTemplateCounter;
-                element.getElementsByClassName('post-number')[0].innerHTML = this.defaultProperties.partTemplateCounter;
-            },
-
-            _regenerateAfterNewCreation: function(element) {
-                this.defaultProperties.partTemplateCounter = 1;
-                var allParts = document.getElementsByClassName('post-part');
-
-                Array.prototype.forEach.call(allParts, (function (element, index, array) {
-                        if (index === 0) {
-                            element.getElementsByClassName('part-header')[0].value = '';
-                            element.getElementsByClassName('part-footer')[0].value = '';
-                            element.getElementsByClassName('part-image')[0].value = '';
-                            element.getElementsByClassName('file-path')[0].value = '';
-                        } else {
-                            element.remove();
-                        }
-                    })
-                );
-                this.postAlias.value = '';
-                this.postMainHeader.value = '';
-                this.postMainText.value = '';
-                this.postMainImage.value = '';
-                document.getElementById('post-create-main').getElementsByClassName('file-path')[0].value = '';
-            },
-
-            createModelPartDelete: function(e) {
-                var self = PostCreate,
-                    currElem = getClosest(e.target, '.post-part'),
-                    paragraph = self.deletePostPartModal.getElementsByTagName('p')[0],
-                    postParts = document.getElementsByClassName('post-part'),
-                    _html = '';
-
-                if (postParts.length == 1) {
-                    _html = "<h4 class='red-text'>Can't Delete Last Part</h4>"
+            _toggleSwitcher: function (el) {
+                if (el.classList.contains('checked')) {
+                    el.classList.remove('checked');
+                    el.classList.add('unchecked');
                 } else {
-                    _html = '<p>Post N_' + currElem.getElementsByClassName('post-number')[0].innerHTML + '</p>' +
-                        '<p>Post Header: ' + currElem.getElementsByClassName('part-header')[0].value + '</p>' +
-                        '<p>Post Footer: ' + currElem.getElementsByClassName('part-footer')[0].value + '</p>';
+                    el.classList.add('checked');
+                    el.classList.remove('unchecked');
                 }
-
-                paragraph.innerHTML = _html;
-                self.deletePostPartModal.getElementsByClassName('confirm-delete')[0].dataset.id = currElem.getAttribute('data-id');
-
-                self.deletePostPartModal.getElementsByClassName('confirm-delete')[0].addEventListener('click',
-                    self.confirmPartRemove
-                );
             },
 
-            createModalContent: function() {
-                var content = this.modalAddPost.getElementsByClassName('modal-content')[0],
-                    paragraph = content.getElementsByTagName('p')[0],
-                    _html = '<p>Header: ' + this.postMainHeader.value + '</p>' +
-                        '<p>Main Text: ' + this.postMainText.value + '</p>' +
-                        '<p>Category: ' + this.postSubcategory.options[this.postSubcategory.selectedIndex].text + '</p>';
+            _regenerateAfterPartDelete: function(postPartLocaleContainer) {
+                var self = this,
+                    allPostParts = postPartLocaleContainer.getElementsByClassName('post-part'),
+                    locale = postPartLocaleContainer.dataset.localename;
 
-                paragraph.innerHTML = _html;
+                Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
+                    var partNumber = element.dataset.partnumber;
+
+                    if (partNumber > self.defaultProperties.partTemplateCounter[locale]) {
+                        self._makePostPartIds(element);
+                        self.defaultProperties.partTemplateCounter[locale]++;
+                    }
+                }));
+
+                this.defaultProperties.partTemplateCounter[locale]--;
             },
 
-            addPostPart: function() {
-                var clone = this.defaultProperties.basicPartTemplate.cloneNode(true);
-                this.postCreateParts.appendChild(clone);
-                this.renderPartTemplate();
+            _proceedLocalePartEnablingDisabling: function (el) {
+                var localeMainContainer = getClosest(el, '.main-locale-container'),
+                    mainBtns = localeMainContainer.getElementsByClassName('btn'),
+                    mainInputs = localeMainContainer.getElementsByClassName('input-area'),
+
+                    locale = localeMainContainer.dataset.localename,
+                    postPartLocaleContainer = document.getElementById('part-locale-' + locale),
+                    localeBtns = postPartLocaleContainer.getElementsByClassName('btn'),
+                    localeInputs = postPartLocaleContainer.getElementsByTagName('input'),
+
+                    triggeredDisableEnableArr = [mainInputs, localeInputs],
+                    classedDisableEnableArr = [mainBtns, localeBtns];
+
+                if (el.classList.contains('checked')) {
+                    this._doTriggerDisableEnable(triggeredDisableEnableArr, false);
+                    this._doClassedDisableEnable(classedDisableEnableArr, false);
+                } else {
+                    this._doTriggerDisableEnable(triggeredDisableEnableArr, true);
+                    this._doClassedDisableEnable(classedDisableEnableArr, true);
+                }
             },
 
-            getHashtagList: function() {
-                var hashtags = getClosest(this.hashtagSelect, '.select-wrapper')
-                    .getElementsByClassName('multiple-select-dropdown')[0]
-                    .getElementsByClassName('active');
-                return hashtags ? hashtags : [];
+            _doTriggerDisableEnable: function (butchArr, bool) {
+                Array.prototype.forEach.call(butchArr, (function (butch) {
+                    Array.prototype.forEach.call(butch, (function (element, index, array) {
+                        element.disabled = bool;
+                    }));
+                }));
+            },
+
+            _doClassedDisableEnable: function (butchArr, bool) {
+                Array.prototype.forEach.call(butchArr, (function (butch) {
+                    Array.prototype.forEach.call(butch, (function (element, index, array) {
+                        if (bool) {
+                            element.classList.add('disabled');
+                        } else {
+                            element.classList.remove('disabled');
+                        }
+                    }));
+                }));
             }
         };
 
-        PostCreate.confirmButton.addEventListener('click', PostCreate.confirmPost.bind(PostCreate));
-        PostCreate.addButton.addEventListener('click', PostCreate.createModalContent.bind(PostCreate));
-        PostCreate.postPartAddButton.addEventListener('click', PostCreate.addPostPart.bind(PostCreate));
         PostCreate._init();
     </script>
 @endsection

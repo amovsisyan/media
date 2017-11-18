@@ -49,6 +49,11 @@ class Hashtag extends Model
         return $result;
     }
 
+    public static function getAllHashtags()
+    {
+        return self::select('id', 'alias')->orderBy('alias')->get();
+    }
+
     /**
      * @param $id
      * @return mixed

@@ -6,6 +6,13 @@
 #post-create-main .col{
     margin-bottom: 30px;
 }
+.main-locale-container,
+.part-locale-container {
+    box-shadow: 2px 2px 3px #888888;
+}
+.post-part {
+    padding-bottom: 30px !important;
+}
 
 /*	 Collapse		*/
 .part-template .collapsible-body {

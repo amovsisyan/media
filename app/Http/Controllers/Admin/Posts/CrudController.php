@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Posts;
 use App\Category;
 use App\Hashtag;
 use App\Http\Controllers\Helpers\DirectoryEditor;
+use App\Http\Controllers\Services\Locale\LocaleSettings;
 use App\Post;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validator\PostsValidation;
@@ -24,13 +25,15 @@ class CrudController extends PostsController
         'byAlias' => '3',
     ];
 
+    const TEMPLATE_MAX_COLUMNS = 12;
+
     /**
      * Returns Data for Post Creation View
      * @return \Illuminate\Http\Response
      */
     protected function createPost_get()
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
 
         //  All CATEGORY    &   SUBCATEGORY
         $getAllCatSubcat = self::_getAllCategoriesSubcategories();
@@ -41,9 +44,12 @@ class CrudController extends PostsController
         $response['hashtags'] = !empty($getAllHashtags['hashtags']) ? $getAllHashtags['hashtags'] : [];
 
         $response['colLength'] = [
-            'post' => DBColumnLengthData::POSTS_TABLE,
-            'parts' => DBColumnLengthData::POST_PARTS_TABLE,
+            'post' => DBColumnLengthData::getPostLenghts(),
+            'parts' => DBColumnLengthData::getPostPartsLenght(),
         ];
+
+        $response['activeLocales'] = LocaleSettings::getActiveLocales();
+        $response['templateDivider'] = self::TEMPLATE_MAX_COLUMNS / count($response['activeLocales']);
 
         return response()
             -> view('admin.posts.crud.create', ['response' => $response]);
@@ -125,7 +131,7 @@ class CrudController extends PostsController
     // todo rename this method and add annotation
     protected function updatePost_get()
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
 
         return response()
             -> view('admin.posts.crud.update', ['response' => $response]);
@@ -169,7 +175,7 @@ class CrudController extends PostsController
      */
     protected function postMainDetails_get(Request $request, $id)
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
         // todo not sure that we need try/catch here
         try {
             $post = Post::findOrFail($id);
@@ -246,7 +252,7 @@ class CrudController extends PostsController
      */
     protected function postPartsDetails_get(Request $request, $id)
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
         // todo not sure that we need try/catch here
         try {
             $post = Post::findOrFail($id);
@@ -374,7 +380,7 @@ class CrudController extends PostsController
      */
     protected function postPartsAttach_get(Request $request, $id)
     {
-        $response = Helpers::prepareAdminNavbars(request()->segment(3));
+        $response = Helpers::prepareAdminNavbars();
         // todo not sure that we need try/catch here
         try {
             $postPart = PostParts::where('id', $id)->first();
@@ -580,18 +586,20 @@ class CrudController extends PostsController
     private static function _getAllCategoriesSubcategories()
     {
         $response = [];
-        $categories = Category::select('id', 'name')->orderBy('name')->get();
+        $categories = Category::getCategoriesWithSubcategories();
+
+        // todo remove it to prepare
         foreach ($categories as $key => $category) {
             $response['categories'][$key]['category'] = [
                 'id' => $category->id,
-                'name' => $category->name
+                'alias' => $category->alias
             ];
             $response['categories'][$key]['subcategory'] = [];
-            $subcategories = $category->subcategories()->select('id', 'name')->get();
+            $subcategories = $category['subcategories'];
             foreach ($subcategories as $subcategory) {
                 $response['categories'][$key]['subcategory'][] = [
                     'id' => $subcategory->id,
-                    'name' => $subcategory->name
+                    'alias' => $subcategory->alias
                 ];
             }
         }
@@ -605,11 +613,13 @@ class CrudController extends PostsController
     private static function _getAllHashtags()
     {
         $response = [];
-        $hashtags = Hashtag::select('id', 'hashtag')->orderBy('hashtag')->get();
+        $hashtags = Hashtag::getAllHashtags();
+
+        // todo remove it to prepare
         foreach ($hashtags as $hashtag) {
             $response['hashtags'][] = [
                 'id' => $hashtag->id,
-                'hashtag' => $hashtag->hashtag
+                'alias' => $hashtag->alias
             ];
         }
         return $response;

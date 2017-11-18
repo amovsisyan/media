@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Data;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class DBColumnLengthData extends Controller
@@ -72,6 +71,25 @@ class DBColumnLengthData extends Controller
         return [
             'alias' => self::HASHTAG_TABLE['alias'],
             'hashtag' => self::HASHTAG_LOCALE_TABLE['hashtag']
+        ];
+    }
+
+    public static function getPostLenghts()
+    {
+        return [
+            'alias' => self::POSTS_TABLE['alias'],
+            'header' => self::POSTS_LOCALE_TABLE['header'],
+            'text' => self::POSTS_LOCALE_TABLE['text'],
+            'image' => self::POSTS_LOCALE_TABLE['image']
+        ];
+    }
+
+    public static function getPostPartsLenght()
+    {
+        return [
+            'head' => self::POST_PARTS_TABLE['head'],
+            'body' => self::POST_PARTS_TABLE['body'],
+            'foot' => self::POST_PARTS_TABLE['foot']
         ];
     }
 }

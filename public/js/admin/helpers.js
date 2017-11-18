@@ -43,7 +43,7 @@ function getClosest (elem, selector) {
     }
 
     return null;
-};
+}
 
 /**
  * helps to handle toast after bad or OK response
@@ -118,7 +118,7 @@ function imageSizeWarning(files, standards) {
         fr.onload = function() {
             var img = new Image;
             img.onload = function() {
-                imgRatio = img.width/img.height;
+                imgRatio = img.width / img.height;
                 var biggerThanBottom = imgRatio >= dmsRatio.ratioBottom,
                     smallerThanTop = imgRatio <= dmsRatio.ratioTop;
 
@@ -130,6 +130,13 @@ function imageSizeWarning(files, standards) {
                         type: 'Image size Warning'
                     };
                     handleResponseToast(response, false);
+                } else {
+                    response = {
+                        response: ['Good'],
+                        type: 'Correct'
+                    };
+                    var text = 'Good';
+                    handleResponseToast(response, true, text);
                 }
             };
             img.src = fr.result;
