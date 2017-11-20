@@ -8,19 +8,21 @@
         <div class="container">
             <div class="row right-align m_t_50 post-create-btns">
                 <a class="waves-effect waves-light btn">Finish & Test</a>
-                <!-- Modal -->
+                <!-- Modal Create New Post-->
                 <a id='add_post' class="waves-effect waves-light btn modal-trigger" href="#modal_add_post">Finish & Add</a>
                 <div id="modal_add_post" class="modal">
                     <div class="modal-content left-align">
                         <h4>Are You Sure You Want Create Post?</h4>
                     </div>
                     <div class="modal-footer">
-                        <a id='confirm_post' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+                        <a id='confirm-add-post' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
                         <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Modal Post Part Delete Confirm -->
         <div class="modal" id="deletePostPartModal">
             <div class="modal-content left-align">
                 <h4>Are You Sure You Want Delete This Part?</h4>
@@ -39,8 +41,8 @@
 
     <script>
         $(document).ready(function(){
-            $('#subcategory_select').material_select();
-            $('#hashtag_select').material_select();
+            $('#subcategory-select').material_select();
+            $('#hashtag-select').material_select();
             $('.modal').modal();
         });
 
@@ -50,10 +52,14 @@
                 basicPartTemplate: document.getElementsByClassName('post-part')[0]
             },
 
-            postMainImages: document.getElementsByClassName('main_image'),
+            postMainImages: document.getElementsByClassName('main-image'),
             postPartAddButtons: document.getElementsByClassName('post-part-add-button'),
             localeSwitchInputs: document.getElementsByClassName('locale-switch-input'),
+            hashtagSelect: document.getElementById('hashtag-select'),
+            postAlias: document.getElementById('alias'),
+            postSubcategory: document.getElementById('subcategory-select'),
 
+            confirmAddPostBtn: document.getElementById('confirm-add-post'),
             confirmPartDeleteBtn: document.getElementById('confirm-part-delete'),
 
             _init: function () {
@@ -64,7 +70,9 @@
             addListeners: function () {
                 var self = this;
 
-                // add button listener
+                // post add confirm btn listener
+                this.confirmAddPostBtn.addEventListener('click', this.addNewPostRequest.bind(this));
+                // add post parts add button listener
                 Array.prototype.forEach.call(this.postPartAddButtons, (function (element, index, array) {
                         element.addEventListener('click', self.addPostPart.bind(self));
                     })
@@ -148,6 +156,97 @@
                     this.defaultProperties.partTemplateCounter[locale] = num;
                     this._regenerateAfterPartDelete(postPartLocaleContainer);
                 }
+            },
+
+            addNewPostRequest: function () {
+                var updateBtns = [this.confirmAddPostBtn, this.confirmPartDeleteBtn];
+                updateAddConfirmButtons(updateBtns, true);
+
+                var self = this,
+                    postAlias = this.postAlias.value,
+                    postSubcategory = this.postSubcategory.options[this.postSubcategory.selectedIndex].value,
+                    postHashtags = this._getHashtagList(),
+                    activeLocales = this._getActiveLocales(),
+                    xhr = new XMLHttpRequest(),
+                    formData = new FormData();
+
+                if (!postAlias || !postHashtags.length || !activeLocales.length) {
+                    var response = {};
+                    response.type = 'Validation error';
+
+                    if (!postAlias) {
+                        response.response = ['Alias Required']
+                    } else if (!postHashtags.length) {
+                        response.response = ['Select at least one hashtag']
+                    } else if (!activeLocales.length) {
+                        response.response = ['Activeate at least one locale']
+                    }
+
+                    handleResponseToast(response, false);
+                    updateAddConfirmButtons(updateBtns, false);
+                    return;
+                }
+                // Main
+                formData.append("postAlias", postAlias);
+                formData.append("postSubcategory", postSubcategory);
+                formData.append("postHashtag", JSON.stringify(postHashtags));
+                formData.append("activeLocales", JSON.stringify(activeLocales));
+
+                // Main Localed image, header and text
+                this._appendLocaledData(activeLocales, formData); // formData by reference
+
+                xhr.open('POST', location.pathname, true);
+                xhr.setRequestHeader('X-CSRF-TOKEN', getCSRFToken());
+
+                xhr.onload = function() {
+                    var response = JSON.parse(xhr.responseText);
+                    if (xhr.status === 200 && response.error !== true) {
+                        handleResponseToast(response, true, 'Added New Post');
+                        self._regenerateAfterNewCreation();
+                    }
+                    else if (xhr.status !== 200 || response.error === true) {
+                        handleResponseToast(response, false);
+                    }
+                    updateAddConfirmButtons(updateBtns, false);
+                };
+                xhr.send(formData);
+            },
+
+            _regenerateAfterNewCreation: function() {
+                var self = this;
+                this.postAlias.value = '';
+
+                Array.prototype.forEach.call(this._getActiveLocales(), (function (locale, index, array) {
+                    self.defaultProperties.partTemplateCounter[locale] = 1;
+
+                    var mainLocaled = document.getElementById('main-locale-' + locale);
+                    self._emptyMainAfterNewCreation(mainLocaled);
+
+                    var partLocaled = document.getElementById('part-locale-' + locale),
+                        postParts = partLocaled.querySelectorAll('.post-part');
+
+                    Array.prototype.forEach.call(postParts, (function (postPart, index, array) {
+                        if (postPart.dataset.partnumber == 1) {
+                            self._emptyPartAfterNewCreation(postPart);
+                        } else {
+                            postPart.remove();
+                        }
+                    }));
+                }));
+            },
+
+            _emptyMainAfterNewCreation: function (mainLocaled) {
+                mainLocaled.getElementsByClassName('main-header')[0].value = '';
+                mainLocaled.getElementsByClassName('main-text')[0].value = '';
+                mainLocaled.getElementsByClassName('main-image')[0].value = '';
+                mainLocaled.getElementsByClassName('file-path')[0].value = '';
+            },
+
+            _emptyPartAfterNewCreation: function (postPart) {
+                postPart.getElementsByClassName('part-header')[0].value = '';
+                postPart.getElementsByClassName('part-image')[0].value = '';
+                postPart.getElementsByClassName('file-path')[0].value = '';
+                postPart.getElementsByClassName('part-footer')[0].value = '';
             },
 
             _initDefaultCounter: function () {
@@ -266,6 +365,61 @@
                         } else {
                             element.classList.remove('disabled');
                         }
+                    }));
+                }));
+            },
+
+            _getActiveLocales: function () {
+                var activeLocales = [],
+                    locales = document.getElementsByClassName("locale-switch-input checked");
+                Array.prototype.forEach.call(locales, (function (element, index, array) {
+                    activeLocales.push(element.value)
+                }));
+
+                return activeLocales;
+            },
+
+            _getHashtagList: function() {
+                var hashtagsList = [],
+                    hashtags = getClosest(this.hashtagSelect, '.select-wrapper')
+                    .getElementsByClassName('multiple-select-dropdown')[0]
+                    .getElementsByClassName('active'),
+                    hashtagArr = hashtags ? hashtags : [];
+                    
+                Array.prototype.forEach.call(hashtagArr, (function (element, index, array) {
+                    var elementContent = element.getElementsByTagName('span')[0].textContent;
+                    hashtagsList.push(explodeGetLast(elementContent, '_'))
+                }));
+
+                return hashtagsList ? hashtagsList : [];
+            },
+
+            _appendLocaledData: function (activeLocales, formData) {
+                Array.prototype.forEach.call(activeLocales, (function (locale, index, array) {
+                    // Localed Main
+                    var localeMainContainer = document.getElementById('main-locale-' + locale),
+                        fileContainer = localeMainContainer.getElementsByClassName('main-image')[0].files,
+                        file = [];
+                    if (fileContainer.length) {
+                        file = localeMainContainer.getElementsByClassName('main-image')[0].files[0]
+                    }
+                    formData.append('header[' + locale + ']', localeMainContainer.getElementsByClassName('main-header')[0].value);
+                    formData.append('image[' + locale + ']', file);
+                    formData.append('text[' + locale + ']', localeMainContainer.getElementsByClassName('main-text')[0].value);
+
+                    // Localed Part
+                    var localePartContainer = document.getElementById('part-locale-' + locale),
+                        allLocaleParts = localePartContainer.getElementsByClassName('post-part');
+
+                    Array.prototype.forEach.call(allLocaleParts, (function (part, i, arr) {
+                        var fileContainer = part.getElementsByClassName('part-image')[0].files,
+                            file = [];
+                        if (fileContainer.length) {
+                            file = part.getElementsByClassName('part-image')[0].files[0]
+                        }
+                        formData.append('partHeader[' + locale + '][]', part.getElementsByClassName('part-header')[0].value);
+                        formData.append('partImage[' + locale + '][]', file);
+                        formData.append('partFooter[' + locale + '][]', part.getElementsByClassName('part-footer')[0].value);
                     }));
                 }));
             }

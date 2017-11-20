@@ -62,7 +62,9 @@ class CrudController extends PostsController
      */
     protected function createPost_post(Request $request)
     {
-        $requestAll =  $request->all();
+        $requestAll = $request->all();
+        $requestAll['postHashtag'] = json_decode($requestAll['postHashtag']);
+        $requestAll['activeLocales'] = json_decode($requestAll['activeLocales']);
 
         // Main fields Validation
         $mainValidation = PostsValidation::createPostMainFieldsValidations($requestAll);
@@ -82,10 +84,11 @@ class CrudController extends PostsController
             // Post Main Creation
             $createMainRes = self::_createPostMain($request);
             $post = $createMainRes['post'];
+            $postsLocale = $createMainRes['postsLocale'];
             $mainPath = $createMainRes['mainPath'];
 
             // Post Parts Creation
-            self::_createPostParts($request, $post, $mainPath);
+            self::_createPostParts($request, $postsLocale, $mainPath);
 
             // Hashtag Attach
             $post->hashtags()->attach(json_decode($request->postHashtag));
@@ -515,67 +518,96 @@ class CrudController extends PostsController
     {
         $subcategory = Subcategory::findOrFail($request->postSubcategory);
 
-        $createArr = [
-            'alias' => $request->postAlias,
-            'header' => $request->postMainHeader,
-            'text' => $request->postMainText,
-            'image' => $request->postAlias . '.' . $request->file('postMainImage')->getClientOriginalExtension()
+        $createPostArr = [
+            'alias' => $request->postAlias
         ];
-        $post = $subcategory->posts()->create($createArr);
+        $post = $subcategory->posts()->create($createPostArr);
 
-        $mainPath = $subcategory->alias . DIRECTORY_SEPARATOR . $post->alias;
-        $file = $request->file('postMainImage');
-        $filename = $mainPath . DIRECTORY_SEPARATOR . $post->image;
-        Storage::disk('public_posts')->put($filename, File::get($file));
+        $createPostPartArr = [];
+        $activeLocales = json_decode($request->activeLocales);
+
+        foreach ($activeLocales as $locale) {
+            $createPostPartArr[] = [
+                'header' => $request['header'][$locale],
+                'text' => $request['text'][$locale],
+                'image' => $request['postAlias'] . '.' . $request->file('image')[$locale]->getClientOriginalExtension(),
+                'locale_id' => LocaleSettings::getLocaleIdByName($locale)
+            ];
+        }
+
+        $postsLocale = $post->postLocale()->createMany($createPostPartArr);
+
+//        $mainPath = $subcategory->alias . DIRECTORY_SEPARATOR . $post->alias;
+//        $file = $request->file('postMainImage');
+//        $filename = $mainPath . DIRECTORY_SEPARATOR . $post->image;
+//        Storage::disk('public_posts')->put($filename, File::get($file));
 
         return [
             'post' => $post,
-            'mainPath' => $mainPath
+            'postsLocale' => $postsLocale,
+//            'mainPath' => $mainPath
+            'mainPath' => null
         ];
     }
 
     /**
      * Create Post Parts
      * @param $request
-     * @param $post
+     * @param $postsLocale
      * @param $mainPath
      * @return array
      */
-    private static function _createPostParts($request, $post, $mainPath)
+    private static function _createPostParts($request, $postsLocale, $mainPath)
     {
         $createArr = [];
-        $postParts = $post->postParts()->get();
-
-        // this needs for update, it helps not overwrite existing images (image names)
-        $arrOfBusyNums = [];
-        if ($postParts->count()) {
-            foreach ($postParts as $part) {
-                $explodedOnce =  explode('_', $part->body);
-                $lastPart = end($explodedOnce);
-                $arrOfBusyNums[] = explode('.', $lastPart)[0];
+        $imageKey = 0;
+        foreach ($postsLocale as $postLocale) {
+            $eachCreateArr = [];
+            $localeName = LocaleSettings::getLocaleNameById($postLocale->locale_id);
+            $partHeaderLocaled = $request->partHeader[$localeName];
+            $partImageLocaled = $request->file('partImage')[$localeName];
+            $partFooterLocaled = $request->partFooter[$localeName];
+            foreach ($partHeaderLocaled as $key => $partHeader) {
+                $eachCreateArr[] = [
+                    'head'=> $partHeaderLocaled[$key],
+                    'body'=> $partHeaderLocaled[$key] . '_' . $imageKey++ . '.' . $partImageLocaled[$key]->getClientOriginalExtension(),
+                    'foot'=> $partFooterLocaled[$key]
+                ];
             }
-        };
+            $postParts = $postLocale->postParts()->createMany($eachCreateArr);
+        }
 
-        foreach ($request['partHeader'] as $key => $value) {
-            if (in_array($key, $arrOfBusyNums)) {
-                $bodyKey = max($arrOfBusyNums) + 1;
-                $arrOfBusyNums[] = $bodyKey;
-            } else {
-                $bodyKey = $key;
-            }
-            $createArr[$key] = [
-                'head' => $request['partHeader'][$key],
-                'body' => $post->alias . '_' . $bodyKey . '.' . $request->file('partImage')[$key]->getClientOriginalExtension(),
-                'foot' => $request['partFooter'][$key],
-            ];
-        };
-
-        $postParts = $post->postParts()->createMany($createArr);
-
-        foreach ($request['partImage'] as $key => $file) {
-            $filename = $mainPath . DIRECTORY_SEPARATOR . 'parts' . DIRECTORY_SEPARATOR . $postParts[$key]->body;
-            Storage::disk('public_posts')->put($filename, File::get($file));
-        };
+        // OLD ONE
+//        // this needs for update, it helps not overwrite existing images (image names)
+//        $arrOfBusyNums = [];
+//        if ($postParts->count()) {
+//            foreach ($postParts as $part) {
+//                $explodedOnce =  explode('_', $part->body);
+//                $lastPart = end($explodedOnce);
+//                $arrOfBusyNums[] = explode('.', $lastPart)[0];
+//            }
+//        };
+//
+//        foreach ($request['partHeader'] as $key => $value) {
+//            if (in_array($key, $arrOfBusyNums)) {
+//                $bodyKey = max($arrOfBusyNums) + 1;
+//                $arrOfBusyNums[] = $bodyKey;
+//            } else {
+//                $bodyKey = $key;
+//            }
+//            $createArr[$key] = [
+//                'head' => $request['partHeader'][$key],
+//                'body' => $post->alias . '_' . $bodyKey . '.' . $request->file('partImage')[$key]->getClientOriginalExtension(),
+//                'foot' => $request['partFooter'][$key],
+//            ];
+//        };
+//
+//        $postParts = $post->postParts()->createMany($createArr);
+//
+//        foreach ($request['partImage'] as $key => $file) {
+//            $filename = $mainPath . DIRECTORY_SEPARATOR . 'parts' . DIRECTORY_SEPARATOR . $postParts[$key]->body;
+//            Storage::disk('public_posts')->put($filename, File::get($file));
+//        };
         return ['error' => false];
     }
 

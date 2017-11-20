@@ -15,8 +15,8 @@
                 <label for="alias">Alias (English) <span class="important_icon">*</span></label>
             </div>
         </div>
-        <div class="input-field col m4 s12" id="subcategory_select_container">
-            <select id="subcategory_select">
+        <div class="input-field col m4 s12" id="subcategory-select-container">
+            <select id="subcategory-select">
                 @if (!empty($response) && !empty($response['categories']))
                     @foreach ($response['categories'] as $category)
                         <optgroup label="{{ $category['category']['alias'] }}">
@@ -29,8 +29,8 @@
             </select>
             <label>Select Subcategory <span class="important_icon">*</span></label>
         </div>
-        <div class="input-field col m4 s12" id="hashtag_select_container">
-            <select multiple id="hashtag_select">
+        <div class="input-field col m4 s12" id="hashtag-select-container">
+            <select multiple id="hashtag-select">
                 <option value="" disabled selected>Select Hashtag</option>
                 @if (!empty($response) && !empty($response['hashtags']))
                     @foreach ($response['hashtags'] as $hashtag)
@@ -53,7 +53,7 @@
                             <div class="locale-switch switch">
                                 <label>
                                     Off
-                                    <input type="checkbox" class="locale-switch-input">
+                                    <input type="checkbox" class="locale-switch-input" value="{{$locale['name']}}">
                                     <span class="lever"></span>
                                     On
                                 </label>
@@ -62,21 +62,21 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field">
-                            <textarea name="main_header" class="main_header materialize-textarea input-area" data-length={{$response['colLength']['post']['header']}}></textarea>
-                            <label for="main_header">Header ({{$locale['name']}}) <span class="important_icon">*</span></label>
+                            <textarea name="main-header" class="main-header materialize-textarea input-area" data-length={{$response['colLength']['post']['header']}}></textarea>
+                            <label for="main-header">Header ({{$locale['name']}}) <span class="important_icon">*</span></label>
                         </div>
                     </div>
                     <div class="col s12">
                         <div class="input-field">
-                            <textarea name="main_text" class="main_text materialize-textarea input-area" data-length={{$response['colLength']['post']['text']}}></textarea>
-                            <label for="main_text">Main Text ({{$locale['name']}}) <span class="important_icon">*</span></label>
+                            <textarea name="main-text" class="main-text materialize-textarea input-area" data-length={{$response['colLength']['post']['text']}}></textarea>
+                            <label for="main-text">Main Text ({{$locale['name']}}) <span class="important_icon">*</span></label>
                         </div>
                     </div>
                     <div class="col s12">
                         <div class="file-field input-field">
                             <div class="btn">
                                 <span>Main Image <span class="important_icon">*</span></span>
-                                <input type="file" class="main_image input-area" name="main_image" accept="image/*" enctype="multipart/form-data">
+                                <input type="file" class="main-image input-area" name="main-image" accept="image/*" enctype="multipart/form-data">
                             </div>
                             <div class="file-path-wrapper">
                                 <input class="file-path input-area" type="text">

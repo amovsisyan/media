@@ -72,6 +72,11 @@ class LocaleSettings extends Controller
         return self::DEFAULT_LOCALE;
     }
 
+    public static function getLocaleIdByName($name)
+    {
+        return self::createArr[$name]['id'] ? : null;
+    }
+
     protected static function getActiveLocalesFromDB()
     {
         $activeLocales = Locale::where('active', 1)->get();

@@ -153,9 +153,10 @@ function imageSizeWarning(files, standards) {
 function getPostMainImageStandardRatio(standards) {
     var stdW = standards.width,
         stdH = standards.height,
-        stdRation = stdW/stdH,
+        stdRation = stdW / stdH,
         stdDiverg = standards.diverg,
         diverg = stdRation * stdDiverg;
+
     return {
         ratioBottom: stdRation - diverg,
         ratioTop: stdRation + diverg
