@@ -524,29 +524,28 @@ class CrudController extends PostsController
         $post = $subcategory->posts()->create($createPostArr);
 
         $createPostPartArr = [];
+        $mainPath = $subcategory->alias . DIRECTORY_SEPARATOR . $post->alias;
         $activeLocales = json_decode($request->activeLocales);
 
         foreach ($activeLocales as $locale) {
+            $imgName = $request['postAlias'] . '.' . $request->file('mainImage')[$locale]->getClientOriginalExtension();
             $createPostPartArr[] = [
                 'header' => $request['header'][$locale],
                 'text' => $request['text'][$locale],
-                'image' => $request['postAlias'] . '.' . $request->file('image')[$locale]->getClientOriginalExtension(),
+                'image' => $imgName,
                 'locale_id' => LocaleSettings::getLocaleIdByName($locale)
             ];
+            $file = $request->file('mainImage')[$locale];
+            $filename = $mainPath . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . $imgName;
+            Storage::disk('public_posts')->put($filename, File::get($file));
         }
 
         $postsLocale = $post->postLocale()->createMany($createPostPartArr);
 
-//        $mainPath = $subcategory->alias . DIRECTORY_SEPARATOR . $post->alias;
-//        $file = $request->file('postMainImage');
-//        $filename = $mainPath . DIRECTORY_SEPARATOR . $post->image;
-//        Storage::disk('public_posts')->put($filename, File::get($file));
-
         return [
             'post' => $post,
             'postsLocale' => $postsLocale,
-//            'mainPath' => $mainPath
-            'mainPath' => null
+            'mainPath' => $mainPath
         ];
     }
 
@@ -559,20 +558,28 @@ class CrudController extends PostsController
      */
     private static function _createPostParts($request, $postsLocale, $mainPath)
     {
-        $createArr = [];
-        $imageKey = 0;
         foreach ($postsLocale as $postLocale) {
             $eachCreateArr = [];
             $localeName = LocaleSettings::getLocaleNameById($postLocale->locale_id);
             $partHeaderLocaled = $request->partHeader[$localeName];
             $partImageLocaled = $request->file('partImage')[$localeName];
             $partFooterLocaled = $request->partFooter[$localeName];
+
             foreach ($partHeaderLocaled as $key => $partHeader) {
+                $partImage = $partImageLocaled[$key];
+                $bodyImage = $partHeaderLocaled[$key] . '.' . $partImage->getClientOriginalExtension();
+
                 $eachCreateArr[] = [
                     'head'=> $partHeaderLocaled[$key],
-                    'body'=> $partHeaderLocaled[$key] . '_' . $imageKey++ . '.' . $partImageLocaled[$key]->getClientOriginalExtension(),
+                    'body'=> $bodyImage,
                     'foot'=> $partFooterLocaled[$key]
                 ];
+
+                $filename = $mainPath . DIRECTORY_SEPARATOR
+                    . $localeName . DIRECTORY_SEPARATOR
+                    . 'parts' . DIRECTORY_SEPARATOR
+                    . $bodyImage;
+                Storage::disk('public_posts')->put($filename, File::get($partImage));
             }
             $postParts = $postLocale->postParts()->createMany($eachCreateArr);
         }

@@ -120,6 +120,8 @@
             renderPartTemplate: function (postPart) {
                 // empty postPart
                 this._emptyPostPart(postPart);
+                // remove disabled postPart
+                this._removeDisablesPostPart(postPart);
                 // add ids
                 this._makePostPartIds(postPart);
                 // add post part listeners
@@ -277,6 +279,16 @@
                 postPart.getElementsByClassName('part-image')[0].value = '';
                 postPart.getElementsByClassName('file-path ')[0].value = '';
             },
+            
+            _removeDisablesPostPart: function(postPart) {
+                var localeBtns = postPart.getElementsByClassName('btn'),
+                    localeInputs = postPart.getElementsByTagName('input'),
+                    triggeredDisableEnableArr = [localeInputs],
+                    classedDisableEnableArr = [localeBtns];
+
+                this._doTriggerDisableEnable(triggeredDisableEnableArr, false);
+                this._doClassedDisableEnable(classedDisableEnableArr, false);
+            },
 
             _makePostPartIds: function (postPart) {
                 var postPartLocaleContainer = getClosest(postPart, '.part-locale-container'),
@@ -404,7 +416,7 @@
                         file = localeMainContainer.getElementsByClassName('main-image')[0].files[0]
                     }
                     formData.append('header[' + locale + ']', localeMainContainer.getElementsByClassName('main-header')[0].value);
-                    formData.append('image[' + locale + ']', file);
+                    formData.append('mainImage[' + locale + ']', file);
                     formData.append('text[' + locale + ']', localeMainContainer.getElementsByClassName('main-text')[0].value);
 
                     // Localed Part

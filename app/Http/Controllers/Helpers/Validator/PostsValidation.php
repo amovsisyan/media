@@ -33,7 +33,7 @@ class PostsValidation extends AbstractValidator
 
         foreach ($allRequest['activeLocales'] as $activeLocale) {
             $rules['header.' . $activeLocale] = self::POST_COMMON_RULES['header'];
-            $rules['image.' . $activeLocale] = 'required|image ';
+            $rules['mainImage.' . $activeLocale] = 'required|image ';
             $rules['text.' . $activeLocale] = self::POST_COMMON_RULES['text'];
         }
 
