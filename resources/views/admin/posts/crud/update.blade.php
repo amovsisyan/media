@@ -12,8 +12,7 @@
                     <select id="search-type">
                         <option value="" disabled selected>Search type</option>
                         <option value="1">by ID</option>
-                        <option value="2">by Header</option>
-                        <option value="3">by Alias</option>
+                        <option value="2">by Alias</option>
                     </select>
                 </div>
                 <div class="input-field col m7 s12">
@@ -33,7 +32,6 @@
         <div class="modal" id="deletePostModal">
             <div class="modal-content left-align">
                 <h4>Are You Sure You Want Delete This Post?</h4>
-                <p></p>
             </div>
             <div class="modal-footer">
                 <a class="modal-action modal-close waves-effect waves-green btn-flat red" id="post-confirm-delete">Delete</a>
@@ -95,12 +93,12 @@
                         var clone = self.collapsePostPart.cloneNode(true);
                         clone.getElementsByClassName('part-number')[0].innerHTML = ++index;
                         clone.getElementsByClassName('post-id')[0].innerHTML = 'ID = ' + element.id;
-                        clone.getElementsByClassName('part-header')[0].innerHTML = element.header;
-                        clone.getElementsByClassName('part-text')[0].innerHTML = element.text;
+                        clone.getElementsByClassName('part-alias')[0].innerHTML = element.alias;
+                        clone.getElementsByClassName('post-alias-text')[0].innerHTML = 'ALIAS = ' + element.alias;
                         clone.id = 'search-part-id-' + element.id;
                         clone.dataset.id = element.id;
-                        clone.getElementsByClassName('post-parts-btn')[0].href = location.pathname +  '/main/' + element.id + '/parts';
                         clone.getElementsByClassName('post-main-btn')[0].href = location.pathname + '/main/' + element.id;
+                        clone.getElementsByClassName('post-parts-btn')[0].href = location.pathname +  '/main/' + element.id + '/parts';
                         clone.getElementsByClassName('post-delete-btn')[0].addEventListener('click',
                             self.initDeleteModal.bind(self)
                         );
@@ -123,8 +121,7 @@
                 var updateBtns = [this.postConfirmDelete];
                 updateAddConfirmButtons(updateBtns, true);
 
-                var self = this,
-                    id = e.target.dataset.id,
+                var id = e.target.dataset.id,
                     data = 'postId=' + id,
                     xhr = new XMLHttpRequest();
 

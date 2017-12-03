@@ -194,7 +194,7 @@
                 formData.append("postHashtag", JSON.stringify(postHashtags));
                 formData.append("activeLocales", JSON.stringify(activeLocales));
 
-                // Main Localed image, header and text
+                // Main Localed image, header and text + Part localed info
                 this._appendLocaledData(activeLocales, formData); // formData by reference
 
                 xhr.open('POST', location.pathname, true);

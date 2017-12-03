@@ -3,12 +3,13 @@
         <li class="collapse-post-part">
             <div class="collapsible-header">
                 <span class="part-number"></span>
-                <span class="part-header"></span>
+                <span class="part-alias"></span>
             </div>
             <div class="collapsible-body">
-                <div class="post-id col m2 s12"></div>
-                <div class="part-text col m9 s12"></div>
-                <div class="fixed-action-btn horizontal click-to-toggle col m1 s12">
+                <div class="post-id col s12"></div>
+                <div class="post-alias-text col s10"></div>
+                {{--<div class="part-text col m9 s12"></div>--}}
+                <div class="fixed-action-btn horizontal click-to-toggle col s2 right-align">
                     <a class="btn-floating red">
                         <i class="material-icons">menu</i>
                     </a>

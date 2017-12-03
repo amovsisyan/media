@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Http\Controllers\Helpers\Helpers;
+use App\Http\Controllers\Services\Locale\LocaleSettings;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
@@ -29,9 +30,9 @@ class Post extends Model
         return $this->belongsToMany('App\Hashtag', 'post_hashtag', 'post_id', 'hashtags_id');
     }
 
-    public static function postPartsWithHashtagsLocale($postAlias)
+    public static function postPartsWithHashtagsLocaleByAlias($postAlias)
     {
-        $localeId = Helpers::getLocaleIdFromSession();
+        $localeId = Helpers::getLocaleIdFromSession(); // todo IMPORTANT is it correct ?
 
         $result = self::where('alias', $postAlias)
             ->with(
@@ -46,7 +47,51 @@ class Post extends Model
                         }]);
                     }
                 ]
-            )->get();
+            )->first();
+
+        return $result;
+    }
+
+    public static function postWithPostLocaleHashtagsById($postId)
+    {
+        $result = self::where('id', $postId)
+            ->with(
+                [
+                    'postLocale',
+                    'hashtags'
+                ]
+            )->first();
+
+        return $result;
+    }
+
+    public static function postWithPostLocalePostPartsById($postId)
+    {
+        $result = self::where('id', $postId)
+            ->with(
+                [
+                    'postLocale' => function ($query) {
+                        $query->with(['postParts']);
+                    }
+                ]
+            )->first();
+
+        return $result;
+    }
+
+    public static function postWithSubcategoryPostLocaleById($postId, $locale)
+    {
+        $localeId = LocaleSettings::getLocaleIdByName($locale);
+
+        $result = self::where('id', $postId)
+            ->with(
+                [
+                    'subcategory',
+                    'postLocale' => function ($query) use ($localeId) {
+                        $query->where('locale_id', $localeId);
+                    },
+                ]
+            )->first();
 
         return $result;
     }

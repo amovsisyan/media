@@ -21,8 +21,7 @@ class CrudController extends PostsController
 {
     const POSTEDITSEARCHTYPES = [
         'byID' => '1',
-        'byHeader' => '2',
-        'byAlias' => '3',
+        'byAlias' => '2',
     ];
 
     const TEMPLATE_MAX_COLUMNS = 12;
@@ -106,7 +105,7 @@ class CrudController extends PostsController
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postAddNewParts_post(Request $request, $id)
+    protected function postAddNewPart_post(Request $request, $locale, $id)
     {
         $requestAll = $request->all();
 
@@ -118,12 +117,13 @@ class CrudController extends PostsController
         }
 
         try {
-            $post = Post::findOrFail($id);
-            $subcategory = $post->subcategory()->first();
+            $post = Post::postWithSubcategoryPostLocaleById($id, $requestAll['locale']);
+            $postLocale = $post['postLocale'];
+            $subcategory = $post['subcategory'];
             $mainPath = $subcategory->alias . DIRECTORY_SEPARATOR . $post->alias;
 
             // Post Parts Creation
-            self::_createPostParts($request, $post, $mainPath);
+            self::_createPostParts($request, $postLocale, $mainPath);
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -150,16 +150,16 @@ class CrudController extends PostsController
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
+
         $post = self::_postBySearchType($request);
 
-        $searchResult = $post->select('id', 'header', 'text')->get();
+        $searchResult = $post->select('id', 'alias')->get();
         $response['posts'] = [];
         if (!empty($searchResult)) {
             foreach ($searchResult as $item) {
                 $response['posts'][] = [
                     'id' => $item->id,
-                    'header' => $item->header,
-                    'text' => $item->text
+                    'alias' => $item->alias
                 ];
             }
         }
@@ -176,22 +176,32 @@ class CrudController extends PostsController
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postMainDetails_get(Request $request, $id)
+    protected function postMainDetails_get(Request $request, $alias, $id)
     {
         $response = Helpers::prepareAdminNavbars();
-        // todo not sure that we need try/catch here
+
         try {
-            $post = Post::findOrFail($id);
+            $post = Post::postWithPostLocaleHashtagsById($id);
+
             $response['post'] = [
                 "id" => $post->id,
                 "alias" => $post->alias,
-                "header" => $post->header,
-                "text" => $post->text,
-                "image" => $post->image,
                 "subcateg_id" => $post->subcateg_id
             ];
 
-            $hashtags = $post->hashtags()->select('hashtags.id')->get();
+            $postsLocale = $post['postLocale'];
+            $response['post']['postLocale'] = [];
+            foreach ($postsLocale as $postLocale) {
+                $response['post']['postLocale'][] = [
+                    "header" => $postLocale->header,
+                    "text" => $postLocale->text,
+                    "image" => $postLocale->image,
+                    "localeName" => LocaleSettings::getLocaleNameById($postLocale->locale_id),
+                    "localeId" => $postLocale->locale_id
+                ];
+            }
+
+            $hashtags = $post['hashtags'];
             $response['post']['hashtags'] = [];
             foreach ($hashtags as $hashtag) {
                 $response['post']['hashtags'][] = $hashtag->id;
@@ -204,6 +214,13 @@ class CrudController extends PostsController
             //  All HASHTAGS
             $getAllHashtags = self::_getAllHashtags();
             $response['hashtags'] = $getAllHashtags['hashtags'];
+
+            $response['activeLocales'] = LocaleSettings::getActiveLocales();
+            $response['templateDivider'] = self::TEMPLATE_MAX_COLUMNS / count($response['activeLocales']);
+
+            $response['colLength'] = [
+                'post' => DBColumnLengthData::getPostLenghts(),
+            ];
 
         } catch(\Exception $e) {
             return ResponseController::_catchedResponse($e);
@@ -220,9 +237,10 @@ class CrudController extends PostsController
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postMainDetails_post(Request $request, $id)
+    protected function postMainDetails_post(Request $request, $locale, $id)
     {
         $requestAll =  $request->all();
+        $requestAll['postHashtag'] = json_decode($requestAll['postHashtag']);
 
         // Main fields Validation
         $mainValidation = PostsValidation::updatePostMainFieldsValidations($requestAll);
@@ -232,7 +250,7 @@ class CrudController extends PostsController
         }
 
         try {
-            $post = Post::findOrFail($id);
+            $post = Post::postWithPostLocaleHashtagsById($id);
 
             // Post Main Edited
             self::_postMainPartEdited($request, $post);
@@ -253,26 +271,33 @@ class CrudController extends PostsController
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postPartsDetails_get(Request $request, $id)
+    protected function postPartsDetails_get(Request $request, $alias, $id)
     {
         $response = Helpers::prepareAdminNavbars();
         // todo not sure that we need try/catch here
         try {
-            $post = Post::findOrFail($id);
+            $post = Post::postWithPostLocalePostPartsById($id);
 
             // Post Parts
-            $postParts = $post->postParts()->select('post_parts.id', 'head', 'body', 'foot')->get();
-            foreach ($postParts as $postPart) {
-                $response['post']['postparts'][] = [
-                    'id' => $postPart->id,
-                    'head' => $postPart->head,
-                    'body' => $postPart->body,
-                    'foot' => $postPart->foot,
-                ];
+            foreach ($post['postLocale'] as $localedPost) {
+                $postParts = $localedPost['postParts'];
+                $localeName = LocaleSettings::getLocaleNameById($localedPost->locale_id);
+
+                foreach ($postParts as $postPart) {
+                    $response['post']['postparts'][$localeName][] = [
+                        'id' => $postPart->id,
+                        'head' => $postPart->head,
+                        'body' => $postPart->body,
+                        'foot' => $postPart->foot,
+                    ];
+                }
             }
+
             $response['colLength'] = [
                 'parts' => DBColumnLengthData::POST_PARTS_TABLE,
             ];
+            $response['activeLocales'] = LocaleSettings::getActiveLocales();
+            $response['templateDivider'] = self::TEMPLATE_MAX_COLUMNS / count($response['activeLocales']);
         } catch(\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -293,35 +318,27 @@ class CrudController extends PostsController
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
+
         try {
-            $postPart = PostParts::findOrFail($request->partId);
-            $oldPostPart = clone $postPart;
+            $postPart = PostParts::postPartsWithPostLocalePostSubcategoryById($request->partId);
             $updateArr = [
                 'head' => $request->head,
                 'foot' => $request->foot
             ];
-            $newName = $oldPostPart->body;
 
-            $imgUpdated = false;
             $file = $request->file('body');
             if ($file) {
-                $imgUpdated = true;
-                $imgName = explode('.', $oldPostPart->body);
-                $ext = end($imgName);
-                if ($ext !== $file->getClientOriginalExtension()) {
-                    $newName = implode('.', [$imgName[0],  $file->getClientOriginalExtension()]);
-                    $updateArr['body'] = $newName;
+                $newName = microtime() . '.' . $file->getClientOriginalExtension();
+                $updateArr['body'] = $newName;
+
+                $getRes = DirectoryEditor::postPartImageEdit($postPart);
+                if (!$getRes['error'] && $getRes['toAddDir']) {
+                    $filename = $getRes['toAddDir'] . DIRECTORY_SEPARATOR . $newName;
+                    Storage::disk('public_posts')->put($filename, File::get($file));
                 }
             }
 
             $postPart->update($updateArr);
-            if ($imgUpdated) {
-                $getRes = DirectoryEditor::postPartImageEdit($postPart, $oldPostPart);
-                if (!$getRes['error'] && $getRes['toAddDir']) {
-                    $filename = $getRes['toAddDir'] . $newName;
-                    Storage::disk('public_posts')->put($filename, File::get($file));
-                }
-            }
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -342,7 +359,7 @@ class CrudController extends PostsController
             return ResponseController::_validationResultResponse($validationResult);
         }
         try {
-            $postPart = PostParts::findOrFail($request->partId);
+            $postPart = PostParts::postPartsWithPostLocalePostSubcategoryById($request->partId);
             DirectoryEditor::removePostPartImage($postPart);
             $postPart->delete();
         } catch (\Exception $e) {
@@ -364,10 +381,14 @@ class CrudController extends PostsController
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
+        
         try {
             $post = Post::findOrFail($request->postId);
-            DirectoryEditor::removePostDir($post);
-            $post->delete();
+            $isRemoved = DirectoryEditor::removePostDir($post);
+
+            if (!$isRemoved['error']) {
+                $post->delete();
+            }
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -376,57 +397,59 @@ class CrudController extends PostsController
     }
 
     /**
+     * // todo need to remove,
      * Get Post Part by it's ID
      * @param Request $request
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postPartsAttach_get(Request $request, $id)
-    {
-        $response = Helpers::prepareAdminNavbars();
-        // todo not sure that we need try/catch here
-        try {
-            $postPart = PostParts::where('id', $id)->first();
-            $response['postpart'] = [
-                'head' => $postPart->head,
-            ];
-        } catch(\Exception $e) {
-            return ResponseController::_catchedResponse($e);
-        }
-
-        return response()
-            -> view('admin.posts.crud.attach-part', ['response' => $response]);
-    }
+//    protected function postPartsAttach_get(Request $request, $id)
+//    {
+//        $response = Helpers::prepareAdminNavbars();
+//        // todo not sure that we need try/catch here
+//        try {
+//            $postPart = PostParts::where('id', $id)->first();
+//            $response['postpart'] = [
+//                'head' => $postPart->head,
+//            ];
+//        } catch(\Exception $e) {
+//            return ResponseController::_catchedResponse($e);
+//        }
+//
+//        return response()
+//            -> view('admin.posts.crud.attach-part', ['response' => $response]);
+//    }
 
     /**
+     * todo need to remove
      * Proceed post part attachment to new post
      * @param Request $request
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postPartsAttachSave_post(Request $request, $id)
-    {
-        $validationResult = PostsValidation::postPartsAttachSave($request->all());
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-        try {
-            $postPart = PostParts::findOrFail($id);
-            $oldPost = clone $postPart->post()->first();
-            $newPost = Post::findOrFail($request->newPostId);
-            $dirEdited = DirectoryEditor::postPartAttachmentProcess($oldPost, $newPost, $postPart);
-            $updateArr = [
-                'post_id' => $request->newPostId,
-                'body' => $dirEdited['newName']
-            ];
-            $postPart->update($updateArr);
-        } catch (\Exception $e) {
-            return ResponseController::_catchedResponse($e);
-        }
-
-        return response(['error' => false]);
-    }
+//    protected function postPartsAttachSave_post(Request $request, $id)
+//    {
+//        $validationResult = PostsValidation::postPartsAttachSave($request->all());
+//
+//        if ($validationResult['error']) {
+//            return ResponseController::_validationResultResponse($validationResult);
+//        }
+//        try {
+//            $postPart = PostParts::findOrFail($id);
+//            $oldPost = clone $postPart->post()->first();
+//            $newPost = Post::findOrFail($request->newPostId);
+//            $dirEdited = DirectoryEditor::postPartAttachmentProcess($oldPost, $newPost, $postPart);
+//            $updateArr = [
+//                'post_id' => $request->newPostId,
+//                'body' => $dirEdited['newName']
+//            ];
+//            $postPart->update($updateArr);
+//        } catch (\Exception $e) {
+//            return ResponseController::_catchedResponse($e);
+//        }
+//
+//        return response(['error' => false]);
+//    }
 
     /**
      * Generate post main parts (except hashtag) after post main part edit
@@ -436,76 +459,106 @@ class CrudController extends PostsController
      */
     private static function _postMainPartEdited($request, $post)
     {
-        $oldPost = clone $post;
+        $postUpdateArr = [];
         $oldInfo['oldPost'] = $post;
 
-        $updateArr = [
-            'alias' => $request->postAlias,
-            'header' => $request->postMainHeader,
-            'text' => $request->postMainText,
-        ];
-
-        $subcategCHANGED = false;
-        $oldSubcat = [];
+        // Subcategory changes
+        $subcat = $post->subcategory()->first();
         if ($post->subcateg_id !== (int)$request->postSubcategory) {
-            $updateArr['subcateg_id'] = $request->postSubcategory;
-            $oldSubcat = $post->subcategory()->first();
-            $subcategCHANGED = true;
+            $postUpdateArr['subcateg_id'] = $request->postSubcategory;
+            $oldSubcat = $subcat;
+            $newSubcat = Subcategory::getSubCategoryBuilderByID($request->postSubcategory)->first();
+
+            $result = DirectoryEditor::updateAfterSubcategoryEditforPost($oldSubcat, $newSubcat, $post);
+
+            if ($result['error']) {
+                throw new \Exception("Directory rename Error");
+            }
+
+            $subcat = $newSubcat;
         }
 
-
-        $postMainImageCHANGED = false;
-        $postAliasCHANGED = false;
-        $postMainImage = $request->file('postMainImage');
-        $imgName = explode('.', $post->image);
+        // Alias changes
+        $aliasChanged = false;
         if ($post->alias !== $request->postAlias) {
-            // case alias changed, image sent
-            $postAliasCHANGED = true;
-            if ($postMainImage) {
-                $ext = $postMainImage->getClientOriginalExtension();
-                $postMainImageCHANGED = true;
+            $aliasChanged = true;
+            $oldAlias = $post->alias;
+            $newAlias = $request->postAlias;
+            $postUpdateArr['alias'] = $newAlias;
+
+            $result = DirectoryEditor::updateAfterPostAliasChanged($subcat, $oldAlias, $newAlias);
+
+            if ($result['error']) {
+                throw new \Exception("Directory rename Error");
             }
-            // case alias changed, image didn't sent
-            else {
-                $ext = end($imgName);
-            }
-            $updateArr['image'] = $request->postAlias . '.' . $ext;
         }
-        // case alias NOT changed, but image sent
-        elseif($postMainImage) {
-            $postMainImageCHANGED = true;
-            // update only if new added image have other extension, otherwise we don't need to update in table
-            if ($postMainImage->getClientOriginalExtension() !== end($imgName)) {
-                $ext = $postMainImage->getClientOriginalExtension();
+
+        // Localed Main information
+        $newAlias = $post->alias;
+        foreach ($request['header'] as $localeName => $mainItem) { // each localed item
+            $updateArr = [
+                'header' => $request->header[$localeName],
+                'text' => $request->text[$localeName],
+            ];
+
+            $postMainImageLocale = isset($request->file('mainImage')[$localeName]) ? $request->file('mainImage')[$localeName] : [];
+            $oldPostLocaled = $post['postLocale']
+                ->where('locale_id', LocaleSettings::getLocaleIdByName($localeName))
+                ->first();
+
+            $imgName = explode('.', $oldPostLocaled->image);
+            $ext = end($imgName);
+
+            if ($aliasChanged) {
+                // case alias changed, image sent
+                if (!empty($postMainImageLocale)) {
+                    $ext = $postMainImageLocale->getClientOriginalExtension();
+                    $result = DirectoryEditor::emptyPostFiles($subcat, $localeName, $post, $oldPostLocaled);
+
+                    if ($result['error']) {
+                        throw new \Exception("Directory rename Error");
+                    } else {
+                        $filename = $subcat->alias . DIRECTORY_SEPARATOR
+                            . $post->alias . DIRECTORY_SEPARATOR
+                            . $localeName . DIRECTORY_SEPARATOR
+                            . $newAlias . '.' . $ext;
+                        Storage::disk('public_posts')->put($filename, File::get($postMainImageLocale));
+                    }
+                }
+                // case alias changed, image didn't sent
+                else {
+                    $oldImageName = $oldPostLocaled->image;
+                    $newImageName = $newAlias . '.' . $ext;
+                    $result = DirectoryEditor::movePostFiles($subcat, $localeName, $post, $oldImageName, $newImageName);
+
+                    if ($result['error']) {
+                        throw new \Exception("Directory rename Error");
+                    }
+                }
+
                 $updateArr['image'] = $request->postAlias . '.' . $ext;
             }
-        }
+            // case alias NOT changed, but image sent
+            elseif(!empty($postMainImageLocale)) {
+                // update only if new added image have other extension, otherwise we don't need to update in table
+                if ($postMainImageLocale->getClientOriginalExtension() !== end($imgName)) {
+                    $ext = $postMainImageLocale->getClientOriginalExtension();
+                    $updateArr['image'] = $request->postAlias . '.' . $ext;
+                }
 
-        $updatedPost = $post->update($updateArr);
+                $result = DirectoryEditor::emptyPostFiles($subcat, $localeName, $post, $oldPostLocaled);
 
-        if ($updatedPost) {
-            $newSubcat = $post->subcategory()->first();
-            if ($subcategCHANGED && !empty($oldSubcat)) {
-                $result = DirectoryEditor::updateAfterSubcategoryEditforPost($oldSubcat, $newSubcat, $oldPost);
                 if ($result['error']) {
                     throw new \Exception("Directory rename Error");
+                } else {
+                    $filename = $subcat->alias . DIRECTORY_SEPARATOR
+                        . $post->alias . DIRECTORY_SEPARATOR
+                        . $localeName . DIRECTORY_SEPARATOR
+                        . $newAlias . '.' . $ext;
+                    Storage::disk('public_posts')->put($filename, File::get($postMainImageLocale));
                 }
             }
-
-            if ($postAliasCHANGED) {
-                $result = DirectoryEditor::updateAfterAliasEditedforPost($newSubcat, $oldPost, $post);
-                if ($result['error']) {
-                    throw new \Exception("Directory rename Error");
-                }
-            }
-
-            if ($postMainImageCHANGED) {
-                $postPath = $newSubcat->alias . DIRECTORY_SEPARATOR . $post->alias;
-                DirectoryEditor::deleteImageByPostPath($postPath);
-                $file = $request->file('postMainImage');
-                $filename = $postPath . DIRECTORY_SEPARATOR . $post->image;
-                Storage::disk('public_posts')->put($filename, File::get($file));
-            }
+            $oldPostLocaled->update($updateArr);
         }
     }
 
@@ -567,7 +620,7 @@ class CrudController extends PostsController
 
             foreach ($partHeaderLocaled as $key => $partHeader) {
                 $partImage = $partImageLocaled[$key];
-                $bodyImage = $partHeaderLocaled[$key] . '.' . $partImage->getClientOriginalExtension();
+                $bodyImage = microtime() . '.' . $partImage->getClientOriginalExtension(); // todo dont like nicrotime here
 
                 $eachCreateArr[] = [
                     'head'=> $partHeaderLocaled[$key],
@@ -583,38 +636,6 @@ class CrudController extends PostsController
             }
             $postParts = $postLocale->postParts()->createMany($eachCreateArr);
         }
-
-        // OLD ONE
-//        // this needs for update, it helps not overwrite existing images (image names)
-//        $arrOfBusyNums = [];
-//        if ($postParts->count()) {
-//            foreach ($postParts as $part) {
-//                $explodedOnce =  explode('_', $part->body);
-//                $lastPart = end($explodedOnce);
-//                $arrOfBusyNums[] = explode('.', $lastPart)[0];
-//            }
-//        };
-//
-//        foreach ($request['partHeader'] as $key => $value) {
-//            if (in_array($key, $arrOfBusyNums)) {
-//                $bodyKey = max($arrOfBusyNums) + 1;
-//                $arrOfBusyNums[] = $bodyKey;
-//            } else {
-//                $bodyKey = $key;
-//            }
-//            $createArr[$key] = [
-//                'head' => $request['partHeader'][$key],
-//                'body' => $post->alias . '_' . $bodyKey . '.' . $request->file('partImage')[$key]->getClientOriginalExtension(),
-//                'foot' => $request['partFooter'][$key],
-//            ];
-//        };
-//
-//        $postParts = $post->postParts()->createMany($createArr);
-//
-//        foreach ($request['partImage'] as $key => $file) {
-//            $filename = $mainPath . DIRECTORY_SEPARATOR . 'parts' . DIRECTORY_SEPARATOR . $postParts[$key]->body;
-//            Storage::disk('public_posts')->put($filename, File::get($file));
-//        };
         return ['error' => false];
     }
 
@@ -627,7 +648,6 @@ class CrudController extends PostsController
         $response = [];
         $categories = Category::getCategoriesWithSubcategories();
 
-        // todo remove it to prepare
         foreach ($categories as $key => $category) {
             $response['categories'][$key]['category'] = [
                 'id' => $category->id,
@@ -668,9 +688,6 @@ class CrudController extends PostsController
         switch ($request->searchType) {
             case self::POSTEDITSEARCHTYPES['byID']:
                 return Post::getPostBuilderByID($request->searchText);
-                break;
-            case self::POSTEDITSEARCHTYPES['byHeader']:
-                return Post::getPostsBuilderLikeHeader("%$request->searchText%");
                 break;
             case self::POSTEDITSEARCHTYPES['byAlias']:
                 return Post::getPostsBuilderLikeAlias("%$request->searchText%");

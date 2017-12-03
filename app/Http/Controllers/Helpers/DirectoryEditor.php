@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Admin\Response\ResponseController;
+use App\Http\Controllers\Services\Locale\LocaleSettings;
 use File;
 use App\Category;
 use App\Subcategory;
@@ -111,29 +112,14 @@ class DirectoryEditor extends Controller
         }
     }
 
-    /**
-     * After Post Alias changed rename Post Alias folder and inside post Main Image
-     * @param $newSubcat
-     * @param $oldPost
-     * @param $post
-     * @return array
-     */
-    public static function updateAfterAliasEditedforPost($newSubcat, $oldPost, $post)
+    public static function updateAfterPostAliasChanged($subcat, $oldAlias, $newAlias)
     {
         try {
-            $newSubCategName = $newSubcat->alias;
-            $oldName = $oldPost->alias;
-            $newName = $post->alias;
+            $prefix = self::_getPathTillSubCatPlus($subcat);
+            $oldDir = $prefix . DIRECTORY_SEPARATOR . $oldAlias;
+            $newDir = $prefix . DIRECTORY_SEPARATOR . $newAlias;
 
-            $subCategDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR . $newSubCategName;
-
-            $oldDir = $subCategDir . DIRECTORY_SEPARATOR  . $oldName;
-            $newDir = $subCategDir . DIRECTORY_SEPARATOR  . $newName;
-
-            $oldImg = $newDir . DIRECTORY_SEPARATOR . $oldPost->image;
-            $newImg = $newDir . DIRECTORY_SEPARATOR . $post->image;
-
-            $error = File::move($oldDir, $newDir) && File::move($oldImg, $newImg);
+            $error = File::moveDirectory($oldDir, $newDir);
 
             return ['error' => !$error];
         } catch (\Exception $e) {
@@ -141,27 +127,90 @@ class DirectoryEditor extends Controller
         }
     }
 
+    public static function emptyPostFiles($subcat, $localeName, $newPost, $oldPostLocaled)
+    {
+        $error = !true;
+        try {
+            $path = self::_getPathFromSubTillPostsPlus($subcat, $newPost);
+            $pathLocaled = $path . DIRECTORY_SEPARATOR . $localeName;
+            $filePath = $pathLocaled . DIRECTORY_SEPARATOR . $oldPostLocaled->image;
+
+            if (File::isFile($filePath)) {
+                $error = File::delete($filePath);
+            };
+
+            return ['error' => !$error];
+        } catch (\Exception $e) {
+            return ResponseController::_catchedResponse($e);
+        }
+
+    }
+
+    public static function movePostFiles($subcat, $localeName, $newPost, $oldImageName, $newImageName)
+    {
+        try {
+            $path = self::_getPathFromSubTillPostsPlus($subcat, $newPost);
+            $pathLocaled = $path . DIRECTORY_SEPARATOR . $localeName;
+            $oldFilePath = $pathLocaled . DIRECTORY_SEPARATOR . $oldImageName;
+            $newFilePath = $pathLocaled . DIRECTORY_SEPARATOR . $newImageName;
+
+            $error = File::move($oldFilePath, $newFilePath);
+
+            return ['error' => !$error];
+        } catch (\Exception $e) {
+            return ResponseController::_catchedResponse($e);
+        }
+
+    }
+//    /**
+//     * After Post Alias changed rename Post Alias folder and inside post Main Image
+//     * @param $newSubcat
+//     * @param $oldPost
+//     * @param $post
+//     * @return array
+//     */
+//    public static function updateAfterAliasEditedforPost($newSubcat, $oldPost, $post)
+//    {
+//        try {
+//            $newSubCategName = $newSubcat->alias;
+//            $oldName = $oldPost->alias;
+//            $newName = $post->alias;
+//
+//            $subCategDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR . $newSubCategName;
+//
+//            $oldDir = $subCategDir . DIRECTORY_SEPARATOR  . $oldName;
+//            $newDir = $subCategDir . DIRECTORY_SEPARATOR  . $newName;
+//
+//            $oldImg = $newDir . DIRECTORY_SEPARATOR . $oldPost->image;
+//            $newImg = $newDir . DIRECTORY_SEPARATOR . $post->image;
+//
+//            $error = File::move($oldDir, $newDir) && File::move($oldImg, $newImg);
+//
+//            return ['error' => !$error];
+//        } catch (\Exception $e) {
+//            return ResponseController::_catchedResponse($e);
+//        }
+//    }
+
     /**
      *
      * @param $postPart
-     * @param $oldPostPart
      * @return array
      */
-    public static function postPartImageEdit($postPart, $oldPostPart)
+    public static function postPartImageEdit($postPart)
     {
         try {
-            $post = $postPart->post()->first();
-            $subcat = $post->subcategory()->first();
-            $toMainDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
-            $toAddDir =  self::_getPathFromSubTillPartsPlus($subcat, $post) . DIRECTORY_SEPARATOR;
-            $oldImgDir = $toMainDir . $toAddDir . $oldPostPart->body;
+            $post = $postPart['postLocale']['post'];
+            $subcat = $post['subcategory'];
+            $toAddDir =  self::_getPathFromSubTillPartsPlus($subcat, $postPart) . DIRECTORY_SEPARATOR;
+            $oldImgDir = $toAddDir . $postPart->body;
             if (File::isFile($oldImgDir)) {
                 File::delete($oldImgDir);
             };
 
             return [
                 'error' => false,
-                'toAddDir' => $toAddDir
+                'toAddDir' => self::_getPathFromSubTillPartsPlus($subcat, $postPart, false)
             ];
         } catch (\Exception $e) {
             return [
@@ -179,22 +228,20 @@ class DirectoryEditor extends Controller
     public static function removePostPartImage($postPart)
     {
         try {
-            $post = $postPart->post()->first();
-            $subcat = $post->subcategory()->first();
-            $toMainDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
-            $toAddDir =  self::_getPathFromSubTillPartsPlus($subcat, $post) . DIRECTORY_SEPARATOR;
-            $imgDir = $toMainDir . $toAddDir . $postPart->body;
+            $post = $postPart['postLocale']['post'];
+            $subcat = $post['subcategory'];
+
+            $toAddDir =  self::_getPathFromSubTillPartsPlus($subcat, $postPart) . DIRECTORY_SEPARATOR;
+            $imgDir = $toAddDir . $postPart->body;
             if (File::isFile($imgDir)) {
                 File::delete($imgDir);
             };
             return [
-                'error' => false,
-                'toAddDir' => $toAddDir
+                'error' => false
             ];
         } catch (\Exception $e) {
             return [
-                'error' => true,
-                'toAddDir' => ''
+                'error' => true
             ];
         }
     }
@@ -208,66 +255,64 @@ class DirectoryEditor extends Controller
     {
         try {
             $subcat = $post->subcategory()->first();
-            $toMainDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
-            $toAddDir =  self::_getPathFromSubTillPostsPlus($subcat, $post) . DIRECTORY_SEPARATOR;
-            $postDir = $toMainDir . $toAddDir;
+            $postDir =  self::_getPathFromSubTillPostsPlus($subcat, $post) . DIRECTORY_SEPARATOR;
+
             if (File::isDirectory($postDir)) {
                 File::deleteDirectory($postDir);
             }
 
             return [
                 'error' => false,
-                'toAddDir' => $toAddDir
             ];
         } catch (\Exception $e) {
             return [
                 'error' => true,
-                'toAddDir' => ''
             ];
         }
     }
 
     /**
+     * todo need to remove
      * Edit directories after post part Attachment
      * @param $oldPost
      * @param $newPost
      * @param $postPart
      * @return array
      */
-    public static function postPartAttachmentProcess($oldPost, $newPost, $postPart)
-    {
-        try {
-            $postParts = $newPost->postParts()->get();
-
-            // this needs for update, it helps not overwrite existing images (image names)
-            $bodyKey = self::_generateBodyKey($postParts);
-
-            $partNameExplod = explode('.', $postPart->body);
-            $extension = end($partNameExplod);
-            $newName = $newPost->alias . '_' . $bodyKey . '.' . $extension;
-
-            $subForOld = $oldPost->subcategory()->first();
-            $subForNew = $newPost->subcategory()->first();
-
-            $toMainDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
-            $fromAddDir = self::_getPathFromSubTillPartsPlus($subForOld, $oldPost) . DIRECTORY_SEPARATOR . $postPart->body;
-            $toAddDir = self::_getPathFromSubTillPartsPlus($subForNew, $newPost) . DIRECTORY_SEPARATOR . $newName;
-
-            $partOldFullDir = $toMainDir . $fromAddDir;
-            $partNewFullDir = $toMainDir . $toAddDir;
-            $error = File::move($partOldFullDir, $partNewFullDir);
-
-            return [
-                'error' => !$error,
-                'newName' => $newName
-            ];
-        } catch (\Exception $e) {
-            return [
-                'error' => true,
-                'newName' => ''
-            ];
-        }
-    }
+//    public static function postPartAttachmentProcess($oldPost, $newPost, $postPart)
+//    {
+//        try {
+//            $postParts = $newPost->postParts()->get();
+//
+//            // this needs for update, it helps not overwrite existing images (image names)
+//            $bodyKey = self::_generateBodyKey($postParts);
+//
+//            $partNameExplod = explode('.', $postPart->body);
+//            $extension = end($partNameExplod);
+//            $newName = $newPost->alias . '_' . $bodyKey . '.' . $extension;
+//
+//            $subForOld = $oldPost->subcategory()->first();
+//            $subForNew = $newPost->subcategory()->first();
+//
+//            $toMainDir = self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR;
+//            $fromAddDir = self::_getPathFromSubTillPartsPlus($subForOld, $oldPost) . DIRECTORY_SEPARATOR . $postPart->body;
+//            $toAddDir = self::_getPathFromSubTillPartsPlus($subForNew, $newPost) . DIRECTORY_SEPARATOR . $newName;
+//
+//            $partOldFullDir = $toMainDir . $fromAddDir;
+//            $partNewFullDir = $toMainDir . $toAddDir;
+//            $error = File::move($partOldFullDir, $partNewFullDir);
+//
+//            return [
+//                'error' => !$error,
+//                'newName' => $newName
+//            ];
+//        } catch (\Exception $e) {
+//            return [
+//                'error' => true,
+//                'newName' => ''
+//            ];
+//        }
+//    }
 
     public static function deleteImageByPostPath($postPath)
     {
@@ -291,8 +336,10 @@ class DirectoryEditor extends Controller
      * public/img/cat
      * @return string
      */
-    private static function _getPathTillCatPlus() {
-        return public_path() . DIRECTORY_SEPARATOR . self::IMGCATPATH;
+    private static function _getPathTillCatPlus($withPublicPath) {
+        return $withPublicPath
+            ? public_path() . DIRECTORY_SEPARATOR . self::IMGCATPATH
+            : '';
     }
 
     /**
@@ -300,8 +347,8 @@ class DirectoryEditor extends Controller
      * @param $subcategory
      * @return string
      */
-    private static function _getPathTillSubCatPlus($subcategory) {
-        return self::_getPathTillCatPlus() . DIRECTORY_SEPARATOR . $subcategory->alias;
+    private static function _getPathTillSubCatPlus($subcategory, $withPublicPath) {
+        return self::_getPathTillCatPlus($withPublicPath) . DIRECTORY_SEPARATOR . $subcategory->alias;
     }
 
     /**
@@ -310,8 +357,8 @@ class DirectoryEditor extends Controller
      * @param $post
      * @return string
      */
-    private static function _getPathFromSubTillPostsPlus($subcat, $post) {
-        return $subcat->alias .  DIRECTORY_SEPARATOR . $post->alias;
+    private static function _getPathFromSubTillPostsPlus($subcat, $post, $withPublicPath) {
+        return self::_getPathTillSubCatPlus($subcat, $withPublicPath) .  DIRECTORY_SEPARATOR . $post->alias;
     }
 
     /**
@@ -320,8 +367,12 @@ class DirectoryEditor extends Controller
      * @param $post
      * @return string
      */
-    private static function _getPathFromSubTillPartsPlus($subcat, $post) {
-        return self::_getPathFromSubTillPostsPlus($subcat, $post) . DIRECTORY_SEPARATOR . self::PARTS;
+    private static function _getPathFromSubTillPartsPlus($subcat, $postPart, $withPublicPath = true) {
+        $postLocale = $postPart['postLocale'];
+        $post = $postLocale['post'];
+        return self::_getPathFromSubTillPostsPlus($subcat, $post, $withPublicPath)
+            . DIRECTORY_SEPARATOR . LocaleSettings::getLocaleNameById($postLocale->locale_id)
+            . DIRECTORY_SEPARATOR . self::PARTS;
     }
 
     /**

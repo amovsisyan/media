@@ -4,58 +4,64 @@
     <section id="post-parts-details">
         <div class="container">
             <div class="row">
-                <ul class="collapsible popout collapsible-container" data-collapsible="accordion">
-                    @if(!empty($response['post']))
-                        @foreach($response['post']['postparts'] as $key => $postParts)
-                            <li class="collapse-post-parts" id="part-num-{{$postParts['id']}}">
-                                <div class="collapsible-header">
-                                    <span class="part-number">{{$key+1}}</span>
-                                    <span class="part-header">{{$postParts['head']}}</span>
+            @if(!empty($response['post']))
+                @foreach($response['post']['postparts'] as $locale => $postParts)
+                    <div class="existing-parts-container col s{{$response['templateDivider']}}" id="main-locale-{{$locale}}" data-localename="{{$locale}}">
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="col s2">
+                                    <img src="/img/flags/{{$locale}}.svg" alt="">
                                 </div>
-                                <div class="collapsible-body">
-                                    <div class="part-id col m2 s12" data-id="{{$postParts['id']}}">id: {{$postParts['id']}}</div>
-                                    <div class="col m8 s12">
-                                        <div class="input-field col s12">
-                                            <input type="text" class="part-head validate" name=part-head"
-                                                   value="{{$postParts['head']}}"
-                                            >
-                                            <label for="part-head">Part Head</label>
-                                        </div>
-                                        <div class="file-field input-field col s12">
-                                            <div class="btn">
-                                                <span>Part Image <span class="important_icon">*</span></span>
-                                                <input type="file" class="part-image" name="part-image" accept="image/*" enctype="multipart/form-data">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <ul class="collapsible popout collapsible-container" data-collapsible="accordion">
+                            @foreach($postParts as $key => $postPart)
+                                <li class="collapse-post-parts" id="part-num-{{$postPart['id']}}" data-partid="{{$postPart['id']}}">
+                                    <div class="collapsible-header">
+                                        <span class="part-number">{{$key+1}}</span>
+                                        <span class="part-header">{{$postPart['head']}}</span>
+                                    </div>
+                                    <div class="collapsible-body">
+                                        <div class="part-id col m2 s12" data-id="{{$postPart['id']}}">id: {{$postPart['id']}}</div>
+                                        <div class="col m8 s12">
+                                            <div class="input-field col s12">
+                                                <input type="text" class="part-head validate" name=part-head" value="{{$postPart['head']}}" data-length={{$response['colLength']['parts']['head']}}>
+                                                <label for="part-head">Part Head</label>
                                             </div>
-                                            <div class="file-path-wrapper">
-                                                <input class="file-path validate" type="text"
-                                                       value="{{$postParts['body']}}"
-                                                >
+                                            <div class="file-field input-field col s12">
+                                                <div class="btn">
+                                                    <span>Part Image <span class="important_icon">*</span></span>
+                                                    <input type="file" class="part-image" name="part-image" accept="image/*" enctype="multipart/form-data">
+                                                </div>
+                                                <div class="file-path-wrapper">
+                                                    <input class="file-path validate" type="text" value="{{$postPart['body']}}">
+                                                </div>
+                                            </div>
+                                            <div class="input-field col s12">
+                                                <input type="text" class="part-foot validate" name="part-foot" value="{{$postPart['foot']}}" data-length={{$response['colLength']['parts']['foot']}}>
+                                                <label for="part-foot">Part Foot</label>
                                             </div>
                                         </div>
-                                        <div class="input-field col s12">
-                                            <input type="text" class="part-foot validate" name="part-foot"
-                                                   value="{{$postParts['foot']}}"
-                                            >
-                                            <label for="part-foot">Part Foot</label>
+                                        <div class="col m2 s12">
+                                            <div class="fixed-action-btn vertical click-to-toggle col m1 s12">
+                                                <a class="btn-floating red">
+                                                    <i class="material-icons">menu</i>
+                                                </a>
+                                                <ul>
+                                                    <li><a class="btn-floating modal-trigger part-save-btn" href="#updatePostPartModal">Save</a></li>
+                                                    <li><a class="btn-floating red modal-trigger part-delete-btn" href="#removePostPartModal">Del</a></li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col m2 s12">
-                                        <div class="fixed-action-btn vertical click-to-toggle col m1 s12">
-                                            <a class="btn-floating red">
-                                                <i class="material-icons">menu</i>
-                                            </a>
-                                            <ul>
-                                                <li><a class="btn-floating modal-trigger part-save-btn" href="#updatePostPartModal">Save</a></li>
-                                                <li><a class="btn-floating red modal-trigger part-delete-btn" href="#removePostPartModal">Del</a></li>
-                                                <li><a class="btn-floating orange" href="/qwentin/posts/crud/attach_post_part/{{$postParts['id']}}" target="_blank">Attach</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        @endforeach
-                    @endif
-                </ul>
+                                </li>
+                            @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
             </div>
         </div>
     </section>
@@ -63,37 +69,26 @@
         <div class="container">
             <div class="row" id="new-post-parts">
                 <div class="col s12">
-                    <h4>New Post Parts</h4>
+                    <h4>New Post Part</h4>
                 </div>
                 <div id="parts-container">
                     @include('admin.posts.crud.create-part')
                 </div>
             </div>
-            <div class="row right-align post-part-add-button-container">
-                <a class="waves-effect waves-light btn" id="post-part-add-button">+Add Part</a>
-            </div>
         </div>
     </section>
 
-    <section id="post-parts-add-buttons">
-        <div class="container">
-            <div class="row right-align m_t_50 post-create-btns">
-                <a class="waves-effect waves-light btn">Finish & Test</a>
-                <!-- Modal -->
-                <a id='add-parts' class="waves-effect waves-light btn modal-trigger" href="#modal-add-parts">Finish & Add</a>
-                <div id="modal-add-parts" class="modal">
-                    <div class="modal-content left-align">
-                        <h4>Are You Sure You Want Add This(these) Post Part(s)?</h4>
-                        <p></p>
-                    </div>
-                    <div class="modal-footer">
-                        <a id='confirm-post-parts-addition' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
-                        <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
-                    </div>
-                </div>
-            </div>
+    <!-- Modal -->
+    <div class="modal" id="modal-add-parts">
+        <div class="modal-content left-align">
+            <h4>Are You Sure You Want Add This Post Part?</h4>
+            <p></p>
         </div>
-    </section>
+        <div class="modal-footer">
+            <a id='confirm-post-part-addition' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+            <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+        </div>
+    </div>
 
     <!-- Modal -->
     <div class="modal" id="removePostPartModal">
@@ -118,18 +113,6 @@
             <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
         </div>
     </div>
-
-    <!-- Modal -->
-    <div class="modal" id="deletePostPartModal">
-        <div class="modal-content left-align">
-            <h4>Are You Sure You Want Delete This Not Generated Post Part?</h4>
-            <p></p>
-        </div>
-        <div class="modal-footer">
-            <a class="modal-action modal-close waves-effect waves-green btn-flat red" id="post-part-delete">Delete</a>
-            <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
-        </div>
-    </div>
 @endsection
 
 @section('script')
@@ -138,45 +121,60 @@
 
     <script>
         $('.modal').modal();
+
         PostPartDetails = {
-            newPartCount: 1,
-            addPartsBtn:document.getElementById('add-parts'),
+            partDeleteBtns: document.getElementsByClassName('part-delete-button'),
+            existingPartDeleteBtns: document.getElementsByClassName('part-delete-btn'),
 
             partSaveBtns:document.getElementsByClassName('part-save-btn'),
             postPartConfirmUpdate:document.getElementById('post-part-confirm-update'),
-            postPartDelete:document.getElementById('post-part-delete'),
-            postPartAddBtn:document.getElementById('post-part-add-button'),
+            postPartAddBtns:document.getElementsByClassName('post-part-add-button'),
 
-            partDeleteBtns:document.getElementsByClassName('part-delete-btn'),
             postPartConfirmDelete:document.getElementById('post-part-confirm-delete'),
 
             postPartImageInputs:document.getElementsByClassName('part-image'),
 
-            partsContainer: document.getElementById('parts-container'),
-            postPart:document.getElementsByClassName('post-part')[0],
-            partDeleteBtn:document.getElementsByClassName('part-delete-button')[0],
-
-            confirmPostPartsAdditionBtn: document.getElementById('confirm-post-parts-addition'),
+            confirmPostPartAdditionBtn: document.getElementById('confirm-post-part-addition'),
 
             _init: function() {
+                var self = this;
+                Array.prototype.forEach.call(self.partDeleteBtns, (function (element, index, array) {
+                        element.getElementsByClassName('btn')[0].classList.add('hide');
+                    })
+                )
                 this.makeListenersForExistedParts();
-                document.getElementsByClassName('post-number')[0].innerHTML = this.newPartCount;
-                this.postPart.id = 'post-part-id-' + this.newPartCount;
-                this.postPart.dataset.num = this.newPartCount;
             },
 
             makeListenersForExistedParts: function () {
                 var self = this;
 
+                // Part Save Btns
                 Array.prototype.forEach.call(self.partSaveBtns, (function (element, index, array) {
                     element.addEventListener('click', self.sendIdToUpdateModal.bind(self));
                 }));
-                Array.prototype.forEach.call(self.partDeleteBtns, (function (element, index, array) {
+
+                // Generate Post Part add btns
+                Array.prototype.forEach.call(self.postPartAddBtns, (function (element, index, array) {
+                    element.href = '#modal-add-parts';
+                    element.addEventListener('click', self.sendIdToNewPartModal.bind(self));
+                }));
+
+                // Generate Post Part delete btns
+                Array.prototype.forEach.call(self.existingPartDeleteBtns, (function (element, index, array) {
                     element.addEventListener('click', self.sendIdToDeleteModal.bind(self));
                 }));
+
+                // Image size changer
                 Array.prototype.forEach.call(self.postPartImageInputs, (function (element, index, array) {
                     element.addEventListener('change', self.imageSizeWarningLocal.bind(self));
                 }));
+
+                // Modal Post Part Update Confirm Listener
+                self.postPartConfirmUpdate.addEventListener('click', self.updatePostPartRequest.bind(self));
+                // Modal Post Part Add Listener
+                self.confirmPostPartAdditionBtn.addEventListener('click', self.addPostPartsRequest.bind(self));
+                // Modal Post Part Delete Listener
+                self.postPartConfirmDelete.addEventListener('click', self.deletePostPartRequest.bind(self));
             },
 
             imageSizeWarningLocal: function(e) {
@@ -186,15 +184,19 @@
             },
 
             sendIdToUpdateModal: function (e) {
-                 var el = getClosest(e.target, '.collapsible-body'),
-                     id = el.getElementsByClassName('part-id')[0].dataset.id;
+                var el = getClosest(e.target, '.collapsible-body'),
+                    id = el.getElementsByClassName('part-id')[0].dataset.id;
                  this.postPartConfirmUpdate.dataset.id = id;
             },
 
+            sendIdToNewPartModal: function (e) {
+                var localename = getClosest(e.target, '.part-locale-container').dataset.localename;
+                this.confirmPostPartAdditionBtn.dataset.localename = localename;
+            },
+
             sendIdToDeleteModal: function (e) {
-                var el = getClosest(e.target, '.collapsible-body'),
-                    id = el.getElementsByClassName('part-id')[0].dataset.id;
-                this.postPartConfirmDelete.dataset.id = id;
+                var partId = getClosest(e.target, '.collapse-post-parts').dataset.partid;
+                this.postPartConfirmDelete.dataset.partid = partId;
             },
 
             updatePostPartRequest: function(e) {
@@ -206,30 +208,25 @@
                     el = document.getElementById('part-num-' + id),
                     head = el.getElementsByClassName('part-head')[0].value,
                     foot = el.getElementsByClassName('part-foot')[0].value,
-                    data = '',
-                    xhr = new XMLHttpRequest();
+                    xhr = new XMLHttpRequest(),
+                    data = new FormData();
 
-                xhr.open('POST', location.pathname);
+                data.append("partId", id);
+                data.append("head", head);
+                data.append("foot", foot);
 
                 if (el.getElementsByClassName('part-image')[0].files.length) {
                     var body = el.getElementsByClassName('part-image')[0].files[0];
-
-                    data = new FormData();
-                    data.append("partId", id);
-                    data.append("head", head);
                     data.append("body", body);
-                    data.append("foot", foot);
-                } else {
-                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    data = encodeURI('partId=' + id + '&head=' + head + '&foot=' + foot)
                 }
 
-
+                xhr.open('POST', location.pathname);
                 xhr.setRequestHeader('X-CSRF-TOKEN', getCSRFToken());
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
                         handleResponseToast(response, true, 'Post Part Updated');
+                        location.reload();
                     } else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
@@ -243,7 +240,7 @@
                 updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
-                    id = e.target.dataset.id,
+                    id = e.target.dataset.partid,
                     data = encodeURI('partId=' + id),
                     xhr = new XMLHttpRequest();
 
@@ -263,95 +260,35 @@
                 updateAddConfirmButtons(updateBtns, false);
             },
 
-            partDelEvent: function(e) {
-                this.postPartDelete.dataset.num = getClosest(e.target, '.create-part').dataset.num;
-            },
-
-            addPostPart: function() {
-                var clone = this.postPart.cloneNode(true);
-                this.partsContainer.appendChild(clone);
-                this.renderPartTemplate();
-            },
-
-            renderPartTemplate: function() {
-                var num = this.newPartCount++,
-                    currTempl = document.getElementsByClassName('post-part')[num];
-                this._regeneratePostPartIds(currTempl);
-
-                currTempl.getElementsByClassName('part-header')[0].value = '';
-                currTempl.getElementsByClassName('part-footer')[0].value = '';
-                currTempl.getElementsByClassName('file-path ')[0].value = '';
-
-                currTempl.getElementsByClassName('part-delete-button')[0].addEventListener('click',
-                    this.partDelEvent.bind(this)
-                );
-                currTempl.getElementsByClassName('part-image')[0].addEventListener('change',
-                    this.imageSizeWarningLocal.bind(self)
-                );
-            },
-
-            _regeneratePostPartIds: function(element) {
-                element.dataset.num = this.newPartCount;
-                element.id = 'post-part-id-' + this.newPartCount;
-                element.getElementsByClassName('post-number')[0].innerHTML = this.newPartCount;
-            },
-
-            generatePartDelBtnListener: function(e) {
-                if (this.newPartCount === 1) {
-                    alert('You Cant Delete Last Part');
-                } else {
-                    document.getElementById('post-part-id-' + e.target.dataset.num).remove();
-                    this.newPartCount = e.target.dataset.num;
-                    this.regenerateAfterPartDelete();
-                }
-            },
-
-            regenerateAfterPartDelete: function () {
-                var self = this,
-                    allPostParts = document.getElementsByClassName('post-part');
-
-                Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
-                    var arr = element.id.split('-'),
-                        id = arr[arr.length-1];
-                    if (id > self.newPartCount) {
-                        self._regeneratePostPartIds(element);
-                        self.newPartCount++;
-                    }
-                }));
-
-                this.newPartCount--;
-            },
-
-            addPostPartsRequest: function () {
-                var updateBtns = [this.confirmPostPartsAdditionBtn, this.addPartsBtn];
+            addPostPartsRequest: function (e) {
+                var updateBtns = [this.confirmPostPartAdditionBtn];
                 updateAddConfirmButtons(updateBtns, true);
 
                 var self = this,
+                    locale = e.target.dataset.localename,
                     xhr = new XMLHttpRequest(),
-                    allPostParts = document.getElementsByClassName('post-part'),
+                    postPart = document.getElementById('part-locale-' + locale),
                     formData = new FormData();
 
-                // Parts
-                Array.prototype.forEach.call(allPostParts, (function (element, index, array) {
-                    formData.append('partHeader[]', element.getElementsByClassName('part-header')[0].value);
+                formData.append('locale', locale);
+                formData.append('partHeader[' + locale + '][]', postPart.getElementsByClassName('part-header')[0].value);
+                formData.append('partFooter[' + locale + '][]', postPart.getElementsByClassName('part-footer')[0].value);
 
-                    var fileContainer = element.getElementsByClassName('part-image')[0].files,
-                        file = [];
-                    if (fileContainer.length) {
-                        file = element.getElementsByClassName('part-image')[0].files[0]
-                    }
-                    formData.append('partImage[' + index + ']', file);
-                    formData.append('partFooter[]', element.getElementsByClassName('part-footer')[0].value);
-                }));
+                var fileContainer = postPart.getElementsByClassName('part-image')[0].files,
+                file = [];
+                if (fileContainer.length) {
+                    file = postPart.getElementsByClassName('part-image')[0].files[0]
+                }
+                formData.append('partImage[' + locale + '][]', file);
 
-                xhr.open('POST', location.pathname + '/add-parts', true);
+                xhr.open('POST', location.pathname + '/add-part', true);
                 xhr.setRequestHeader('X-CSRF-TOKEN', getCSRFToken());
 
                 xhr.onload = function() {
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
                         handleResponseToast(response, true, 'Added New Post Parts');
-                        self._regenerateAfterNewCreation();
+                        self._regenerateAfterNewCreation(postPart);
                         location.reload();
                     }
                     else if (xhr.status !== 200 || response.error === true) {
@@ -362,30 +299,14 @@
                 updateAddConfirmButtons(updateBtns, false);
             },
 
-            _regenerateAfterNewCreation: function(element) {
-                this.newPartCount = 1;
-                var allParts = document.getElementsByClassName('post-part');
-
-                Array.prototype.forEach.call(allParts, (function (element, index, array) {
-                        if (index === 0) {
-                            element.getElementsByClassName('part-header')[0].value = '';
-                            element.getElementsByClassName('part-footer')[0].value = '';
-                            element.getElementsByClassName('part-image')[0].value = '';
-                            element.getElementsByClassName('file-path')[0].value = '';
-                        } else {
-                            element.remove();
-                        }
-                    })
-                );
+            _regenerateAfterNewCreation: function(postPart) {
+                postPart.getElementsByClassName('part-header')[0].value = '';
+                postPart.getElementsByClassName('part-footer')[0].value = '';
+                postPart.getElementsByClassName('part-image')[0].value = '';
+                postPart.getElementsByClassName('file-path')[0].value = '';
             }
         };
 
-        PostPartDetails.postPartConfirmUpdate.addEventListener('click', PostPartDetails.updatePostPartRequest.bind(PostPartDetails));
-        PostPartDetails.postPartConfirmDelete.addEventListener('click', PostPartDetails.deletePostPartRequest.bind(PostPartDetails));
-        PostPartDetails.postPartDelete.addEventListener('click', PostPartDetails.generatePartDelBtnListener.bind(PostPartDetails));
-        PostPartDetails.partDeleteBtn.addEventListener('click', PostPartDetails.partDelEvent.bind(PostPartDetails));
-        PostPartDetails.postPartAddBtn.addEventListener('click', PostPartDetails.addPostPart.bind(PostPartDetails));
-        PostPartDetails.confirmPostPartsAdditionBtn.addEventListener('click', PostPartDetails.addPostPartsRequest.bind(PostPartDetails));
         PostPartDetails._init();
     </script>
 @endsection

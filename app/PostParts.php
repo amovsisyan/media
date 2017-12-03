@@ -13,7 +13,23 @@ class PostParts extends Model
         'head', 'body', 'foot', 'post_id'
     ];
 
-    public function post(){
-        return $this->belongsTo('App\Post');
+    public function postLocale(){
+        return $this->belongsTo('App\PostLocale', 'posts_locale_id');
+    }
+
+    public static function postPartsWithPostLocalePostSubcategoryById($id)
+    {
+        return self::where('id', $id)
+            ->with(
+                [
+                    'postLocale' => function ($query) {
+                        $query->with([
+                            'post' => function ($query) {
+                                $query->with(['subcategory']);
+                            }
+                        ]);
+                    }
+                ]
+            )->first();
     }
 }

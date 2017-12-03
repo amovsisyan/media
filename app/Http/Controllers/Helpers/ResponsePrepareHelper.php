@@ -61,25 +61,23 @@ class ResponsePrepareHelper extends Controller
         $postPartsResponse = [];
         $postHeader = null;
 
-        foreach ($postPartsLocale as $postPartLocale) {
-            foreach ($postPartLocale['postLocale'] as $postsLocale) {
-                $postHeader = $postsLocale->header;
-                foreach ($postsLocale['postParts'] as $part) {
-                    $postPartsResponse['data']['postParts'][] = [
-                          'head' => $part->head
-                        , 'body' => $part->body
-                        , 'foot' => $part->foot
-                    ];
-                }
+        foreach ($postPartsLocale['postLocale'] as $postsLocale) {
+            $postHeader = $postsLocale->header;
+            foreach ($postsLocale['postParts'] as $part) {
+                $postPartsResponse['data']['postParts'][] = [
+                      'head' => $part->head
+                    , 'body' => $part->body
+                    , 'foot' => $part->foot
+                ];
             }
+        }
 
-            foreach ($postPartLocale['hashtags'] as $hashtag) {
-                foreach ($hashtag['hashtagsLocale'] as $hashtagLocale) {
-                    $postPartsResponse['data']['postHashtags'][] = [
-                          'alias'   => $hashtag->alias
-                        , 'hashtag' => $hashtagLocale->hashtag
-                    ];
-                }
+        foreach ($postPartsLocale['hashtags'] as $hashtag) {
+            foreach ($hashtag['hashtagsLocale'] as $hashtagLocale) {
+                $postPartsResponse['data']['postHashtags'][] = [
+                      'alias'   => $hashtag->alias
+                    , 'hashtag' => $hashtagLocale->hashtag
+                ];
             }
         }
 

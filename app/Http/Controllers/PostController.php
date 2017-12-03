@@ -14,13 +14,13 @@ class PostController extends SubcategoryController
         parent::__construct();
     }
 
-    public function getPost(Request $request, $locale, $category, $subcategory, $post)
+    public function getPost(Request $request, $locale, $category, $subcategory, $postAlias)
     {
         $response = [];
 
-        $postPartsLocale = Post::postPartsWithHashtagsLocale($post);
+        $postPartsLocale = Post::postPartsWithHashtagsLocaleByAlias($postAlias);
 
-        if (!empty($post)) {
+        if (!empty($postPartsLocale)) {
             $postPartsResponse = ResponsePrepareHelper::PR_partsGetPost($postPartsLocale);
 
             $response = [

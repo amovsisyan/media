@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin\Response;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class ResponseController extends Controller
@@ -18,12 +17,18 @@ class ResponseController extends Controller
     }
 
     public static function _catchedResponse(\Exception $e) {
-        return response(
-            [
-                'error' => true,
-                'type' => 'Some Other Error',
-                'response' => [$e->getMessage()]
-            ], 404
-        );
+        return [
+            'error' => true,
+            'type' => 'Some Other Error',
+            'response' => [$e->getMessage()]
+        ];
+
+//        return response(
+//            [
+//                'error' => true,
+//                'type' => 'Some Other Error',
+//                'response' => [$e->getMessage()]
+//            ], 404
+//        );
     }
 }

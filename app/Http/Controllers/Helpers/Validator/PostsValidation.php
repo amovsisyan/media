@@ -14,8 +14,8 @@ class PostsValidation extends AbstractValidator
     ];
 
     const POST_PARTS_COMMON_RULES = [
-        'head' => 'required|max:' . DBColumnLengthData::POST_PARTS_TABLE['head'],
-        'foot' => 'required|max:' . DBColumnLengthData::POST_PARTS_TABLE['foot']
+        'head' => 'required|min:2|max:' . DBColumnLengthData::POST_PARTS_TABLE['head'],
+        'foot' => 'required|min:2|max:' . DBColumnLengthData::POST_PARTS_TABLE['foot']
     ];
 
     const HASHTAG_COMMON_RULES = [
@@ -81,11 +81,14 @@ class PostsValidation extends AbstractValidator
     public static function updatePostMainFieldsValidations($allRequest) {
         $rules = [
             'postAlias' => self::POST_COMMON_RULES['alias'],
-            'postMainHeader' => self::POST_COMMON_RULES['header'],
-            'postMainText' => self::POST_COMMON_RULES['text'],
             'postSubcategory' => 'required',
             'postHashtag' => 'required'
         ];
+
+        foreach ($allRequest['header'] as $locale => $value) {
+            $rules['header.' . $locale] = self::POST_COMMON_RULES['header'];
+            $rules['text.' . $locale] = self::POST_COMMON_RULES['text'];
+        }
 
         $validator = Validator::make($allRequest, $rules);
 
@@ -164,7 +167,7 @@ class PostsValidation extends AbstractValidator
 
     public static function validateEditPostSearchValues($allRequest) {
         $rules = [
-            'searchType' => 'required',
+            'searchType' => 'required|integer',
             'searchText' => 'required',
         ];
 
@@ -251,17 +254,18 @@ class PostsValidation extends AbstractValidator
         return self::_generateValidationSimpleOKResponse();
     }
 
-    public static function postPartsAttachSave($allRequest) {
-        $rules = [
-            'newPostId' => 'required|min:1|max:10',
-        ];
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return self::_generateValidationSimpleOKResponse();
-    }
+    // todo need to remove
+//    public static function postPartsAttachSave($allRequest) {
+//        $rules = [
+//            'newPostId' => 'required|min:1|max:10',
+//        ];
+//
+//        $validator = Validator::make($allRequest, $rules);
+//
+//        if ($validator->fails()) {
+//            return self::_generateValidationErrorResponse($validator);
+//        };
+//
+//        return self::_generateValidationSimpleOKResponse();
+//    }
 }

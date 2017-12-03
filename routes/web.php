@@ -21,7 +21,7 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
                                 Route::get('/', ['uses'=>'Admin\Posts\CrudController@postPartsDetails_get','as'=>'postPartsDetailsGet'])->where(['id' => '^[0-9]*$']);
                                 Route::post('/', ['uses'=>'Admin\Posts\CrudController@postPartsDetails_post','as'=>'postPartsDetailsPost'])->where(['id' => '^[0-9]*$']);
                                 Route::post('/delete', ['uses'=>'Admin\Posts\CrudController@postPartDelete_post','as'=>'postPartDeletePost'])->where(['id' => '^[0-9]*$']);
-                                Route::post('/add-parts', ['uses'=>'Admin\Posts\CrudController@postAddNewParts_post','as'=>'postAddNewParts'])->where(['id' => '^[0-9]*$']);
+                                Route::post('/add-part', ['uses'=>'Admin\Posts\CrudController@postAddNewPart_post','as'=>'postAddNewParts'])->where(['id' => '^[0-9]*$']);
                             });
                         });
                         Route::get('/', ['uses'=>'Admin\Posts\CrudController@updatePost_get','as'=>'postEditGet']);
@@ -29,12 +29,13 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
                         Route::post('/', ['uses'=>'Admin\Posts\CrudController@updatePost_post','as'=>'postEditPost']);
                         Route::post('/delete', ['uses'=>'Admin\Posts\CrudController@postDelete_post','as'=>'postDelete']);
                     });
-                    Route::group(['prefix' => 'attach_post_part'], function () {
-                        Route::get('/{id}', ['uses'=>'Admin\Posts\CrudController@postPartsAttach_get','as'=>'postPartsAttachGet'])->where(['id' => '^[0-9]*$']);
-                        // this method also calls above
-                        Route::post('/{id}', ['uses'=>'Admin\Posts\CrudController@updatePost_post','as'=>'postPartsAttachGetPostsPost'])->where(['id' => '^[0-9]*$']);
-                        Route::post('/{id}/save', ['uses'=>'Admin\Posts\CrudController@postPartsAttachSave_post','as'=>'postPartsAttachSavePost'])->where(['id' => '^[0-9]*$']);
-                    });
+                    // todo need to remove
+//                    Route::group(['prefix' => 'attach_post_part'], function () {
+//                        Route::get('/{id}', ['uses'=>'Admin\Posts\CrudController@postPartsAttach_get','as'=>'postPartsAttachGet'])->where(['id' => '^[0-9]*$']);
+//                        // this method also calls above
+//                        Route::post('/{id}', ['uses'=>'Admin\Posts\CrudController@updatePost_post','as'=>'postPartsAttachGetPostsPost'])->where(['id' => '^[0-9]*$']);
+//                        Route::post('/{id}/save', ['uses'=>'Admin\Posts\CrudController@postPartsAttachSave_post','as'=>'postPartsAttachSavePost'])->where(['id' => '^[0-9]*$']);
+//                    });
                 });
                 Route::group(['prefix' => 'hashtag'], function () {
                     Route::get('/create_hashtag', ['uses'=>'Admin\Posts\HashtagController@createHashtag_get','as'=>'hashtagCreateGet']);
@@ -102,14 +103,14 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 });
 
 
-// todo localization
 // todo gethashtaglist must be modified and must be like it done in post createblade
+// todo some big inputs to textareas
 // todo add change category in subcategory edit
 // todo subcategory edit after post localization will be finish
 // todo after subcategory delete delete all subcategory directories (folders)
 // todo after category delete delete all subcategory directories (folders)
 // todo regenerate select part if possible after category is deleted successfully
-// todo language changer for user and admin
+// todo language changer for user
 // todo language active status changer in admin part
 // todo dropdowns for admin navs, for working with separate locales, if there is need
 // todo standardization the var names from front side and validation part standardization
