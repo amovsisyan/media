@@ -62,13 +62,13 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field">
-                            <textarea name="main-header" class="main-header materialize-textarea input-area" data-length={{$response['colLength']['post']['header']}}></textarea>
+                            <input type="text" name="main-header" class="main-header input-area" data-length={{$response['colLength']['post']['header']}}>
                             <label for="main-header">Header ({{$locale['name']}}) <span class="important_icon">*</span></label>
                         </div>
                     </div>
                     <div class="col s12">
                         <div class="input-field">
-                            <textarea name="main-text" class="main-text materialize-textarea input-area" data-length={{$response['colLength']['post']['text']}}></textarea>
+                            <input type="text" name="main-text" class="main-text input-area" data-length={{$response['colLength']['post']['text']}}>
                             <label for="main-text">Main Text ({{$locale['name']}}) <span class="important_icon">*</span></label>
                         </div>
                     </div>

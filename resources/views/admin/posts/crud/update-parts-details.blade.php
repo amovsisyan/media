@@ -26,7 +26,7 @@
                                         <div class="part-id col m2 s12" data-id="{{$postPart['id']}}">id: {{$postPart['id']}}</div>
                                         <div class="col m8 s12">
                                             <div class="input-field col s12">
-                                                <input type="text" class="part-head validate" name=part-head" value="{{$postPart['head']}}" data-length={{$response['colLength']['parts']['head']}}>
+                                                <textarea class="part-head materialize-textarea" name="part-head" data-length={{$response['colLength']['parts']['head']}}>{{$postPart['head']}}</textarea>
                                                 <label for="part-head">Part Head</label>
                                             </div>
                                             <div class="file-field input-field col s12">
@@ -39,7 +39,7 @@
                                                 </div>
                                             </div>
                                             <div class="input-field col s12">
-                                                <input type="text" class="part-foot validate" name="part-foot" value="{{$postPart['foot']}}" data-length={{$response['colLength']['parts']['foot']}}>
+                                                <textarea class="part-foot materialize-textarea" name="part-foot" data-length={{$response['colLength']['parts']['foot']}}>{{$postPart['foot']}}</textarea>
                                                 <label for="part-foot">Part Foot</label>
                                             </div>
                                         </div>

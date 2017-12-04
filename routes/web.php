@@ -103,8 +103,7 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 });
 
 
-// todo gethashtaglist must be modified and must be like it done in post createblade
-// todo some big inputs to textareas
+// todo edit hashtag does not work
 // todo add change category in subcategory edit
 // todo subcategory edit after post localization will be finish
 // todo after subcategory delete delete all subcategory directories (folders)

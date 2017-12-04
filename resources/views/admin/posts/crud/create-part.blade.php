@@ -13,7 +13,7 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field">
-                            <input type="text" class="part-header validate" data-length={{$response['colLength']['parts']['head']}}>
+                            <textarea class="part-header materialize-textarea" data-length={{$response['colLength']['parts']['head']}}></textarea>
                             <label for="part-header">Part Header<span class="important_icon">*</span></label>
                         </div>
                     </div>
@@ -30,7 +30,7 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field">
-                            <input type="text" class="part-footer validate" data-length={{$response['colLength']['parts']['foot']}}>
+                            <textarea class="part-footer materialize-textarea" data-length={{$response['colLength']['parts']['foot']}}></textarea>
                             <label for="part-footer">Part Footer<span class="important_icon">*</span></label>
                         </div>
                     </div>
