@@ -103,8 +103,6 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 });
 
 
-// todo after subcategory delete delete all subcategory directories (folders)
-// todo after category delete delete all subcategory directories (folders)
 // todo regenerate select part if possible after category is deleted successfully
 // todo language changer for user
 // todo language active status changer in admin part

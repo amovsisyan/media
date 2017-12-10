@@ -83,8 +83,8 @@ class CategoriesController extends MainCategoriesController
 
     protected function deleteCategory_post(Request $request)
     {
-        $validateData = json_decode($request->data);
-        $validationResult = CategoriesValidation::validateCategoryDelete($validateData);
+        $requestData = json_decode($request->data);
+        $validationResult = CategoriesValidation::validateCategoryDelete($requestData);
 
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
@@ -92,8 +92,8 @@ class CategoriesController extends MainCategoriesController
 
         try {
             $ids = [];
-            if ($request->data) {
-                foreach (json_decode($request->data) as $id) {
+            if (!empty($requestData)) {
+                foreach ($requestData as $id) {
                     $ids[] = $id;
                 }
             }

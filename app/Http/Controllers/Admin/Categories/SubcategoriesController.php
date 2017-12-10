@@ -101,26 +101,17 @@ class SubcategoriesController extends MainCategoriesController
         try {
             $ids[] = $request->subcategoryId;
 
-            // todo part
-//             $deleteDir = DirectoryEditor::clearAfterSubcategoryDelete($ids);
-//            if (!$deleteDir['error']) {
-//                if (Subcategory::delSubCategoriesByIDs($ids)) {
-//                    return response(
-//                        [
-//                            'error' => false,
-//                            'ids' => $ids
-//                        ]
-//                    );
-//                };
-//            }
-            if (Subcategory::delSubCategoriesByIDs($ids)) {
-                return response(
-                    [
-                        'error' => false,
-                        'ids' => $ids
-                    ]
-                );
-            };
+            $deleteDir = DirectoryEditor::clearAfterSubcategoryDelete($ids);
+            if (!$deleteDir['error']) {
+                if (Subcategory::delSubCategoriesByIDs($ids)) {
+                    return response(
+                        [
+                            'error' => false,
+                            'ids' => $ids
+                        ]
+                    );
+                };
+            }
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }

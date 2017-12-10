@@ -19,7 +19,6 @@
                     <div id="modal_delete_category" class="modal">
                         <div class="modal-content left-align">
                             <h4>Are You Sure You Want Delete Category?</h4>
-                            <p></p>
                         </div>
                         <div class="modal-footer">
                             <a id='confirm_delete_category' class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
@@ -47,18 +46,6 @@
             modalDeleteCategory: document.getElementById('modal_delete_category'),
             categorySelect: document.getElementById('category_select'),
 
-            createModalContent: function() {
-                var content = this.modalDeleteCategory.getElementsByClassName('modal-content')[0],
-                    paragraph = content.getElementsByTagName('p')[0],
-                    list = this.getDeleteList(),
-                    cat_s = '';
-                Array.prototype.forEach.call(list, (function (element, index, array) {
-                    cat_s += '<p>' + ++index + '. ' + element.getElementsByTagName('span')[0].textContent + '</p>';
-                }));
-                var _html = '<p>Delete Category(es):' + cat_s + '</p>';
-                paragraph.innerHTML = _html;
-            },
-
             confirmDeleteCategory: function() {
                 var updateBtns = [this.deleteBtn, this.confirmButton];
                 updateAddConfirmButtons(updateBtns, true);
@@ -84,8 +71,8 @@
                         if (response.ids && response.ids.length) {
                             var options = self.categorySelect.getElementsByTagName('option');
                             response.ids.forEach(function (element, index, array) {
-                                Array.prototype.forEach.call(options,(function (el, i, arr){
-                                    if(el.value === element) {
+                                Array.prototype.forEach.call(options, (function (el, i, arr){
+                                    if(explodeGetLast(el.value, '_') === element) {
                                         el.remove();
                                     }
                                 }));
@@ -105,7 +92,6 @@
                 return this.categoryDeleteRow.getElementsByClassName('multiple-select-dropdown')[0].getElementsByClassName('active');
             }
         };
-        CategoryDelete.deleteBtn.addEventListener('click', CategoryDelete.createModalContent.bind(CategoryDelete));
         CategoryDelete.confirmButton.addEventListener('click', CategoryDelete.confirmDeleteCategory.bind(CategoryDelete));
     </script>
 @endsection
