@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Services\Locale\LocaleSettings;
 
 class ResponsePrepareHelper extends Controller
 {
@@ -118,6 +119,32 @@ class ResponsePrepareHelper extends Controller
                 'alias' => $category->alias
             ];
         }
+        return $response;
+    }
+
+    public static function PR_EditHashtag($hashtags)
+    {
+        $response['hashtags'] = [];
+        if (!empty($hashtags)) {
+            foreach ($hashtags as $hashtag) {
+                $localeArr = [];
+                $hashtagLocale = $hashtag['hashtagsLocale'];
+                foreach ($hashtagLocale as $locale) {
+                    $abbr = LocaleSettings::getLocaleNameById($locale->locale_id);
+                    $localeArr[] = [
+                        'id' => $locale->id,
+                        'hashtag' => $locale->hashtag,
+                        'abbr' => $abbr
+                    ];
+                }
+                $response['hashtags'][] = [
+                    'id' => $hashtag->id,
+                    'alias' => $hashtag->alias,
+                    'locale' => $localeArr
+                ];
+            }
+        }
+
         return $response;
     }
 

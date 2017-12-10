@@ -336,7 +336,7 @@ class DirectoryEditor extends Controller
      * public/img/cat
      * @return string
      */
-    private static function _getPathTillCatPlus($withPublicPath) {
+    private static function _getPathTillCatPlus($withPublicPath = true) {
         return $withPublicPath
             ? public_path() . DIRECTORY_SEPARATOR . self::IMGCATPATH
             : '';
@@ -347,7 +347,7 @@ class DirectoryEditor extends Controller
      * @param $subcategory
      * @return string
      */
-    private static function _getPathTillSubCatPlus($subcategory, $withPublicPath) {
+    private static function _getPathTillSubCatPlus($subcategory, $withPublicPath = true) {
         return self::_getPathTillCatPlus($withPublicPath) . DIRECTORY_SEPARATOR . $subcategory->alias;
     }
 
@@ -357,7 +357,7 @@ class DirectoryEditor extends Controller
      * @param $post
      * @return string
      */
-    private static function _getPathFromSubTillPostsPlus($subcat, $post, $withPublicPath) {
+    private static function _getPathFromSubTillPostsPlus($subcat, $post, $withPublicPath = true) {
         return self::_getPathTillSubCatPlus($subcat, $withPublicPath) .  DIRECTORY_SEPARATOR . $post->alias;
     }
 

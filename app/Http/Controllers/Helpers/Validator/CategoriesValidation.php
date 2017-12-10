@@ -149,11 +149,17 @@ class CategoriesValidation extends AbstractValidator
 
     public static function validateEditSubcategorySearchValuesSave($allRequest) {
         $rules = [
-            'id' => 'required',
+            'id' => 'required|min:1|max:10',
             'newCategoryId' => 'required|min:1|max:10',
             'newAlias' => self::SUBCATEGORY_COMMON_RULES['alias'],
-            'newName' => self::SUBCATEGORY_COMMON_RULES['name']
         ];
+
+        foreach ($allRequest['subcategoryNames'] as $key => $name) {
+            $idValidation = "subcategoryNames." . $key . '.id';
+            $nameValidation = "subcategoryNames." . $key . '.name';
+            $rules[$idValidation] = 'required|min:1|max:10';
+            $rules[$nameValidation] = self::SUBCATEGORY_COMMON_RULES['name'];
+        }
 
         $validator = Validator::make($allRequest, $rules);
 

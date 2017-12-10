@@ -7,6 +7,7 @@ use App\HashtagLocale;
 use App\Http\Controllers\Admin\Response\ResponseController;
 use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\Helpers;
+use App\Http\Controllers\Helpers\ResponsePrepareHelper;
 use App\Http\Controllers\Helpers\Validator\PostsValidation;
 use App\Http\Controllers\Services\Locale\LocaleSettings;
 use Illuminate\Http\Request;
@@ -42,27 +43,7 @@ class HashtagController extends PostsController
             }])
             ->get();
 
-        $response['hashtags'] = [];
-        // todo make prepare
-        if (!empty($searchResult)) {
-            foreach ($searchResult as $hashtag) {
-                $localeArr = [];
-                $hashtagLocale = $hashtag['hashtagsLocale'];
-                foreach ($hashtagLocale as $locale) {
-                    $abbr = LocaleSettings::getLocaleNameById($locale->locale_id);
-                    $localeArr[] = [
-                        'id' => $locale->id,
-                        'hashtag' => $locale->hashtag,
-                        'abbr' => $abbr
-                    ];
-                }
-                $response['hashtags'][] = [
-                    'id' => $hashtag->id,
-                    'alias' => $hashtag->alias,
-                    'locale' => $localeArr
-                ];
-            }
-        }
+        $response = ResponsePrepareHelper::PR_EditHashtag($searchResult);
 
         return response(
             [

@@ -12,8 +12,7 @@
                     <select id="search-type">
                         <option value="" disabled selected>Search type</option>
                         <option value="1">by ID</option>
-                        <option value="2">by Name</option>
-                        <option value="3">by Alias</option>
+                        <option value="2">by Alias</option>
                     </select>
                 </div>
                 <div class="input-field col m7 s12">
@@ -32,10 +31,9 @@
         <div class="modal" id="changesConfirmModal">
             <div class="modal-content left-align">
                 <h4>Are You Sure You Want Make This Changes?</h4>
-                <p></p>
             </div>
             <div class="modal-footer">
-                <a class="modal-action modal-close waves-effect waves-green btn-flat confirm-changes">Save</a>
+                <a class="modal-action modal-close waves-effect waves-green btn-flat" id="confirm-changes">Save</a>
                 <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
             </div>
         </div>
@@ -47,15 +45,18 @@
         $(document).ready(function(){
             $('#search-type').material_select();
             $('#changesConfirmModal').modal();
+            $('.collapsible').collapsible();
         });
         SubcategoryEdit = {
             searchButton: document.getElementById('search-button'),
             searchTypeSelect: document.getElementById('search-type'),
             searchText: document.getElementById('search-text'),
-            partTemplate: document.getElementsByClassName('part-template')[0],
+            partTemplate: document.getElementById('part-template'),
             partNoResult: document.getElementsByClassName('part-no-result')[0],
             searchResultContainer: document.getElementById('search-result'),
-            changesConfirmModal: document.getElementById('changesConfirmModal'),
+            subcategoryPart: document.getElementsByClassName('collapse-subcategory-part')[0],
+            collapsibleContainer: document.getElementById('collapsible-container'),
+            confirmChangesBtn: document.getElementById('confirm-changes'),
 
             searchSubcategoryRequest: function(){
                 var updateBtns = [this.searchButton];
@@ -84,66 +85,95 @@
 
             makeParts: function(response) {
                 var self = this;
-                self.searchResultContainer.innerHTML = '';
+                self.collapsibleContainer.innerHTML = '';
                 if (response.response &&
                     response.response.categories && response.response.categories.length &&
                     response.response.subcategories && response.response.subcategories.length) {
                     Array.prototype.forEach.call(response.response.subcategories, (function (element, index, array) {
-                        var clone = self.partTemplate.cloneNode(true),
-                            _options = '',
-                            categoryForSubcategory = clone.getElementsByClassName('category-for-subcategory')[0];
+                        var categories = response.response.categories,
+                            elLocales = element.subcategoriesLocale,
+                            clone = self.subcategoryPart.cloneNode(true),
 
-                        clone.getElementsByClassName('part-number')[0].innerHTML = ++index;
-                        clone.getElementsByClassName('part-alias')[0].value = element.alias;
-                        clone.getElementsByClassName('part-name')[0].value = element.name;
+                            collapseHeader = clone.getElementsByClassName('collapsible-header')[0],
+                            headerNumber = collapseHeader.getElementsByClassName('part-number')[0],
+                            headerAlias = collapseHeader.getElementsByClassName('part-alias')[0],
+
+                            collapseBody = clone.getElementsByClassName('collapsible-body')[0],
+                            bodyAlias = collapseBody.getElementsByClassName('part-alias')[0],
+
+                            categoriesSelect = collapseBody.getElementsByClassName('categories-select')[0],
+                            option = categoriesSelect.getElementsByTagName('option')[0],
+
+                            localeContainer = collapseBody.getElementsByClassName('locale-part-container')[0],
+                            localePart = localeContainer.getElementsByClassName('locale-part')[0];
+
+                        categoriesSelect.innerHTML = '';
+                        localeContainer.innerHTML = '';
+
+                        headerNumber.innerHTML = ++index;
+                        headerAlias.innerHTML = element.alias;
+                        bodyAlias.value = element.alias;
+
+                        // making categories
+                        Array.prototype.forEach.call(categories, (function (el) {
+                            cloneOption = option.cloneNode(true);
+                            cloneOption.value = el.id;
+                            cloneOption.innerHTML = el.alias;
+                            if (el.id === element.categ_id) {
+                                cloneOption.selected = true;
+                            }
+                            categoriesSelect.appendChild(cloneOption);
+                        }));
+
+                        // making each locale
+                        Array.prototype.forEach.call(elLocales, (function (e) {
+                            cloneLocale = localePart.cloneNode(true);
+                            cloneLocale.dataset.localename = e.locale_name;
+                            cloneLocale.dataset.id = e.id;
+                            cloneLocale.getElementsByTagName('img')[0].src = '/img/flags/' + e.locale_name +'.svg';
+                            cloneLocale.getElementsByClassName('part-locale-name')[0].value = e.name;
+                            localeContainer.appendChild(cloneLocale);
+                        }));
                         clone.id = 'search-part-id-' + element.id;
                         clone.dataset.id = element.id;
 
-                        Array.prototype.forEach.call(response.response.categories, (function (el, i, arr) {
-                            if (el.id === element.categ_id) {
-                                _options += '<option value="' + el.id + '" selected>' + el.name + '</option>';
-                            } else {
-                                _options += '<option value="' + el.id + '">' + el.name + '</option>';
-                            }
-                        }));
-                        categoryForSubcategory.innerHTML = _options;
-                        self.searchResultContainer.appendChild(clone);
-                        clone.classList.remove('hide');
+                        self.collapsibleContainer.appendChild(clone);
+                        self.partTemplate.classList.remove('hide');
+                        self.partNoResult.classList.add('hide');
+
                         clone.getElementsByClassName('part-confirm-button')[0].addEventListener('click',
-                            self.createModelPartConfirm
+                            self.createModelPartConfirm.bind(self)
                         );
                     }));
+                    $('.categories-select').material_select();
                 } else {
                     self.partNoResult.classList.remove('hide');
+                    self.partTemplate.classList.add('hide');
                     self.searchResultContainer.appendChild(self.partNoResult);
                 }
             },
 
             createModelPartConfirm: function(e) {
-                var self = SubcategoryEdit,
-                    currElem = getClosest(e.target, '.part-template'),
-                    paragraph = self.changesConfirmModal.getElementsByTagName('p')[0];
-                    categoryForSubcategory = currElem.querySelector('select.category-for-subcategory'),
-                    _html = '<p>ID: <span class="red-text part-id">' + currElem.dataset.id + '</span></p>' +
-                        '<p>New Category: <span class="red-text part-category" data-id="' + categoryForSubcategory.options[categoryForSubcategory.selectedIndex].value + '">' + categoryForSubcategory.options[categoryForSubcategory.selectedIndex].text + '</span></p>' +
-                        '<p>New Post Alias: <span class="red-text part-alias">' + currElem.getElementsByClassName('part-alias')[0].value + '</span></p>' +
-                        '<p>New Post Name: <span class="red-text part-name">' + currElem.getElementsByClassName('part-name')[0].value + '</span></p>';
-                paragraph.innerHTML = _html;
-                self.changesConfirmModal.getElementsByClassName('confirm-changes')[0].addEventListener('click',
-                    self.createModelSearchConfirm
-                );
+                this.confirmChangesBtn.dataset.id = getClosest(e.target, '.collapse-subcategory-part').dataset.id;
             },
 
-            createModelSearchConfirm: function(e) {
-                var updateBtns = [this];
+            confirmChanges: function(e) {
+                var updateBtns = [this.confirmChangesBtn];
                 updateAddConfirmButtons(updateBtns, true);
-                var self = SubcategoryEdit,
-                    elThis = this,
-                    currElem = getClosest(e.target, '.modal'),
-                    data = 'id=' + currElem.getElementsByClassName('part-id')[0].innerHTML
-                        + '&newCategoryId=' + currElem.getElementsByClassName('part-category')[0].dataset.id
-                        + '&newAlias=' + currElem.getElementsByClassName('part-alias')[0].innerHTML
-                        + '&newName=' + currElem.getElementsByClassName('part-name')[0].innerHTML,
+                var self = this,
+                    dataId = e.target.dataset.id,
+                    currElem = document.getElementById('search-part-id-' + dataId),
+                    currSubCategoryElem = currElem.querySelector('select.categories-select'),
+
+                    id = currElem.dataset.id,
+                    newCategoryId = currSubCategoryElem.options[currSubCategoryElem.selectedIndex].value,
+                    newAlias = currElem.querySelector('input.part-alias').value,
+                    subcategoryNames = this._getLocaleNames(currElem),
+
+                    data = 'id=' + id
+                        + '&newCategoryId=' + newCategoryId
+                        + '&newAlias=' + newAlias
+                        + '&subcategoryNames=' + subcategoryNames,
                     xhr = new XMLHttpRequest();
 
                 xhr.open('POST', location.pathname + '/save');
@@ -153,14 +183,31 @@
                     var response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.error !== true) {
                         handleResponseToast(response, true, 'Subcategory was updated');
+                        currElem.querySelector('span.part-alias').innerHTML = newAlias;
                     } else if (xhr.status !== 200 || response.error === true) {
                         handleResponseToast(response, false);
                     }
                     updateAddConfirmButtons(updateBtns, false);
                 };
                 xhr.send(encodeURI(data));
+            },
+
+            _getLocaleNames: function (currElem) {
+                var names = [],
+                    parts = currElem.getElementsByClassName('locale-part');
+                Array.prototype.forEach.call(parts, (function (e) {
+                    var locale = e.dataset.localename,
+                        subcategoryLocaleId = e.dataset.id,
+                        name = e.getElementsByClassName('part-locale-name')[0].value;
+                    names.push({
+                        name: name,
+                        id: subcategoryLocaleId
+                    });
+                }));
+                return JSON.stringify(names);
             }
         };
-        SubcategoryEdit.searchButton.addEventListener('click', SubcategoryEdit.searchSubcategoryRequest.bind(SubcategoryEdit));
+        SubcategoryEdit.searchButton.addEventListener('click', SubcategoryEdit.searchSubcategoryRequest.bind(SubcategoryEdit))
+        SubcategoryEdit.confirmChangesBtn.addEventListener('click', SubcategoryEdit.confirmChanges.bind(SubcategoryEdit))
     </script>
 @endsection

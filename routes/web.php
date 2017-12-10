@@ -103,15 +103,12 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 });
 
 
-// todo edit hashtag does not work
-// todo add change category in subcategory edit
-// todo subcategory edit after post localization will be finish
 // todo after subcategory delete delete all subcategory directories (folders)
 // todo after category delete delete all subcategory directories (folders)
 // todo regenerate select part if possible after category is deleted successfully
 // todo language changer for user
 // todo language active status changer in admin part
-// todo dropdowns for admin navs, for working with separate locales, if there is need
+// todo all validation should work as separate repositories
 // todo standardization the var names from front side and validation part standardization
 // todo response prepare helper, standardize using it
 // todo reread all front classes , make some corrections if needs

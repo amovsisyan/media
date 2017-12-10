@@ -10,14 +10,14 @@ use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\Validator\CategoriesValidation;
 use App\Http\Controllers\Services\Locale\LocaleSettings;
 use App\Subcategory;
+use App\SubcategoryLocale;
 use Illuminate\Http\Request;
 
 class SubcategoriesController extends MainCategoriesController
 {
     const CATEGORYEDITSEARCHTYPES = [
         'byID' => '1',
-        'byName' => '2',
-        'byAlias' => '3',
+        'byAlias' => '2',
     ];
 
     protected function change()
@@ -146,21 +146,44 @@ class SubcategoriesController extends MainCategoriesController
 
         $subcategory = self::_subcategoryBySearchType($request);
 
-        $searchResult = $subcategory->select('id', 'name', 'alias', 'categ_id')->get();
+        $searchResult = $subcategory->select('id', 'alias', 'categ_id')
+            ->with('subcategoriesLocale', 'category')
+            ->get();
+
         $response = [];
-        $response['categories'] = Category::select('id', 'name')->get();
+        $response['subcategories'] = [];
+        $categories = Category::select('id', 'alias')->get();
+        foreach ($categories as $category) {
+            $response['categories'][] = [
+                'id' => $category->id,
+                'alias' => $category->alias
+            ];
+        }
 
         if (!empty($searchResult)) {
             foreach ($searchResult as $item) {
-                $categ = $item->category()->select('id')->first();
+                $categ = $item['category'];
+                $subcategoryLocale = $item['subcategoriesLocale'];
+                $subcategoriesLocale = [];
+
+                foreach ($subcategoryLocale as $localedSub) {
+                    $subcategoriesLocale[] = [
+                        'id' => $localedSub->id,
+                        'name' => $localedSub->name,
+                        'locale_id' => $localedSub->locale_id,
+                        'locale_name' => LocaleSettings::getLocaleNameById($localedSub->locale_id)
+                    ];
+                }
+
                 $response['subcategories'][] = [
                     'id' => $item->id,
                     'alias' => $item->alias,
-                    'name' => $item->name,
                     'categ_id' => $categ->id,
+                    'subcategoriesLocale' => $subcategoriesLocale,
                 ];
             }
         }
+
         return response(
             [
                 'error' => false,
@@ -171,39 +194,55 @@ class SubcategoriesController extends MainCategoriesController
 
     protected function editSubcategorySave_post(Request $request)
     {
-        $validationResult = CategoriesValidation::validateEditSubcategorySearchValuesSave($request->all());
+        $requestAll =  $request->all();
+        $requestAll['subcategoryNames'] = json_decode($requestAll['subcategoryNames'], true);
+        $validationResult = CategoriesValidation::validateEditSubcategorySearchValuesSave($requestAll);
 
         if ($validationResult['error']) {
             return ResponseController::_validationResultResponse($validationResult);
         }
 
         try {
-            $subcategoryBuilder = Subcategory::getSubCategoryBuilderByID($request->id);
+            $subcategoryBuilder = Subcategory::getSubCategoryBuilderByID($requestAll['id']);
 
-            $subcat = $subcategoryBuilder->select('id', 'alias', 'categ_id')->first();
-            $posts = $subcat->posts();
+            $subcat = $subcategoryBuilder
+                ->with([
+                    'posts',
+                    'category',
+                    'subcategoriesLocale'
+                ])->select('id', 'alias', 'categ_id')
+                ->first();
 
-            // PART -> SUBCATEGORY DIRECTORY CHANGES
+            // SUBCATEGORY UPDATE & DIRECTORY CHANGES
             // if there is even one post means there is directory with subcategory alias_id
-            if ($posts->count() > 0 && $subcat->alias !== $request->newAlias) {
+            $posts = $subcat['posts'];
+            if ($posts->count() > 0 && $subcat->alias !== $requestAll['newAlias']) {
                 $oldName = $subcat->alias;
-                $newName = $request->newAlias;
+                $newName = $requestAll['newAlias'];
                 DirectoryEditor::updateAfterSubcategoryEdit($oldName, $newName);
+
+                $updateArr = [
+                    'alias' => $request->newAlias
+                ];
+                $subcategoryBuilder->update($updateArr);
             }
 
-            // PART -> SUBCATEGORY Attach/Detach
-            $categ = $subcat->category()->first();
-            if ($categ->id !== (int)$request->newCategoryId) {
-                $subcat->category()->associate($request->newCategoryId);
+            // SUBCATEGORY Attach/Detach
+            $categ = $subcat['category'];
+            if ($categ->id !== (int)$requestAll['newCategoryId']) {
+                $subcat->category()->associate($requestAll['newCategoryId']);
                 $subcat->save();
             }
 
-            // PART -> SUBCATEGORY UPDATE
-            $updateArr = [
-                'name' => $request->newName,
-                'alias' => $request->newAlias
-            ];
-            $subcategoryBuilder->update($updateArr);
+            // Subcategory Locale Name changes
+            foreach ($requestAll['subcategoryNames'] as $subcategoryLocale) {
+                $id = $subcategoryLocale['id'];
+                $name = $subcategoryLocale['name'];
+
+                $subLocaleModel = SubcategoryLocale::findOrFail($id);
+                $subLocaleModel->name = $name;
+                $subLocaleModel->save();
+            }
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
         }
@@ -215,9 +254,6 @@ class SubcategoriesController extends MainCategoriesController
         switch ($request->searchType) {
             case self::CATEGORYEDITSEARCHTYPES['byID']:
                 return Subcategory::getSubCategoryBuilderByID($request->searchText);
-                break;
-            case self::CATEGORYEDITSEARCHTYPES['byName']:
-                return Subcategory::getSubCategoriesBuilderLikeName($request->searchText);
                 break;
             case self::CATEGORYEDITSEARCHTYPES['byAlias']:
                 return Subcategory::getSubCategoriesBuilderLikeAlias($request->searchText);
