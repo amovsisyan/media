@@ -103,8 +103,6 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 });
 
 
-// todo regenerate select part if possible after category is deleted successfully
-// todo language changer for user
 // todo language active status changer in admin part
 // todo all validation should work as separate repositories
 // todo standardization the var names from front side and validation part standardization

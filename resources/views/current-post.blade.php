@@ -1,3 +1,9 @@
+<?php
+$locale = \App::getLocale();
+$subcategDir = Request::segment(3);
+$postDir = Request::segment(4);
+?>
+
 @extends('layouts.app')
 
 @section('content')
@@ -18,7 +24,7 @@
                             </h5>
                             @if(!empty($post_part['body']))
                                 <div class="body">
-                                    <img src="/img/cat/{{Request::segment(2)}}/{{Request::segment(3)}}/parts/{{$post_part['body']}}" alt="">
+                                    <img src="/img/cat/{{$subcategDir}}/{{$postDir}}/{{$locale}}/parts/{{$post_part['body']}}" alt="">
                                 </div>
                             @endif
                             <h6 class="foot">

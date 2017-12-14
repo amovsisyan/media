@@ -6,6 +6,7 @@ use App\AdminNavbar;
 use App\AdminNavbarParts;
 use App\CategoryLocale;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Services\Locale\LocaleSettings;
 
 class Helpers extends Controller
 {
@@ -48,6 +49,7 @@ class Helpers extends Controller
                 }
             }
         }
+        $response['activeLocales'] = LocaleSettings::getActiveLocales();
 
         return  $response;
     }

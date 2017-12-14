@@ -73,6 +73,7 @@ class ResponsePrepareHelper extends Controller
             }
         }
 
+        $postPartsResponse['data']['postHashtags'] = [];
         foreach ($postPartsLocale['hashtags'] as $hashtag) {
             foreach ($hashtag['hashtagsLocale'] as $hashtagLocale) {
                 $postPartsResponse['data']['postHashtags'][] = [

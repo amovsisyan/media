@@ -85,7 +85,16 @@ nav a{
 	text-transform: capitalize;
 }
 
-/*		HASHTAGS		*/
+/*		LOCALE DROPDOWN		*/
+#locale-dropdown {
+	top: 70px;
+	position: absolute;
+}
+#locale-dropdown li {
+	margin: 0;
+}
+
+	/*		HASHTAGS		*/
 #current-post .hashtags .chip,
 .hashtag-header .chip{
 	color: #fff;

@@ -21,8 +21,8 @@ class LocaleMiddleware
             if ($requestedLocale !== $locale) {
                 $locale = $requestedLocale;
                 $localeId = $localeSettings[$locale]['id'];
-                \App::setLocale($locale);
             }
+            \App::setLocale($locale);
         } else {
             if ($requestedLocale === 'login' || $requestedLocale === 'logout' || $requestedLocale === 'qwentin') {
                 return redirect('/' . $locale . '/' . $requestedLocale);

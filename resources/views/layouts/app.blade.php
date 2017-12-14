@@ -1,3 +1,7 @@
+<?php
+$locale = \App::getLocale();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,6 +23,7 @@
 
     <!-- Scripts -->
 	{{--<script src="/js/app.js"></script>--}}
+	<script src="/js/lodash.js"></script>
 	<script src="/js/jquery-3.2.1.min.js"></script>
 	<script src="/js/materialize.min.js"></script>
     <script>
@@ -65,7 +70,7 @@
 		@endif
 		<nav>
 			<div class="nav-wrapper">
-				<a href="{{ url('/')}}" class="brand-logo left_5">logo</a>
+				<a href="{{ url('/' . $locale)}}" class="brand-logo left_5">logo</a>
 				<ul class="right margin_5">
 					@if (!empty($response))
 						@foreach ($response['navbar'] as $navbar)
@@ -85,6 +90,22 @@
 				</ul>
 			</div>
 		</nav>
+		<div id="locale-dropdown" class="fixed-action-btn horizontal click-to-toggle">
+			<a class="btn-floating">
+				<img src="/img/flags/{{$locale}}.svg" alt="">
+			</a>
+			<ul>
+				@if(!empty($response['navbar']['activeLocales']))
+					@foreach ($response['navbar']['activeLocales'] as $localeLang)
+					<li data-localename="{{$localeLang['name']}}">
+						<a class="btn-floating locale-btn">
+							<img src="/img/flags/{{$localeLang['name']}}.svg" alt="" data-locale="{{$localeLang['name']}}">
+						</a>
+					</li>
+					@endforeach
+				@endif
+			</ul>
+		</div>
 </header>
 	@yield('content')
 <footer class="page-footer">
@@ -113,4 +134,31 @@
 </footer>
 </body>
 <script src="/js/my.js"></script>
+<script>
+	Main = {
+        localeBtns: document.getElementsByClassName('locale-btn'),
+		
+	    init: function () {
+			this.addListeners();
+        },
+		
+		addListeners: function () {
+            var self = this;
+            _.forEach(this.localeBtns, function(localeBtn) {
+                localeBtn.addEventListener('click',
+                    self.changeLocale.bind(self)
+                );
+            });
+        },
+
+        changeLocale: function (e) {
+            var arr = window.location.pathname.split("/");
+            arr[1] = e.target.dataset.locale;
+            var newLocation = _.join(arr, '/');
+            window.location.replace(newLocation);
+        }
+	};
+
+	Main.init()
+</script>
 </html>

@@ -8,8 +8,8 @@ use App\Locale;
 
 class LocaleSettings extends Controller
 {
-    const DEFAULT_LOCALE = self::createArr['en']['name'];
-    const DEFAULT_LOCALE_ID = 1;
+    const DEFAULT_LOCALE = self::createArr['ru']['name'];
+    const DEFAULT_LOCALE_ID = 2;
 
     protected static $activeLocales = null;
 
