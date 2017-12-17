@@ -7,11 +7,13 @@ use App\Http\Controllers\Admin\Response\ResponseController;
 use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
-use App\Http\Controllers\Helpers\Validator\CategoriesValidation;
 use App\Http\Controllers\Services\Locale\LocaleSettings;
+use App\Http\Requests\AdminSide\SubCategoryRequest\CreateSubcategoryRequest;
+use App\Http\Requests\AdminSide\SubCategoryRequest\DeleteSubcategoryRequest;
+use App\Http\Requests\AdminSide\SubCategoryRequest\EditSubcategorySaveRequest;
+use App\Http\Requests\AdminSide\SubCategoryRequest\EditSubcategorySearchRequest;
 use App\Subcategory;
 use App\SubcategoryLocale;
-use Illuminate\Http\Request;
 
 class SubcategoriesController extends MainCategoriesController
 {
@@ -37,18 +39,10 @@ class SubcategoriesController extends MainCategoriesController
             -> view('admin.categories.subcategories.create', ['response' => $response]);
     }
 
-    protected function createSubcategory_post(Request$request)
+    protected function createSubcategory_post(CreateSubcategoryRequest $request)
     {
-        $allRequest = $request->all();
-        $allRequest['subcategoryNames'] = Helpers::jsonObjList2arrayList($allRequest['subcategoryNames']);
-
-        $validationResult = CategoriesValidation::validateSubcategoryCreate($allRequest);
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         try {
+            $allRequest = $request->all();
             $createArr = [
                 'alias' =>$allRequest['subcategoryAlias']
             ];
@@ -91,13 +85,8 @@ class SubcategoriesController extends MainCategoriesController
             -> view('admin.categories.subcategories.delete', ['response' => $response]);
     }
 
-    protected function deleteSubcategory_post(Request $request)
+    protected function deleteSubcategory_post(DeleteSubcategoryRequest $request)
     {
-        $validationResult = CategoriesValidation::validateSubcategoryDelete($request->all());
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
         try {
             $ids[] = $request->subcategoryId;
 
@@ -127,14 +116,8 @@ class SubcategoriesController extends MainCategoriesController
             -> view('admin.categories.subcategories.edit', ['response' => $response]);
     }
 
-    public function editSubcategory_post(Request $request)
+    public function editSubcategory_post(EditSubcategorySearchRequest $request)
     {
-        $validationResult = CategoriesValidation::validateEditSubcategorySearchValues($request->all());
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         $subcategory = self::_subcategoryBySearchType($request);
 
         $searchResult = $subcategory->select('id', 'alias', 'categ_id')
@@ -183,17 +166,10 @@ class SubcategoriesController extends MainCategoriesController
         );
     }
 
-    protected function editSubcategorySave_post(Request $request)
+    protected function editSubcategorySave_post(EditSubcategorySaveRequest $request)
     {
-        $requestAll =  $request->all();
-        $requestAll['subcategoryNames'] = json_decode($requestAll['subcategoryNames'], true);
-        $validationResult = CategoriesValidation::validateEditSubcategorySearchValuesSave($requestAll);
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         try {
+            $requestAll =  $request->all();
             $subcategoryBuilder = Subcategory::getSubCategoryBuilderByID($requestAll['id']);
 
             $subcat = $subcategoryBuilder
