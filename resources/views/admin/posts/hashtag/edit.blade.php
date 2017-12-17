@@ -147,7 +147,7 @@
             },
 
             createSaveModelSearchConfirm: function(e) {
-                var updateBtns = [this];
+                var updateBtns = [e.target];
                 updateAddConfirmButtons(updateBtns, true);
                 var hashtagId = e.target.dataset.id,
                     currElem = document.getElementById('search-part-id-' + hashtagId),

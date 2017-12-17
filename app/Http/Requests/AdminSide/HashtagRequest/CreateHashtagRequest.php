@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\AdminSide\SubCategoryRequest;
+namespace App\Http\Requests\AdminSide\HashtagRequest;
 
 use App\Http\Requests\AdminFormRequest;
 
-class CreateSubcategoryRequest extends AdminFormRequest
+class CreateHashtagRequest extends AdminFormRequest
 {
     /**
      * Get the validator instance for the request.
@@ -14,7 +14,7 @@ class CreateSubcategoryRequest extends AdminFormRequest
     protected function getValidatorInstance()
     {
         // cause comes json, we need to change it to array to validate it
-        $this->request->set('subcategoryNames', json_decode($this->input()['subcategoryNames'], true));
+        $this->request->set('hashtagNames', json_decode($this->input()['hashtagNames'], true));
 
         return parent::getValidatorInstance();
     }
@@ -27,10 +27,9 @@ class CreateSubcategoryRequest extends AdminFormRequest
     public function rules()
     {
         return [
-            'categoryId' => self::REQUIRE_EXISTS['categories']['id'],
-            'subcategoryAlias' => self::SUBCATEGORY_COMMON_RULES['alias'],
-            'subcategoryNames.*.locale_id' => self::REQUIRE_EXISTS['locale']['id'],
-            'subcategoryNames.*.name' => self::SUBCATEGORY_COMMON_RULES['name']
+            'hashtagAlias' => self::HASHTAG_COMMON_RULES['alias'],
+            'hashtagNames.*.locale_id' => self::REQUIRE_EXISTS['locale']['id'],
+            'hashtagNames.*.name' => self::HASHTAG_COMMON_RULES['hashtag']
         ];
     }
 }

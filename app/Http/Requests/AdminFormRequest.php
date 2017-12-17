@@ -9,13 +9,45 @@ use Illuminate\Foundation\Http\FormRequest;
 class AdminFormRequest extends FormRequest
 {
     const CATEGORY_COMMON_RULES = [
-        'alias' => 'required|min:2|max:' . DBColumnLengthData::CATEGORIES_TABLE['alias'],
-        'name' => 'required|min:2|max:' . DBColumnLengthData::CATEGORIES_LOCALE_TABLE['name']
+        'alias' => 'required|unique:categories,alias|min:2|max:' . DBColumnLengthData::CATEGORIES_TABLE['alias'],
+        'name' => 'required|unique:categories_locale,name|min:2|max:' . DBColumnLengthData::CATEGORIES_LOCALE_TABLE['name']
     ];
 
     const SUBCATEGORY_COMMON_RULES = [
-        'alias' => 'required|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_TABLE['alias'],
-        'name' => 'required|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_LOCAL_TABLE['name']
+        'alias' => 'required|unique:subcategories,alias|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_TABLE['alias'],
+        'name' => 'required|unique:subcategories_locale,name|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_LOCAL_TABLE['name']
+    ];
+
+    const HASHTAG_COMMON_RULES = [
+        'alias' => 'required|min:2|max:' . DBColumnLengthData::HASHTAG_TABLE['alias'],
+        'hashtag' => 'required|min:2|max:' . DBColumnLengthData::HASHTAG_LOCALE_TABLE['hashtag']
+    ];
+
+    const REQUIRED = 'required';
+    const MAX_10 = 'max:10';
+
+    const REQUIRE_EXISTS = [
+        'categories' => [
+            'id' => self::REQUIRED . '|' . self::MAX_10 . '|exists:categories,id'
+        ],
+        'categories_locale' => [
+            'id' => self::REQUIRED . '|' . self::MAX_10 . '|exists:categories_locale,id'
+        ],
+        'subcategories' => [
+            'id' => self::REQUIRED . '|' . self::MAX_10 . '|exists:subcategories,id'
+        ],
+        'subcategories_locale' => [
+            'id' => self::REQUIRED . '|' . self::MAX_10 . '|exists:subcategories_locale,id'
+        ],
+        'hashtags' => [
+            'id' => self::REQUIRED . '|' . self::MAX_10 . '|exists:hashtags,id'
+        ],
+        'hashtags_locale' => [
+            'id' => self::REQUIRED . '|' . self::MAX_10 . '|exists:hashtags_locale,id'
+        ],
+        'locale' => [
+            'id' => self::REQUIRED . '|' . self::MAX_10 . '|exists:locale,id'
+        ],
     ];
 
     /**

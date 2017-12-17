@@ -18,11 +18,6 @@ class PostsValidation extends AbstractValidator
         'foot' => 'required|min:2|max:' . DBColumnLengthData::POST_PARTS_TABLE['foot']
     ];
 
-    const HASHTAG_COMMON_RULES = [
-        'alias' => 'required|min:2|max:' . DBColumnLengthData::HASHTAG_TABLE['alias'],
-        'hashtag' => 'required|min:2|max:' . DBColumnLengthData::HASHTAG_LOCALE_TABLE['hashtag']
-    ];
-
     public static function createPostMainFieldsValidations($allRequest) {
 
         $rules = [
@@ -169,80 +164,6 @@ class PostsValidation extends AbstractValidator
         $rules = [
             'searchType' => 'required|integer',
             'searchText' => 'required',
-        ];
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return self::_generateValidationSimpleOKResponse();
-    }
-
-    public static function validateEditHashtagSearchValues($allRequest) {
-        $rules = [
-            'searchType' => 'required',
-            'searchText' => 'required',
-        ];
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return self::_generateValidationSimpleOKResponse();
-    }
-
-    public static function validateEditHashtagSearchValuesSave($allRequest) {
-        $rules = [
-            'id' => 'required|integer',
-            'hashtagAlias' => self::HASHTAG_COMMON_RULES['alias']
-        ];
-        // todo standardizatoin needed  1-2 -->5
-        foreach ($allRequest['hashtagNames'] as $key => $value) {
-            $idValidation = "hashtagNames." . $key . '.locale_id';
-            $nameValidation = "hashtagNames." . $key . '.name';
-            $rules[$idValidation] = 'required|integer';
-            $rules[$nameValidation] = self::HASHTAG_COMMON_RULES['hashtag'];
-        };
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return self::_generateValidationSimpleOKResponse();
-    }
-
-    public static function validateHashtagCreate($allRequest) {
-
-        $rules = [
-            'hashtagAlias' => self::HASHTAG_COMMON_RULES['alias']
-        ];
-
-        // todo standardizatoin needed  1-2 -->3
-        foreach ($allRequest['hashtagNames'] as $key => $value) {
-            $idValidation = "hashtagNames." . $key . '.locale_id';
-            $nameValidation = "hashtagNames." . $key . '.name';
-            $rules[$idValidation] = 'required';
-            $rules[$nameValidation] = self::HASHTAG_COMMON_RULES['hashtag'];
-        };
-
-        $validator = Validator::make($allRequest, $rules);
-
-        if ($validator->fails()) {
-            return self::_generateValidationErrorResponse($validator);
-        };
-
-        return self::_generateValidationSimpleOKResponse();
-    }
-
-    public static function validateHashtagDelete($allRequest) {
-        $rules = [
-            'id' => 'required|min:1|max:10',
         ];
 
         $validator = Validator::make($allRequest, $rules);

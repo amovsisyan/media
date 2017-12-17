@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests\AdminSide\SubCategoryRequest;
+namespace App\Http\Requests\AdminSide\HashtagRequest;
 
 use App\Http\Requests\AdminFormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
-class DeleteSubcategoryRequest extends AdminFormRequest
+class DeleteHashtagRequest extends AdminFormRequest
 {
     /**
      * Get the validator instance for the request.
@@ -24,7 +25,7 @@ class DeleteSubcategoryRequest extends AdminFormRequest
     public function rules()
     {
         return [
-            'subcategoryId' => self::REQUIRE_EXISTS['subcategories']['id']
+            'id' => self::REQUIRE_EXISTS['hashtags']['id']
         ];
     }
 }

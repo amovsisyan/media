@@ -8,9 +8,11 @@ use App\Http\Controllers\Admin\Response\ResponseController;
 use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\ResponsePrepareHelper;
-use App\Http\Controllers\Helpers\Validator\PostsValidation;
 use App\Http\Controllers\Services\Locale\LocaleSettings;
-use Illuminate\Http\Request;
+use App\Http\Requests\AdminSide\HashtagRequest\CreateHashtagRequest;
+use App\Http\Requests\AdminSide\HashtagRequest\DeleteHashtagRequest;
+use App\Http\Requests\AdminSide\HashtagRequest\EditHashtagSaveRequest;
+use App\Http\Requests\AdminSide\HashtagRequest\EditHashtagSearchRequest;
 
 class HashtagController extends PostsController
 {
@@ -27,14 +29,8 @@ class HashtagController extends PostsController
             -> view('admin.posts.hashtag.edit', ['response' => $response]);
     }
 
-    protected function editHashtag_post(Request $request)
+    protected function editHashtag_post(EditHashtagSearchRequest $request)
     {
-        $validationResult = PostsValidation::validateEditHashtagSearchValues($request->all());
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         $hashtag = self::_hashtagBySearchType($request);
 
         $searchResult = $hashtag->select('id', 'alias')
@@ -53,18 +49,10 @@ class HashtagController extends PostsController
         );
     }
 
-    protected function editHashtagSave_post(Request $request)
+    protected function editHashtagSave_post(EditHashtagSaveRequest $request)
     {
-        $allRequest = $request->all();
-        $allRequest['hashtagNames'] = Helpers::jsonObjList2arrayList($allRequest['hashtagNames']);
-
-        $validationResult = PostsValidation::validateEditHashtagSearchValuesSave($allRequest);
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         try {
+            $allRequest = $request->all();
             // Hashtag Main update
             $updateArr = [
                 'alias' => $allRequest['hashtagAlias']
@@ -85,14 +73,8 @@ class HashtagController extends PostsController
         return response(['error' => false]);
     }
 
-    protected function editHashtagDelete_post(Request $request)
+    protected function editHashtagDelete_post(DeleteHashtagRequest $request)
     {
-        $validationResult = PostsValidation::validateHashtagDelete($request->all());
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         try {
             Hashtag::delHashtagById($request->id);
         } catch(\Exception $e) {
@@ -113,18 +95,10 @@ class HashtagController extends PostsController
             -> view('admin.posts.hashtag.create', ['response' => $response]);
     }
 
-    protected function createHashtag_post(Request $request)
+    protected function createHashtag_post(CreateHashtagRequest $request)
     {
-        $allRequest = $request->all();
-        $allRequest['hashtagNames'] = Helpers::jsonObjList2arrayList($allRequest['hashtagNames']);
-
-        $validationResult = PostsValidation::validateHashtagCreate($allRequest);
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         try {
+            $allRequest = $request->all();
             $createArr = [
                 'alias' => $allRequest['hashtagAlias']
             ];

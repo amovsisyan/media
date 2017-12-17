@@ -27,11 +27,11 @@ class EditSubcategorySaveRequest extends AdminFormRequest
     public function rules()
     {
         return [
-            'id' => 'required|max:10|exists:subcategories,id',
-            'newCategoryId' => 'required|max:10|exists:categories,id',
+            'id' => self::REQUIRE_EXISTS['subcategories']['id'],
+            'newCategoryId' => self::REQUIRE_EXISTS['categories']['id'],
             'newAlias' => self::SUBCATEGORY_COMMON_RULES['alias'],
             'subcategoryNames.*.name' => self::SUBCATEGORY_COMMON_RULES['name'],
-            'subcategoryNames.*.id' => 'required|max:10|exists:subcategories_locale,id'
+            'subcategoryNames.*.id' => self::REQUIRE_EXISTS['subcategories_locale']['id']
         ];
     }
 }

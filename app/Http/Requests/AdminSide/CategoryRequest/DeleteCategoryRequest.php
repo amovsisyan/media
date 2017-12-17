@@ -28,7 +28,7 @@ class DeleteCategoryRequest extends AdminFormRequest
     public function rules()
     {
         return [
-            'data.*' => 'required|exists:categories,id'
+            'data.*' => self::REQUIRE_EXISTS['categories']['id']
         ];
     }
 }

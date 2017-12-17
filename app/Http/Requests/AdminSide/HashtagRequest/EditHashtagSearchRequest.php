@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\AdminSide\SubCategoryRequest;
+namespace App\Http\Requests\AdminSide\HashtagRequest;
 
 use App\Http\Requests\AdminFormRequest;
 
-class DeleteSubcategoryRequest extends AdminFormRequest
+class EditHashtagSearchRequest extends AdminFormRequest
 {
     /**
      * Get the validator instance for the request.
@@ -24,7 +24,8 @@ class DeleteSubcategoryRequest extends AdminFormRequest
     public function rules()
     {
         return [
-            'subcategoryId' => self::REQUIRE_EXISTS['subcategories']['id']
+            'searchType' => 'required',
+            'searchText' => 'required'
         ];
     }
 }

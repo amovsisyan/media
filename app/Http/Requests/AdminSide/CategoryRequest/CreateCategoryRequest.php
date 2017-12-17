@@ -27,7 +27,7 @@ class CreateCategoryRequest extends AdminFormRequest
     public function rules()
     {
         return [
-            'categories_names.*.locale_id' => 'required|exists:locale,id',
+            'categories_names.*.locale_id' => self::REQUIRE_EXISTS['locale']['id'],
             'categories_names.*.name' => self::CATEGORY_COMMON_RULES['name'],
             'category_alias' => self::CATEGORY_COMMON_RULES['alias']
         ];

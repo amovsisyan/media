@@ -27,9 +27,9 @@ class EditCategorySaveRequest extends AdminFormRequest
     public function rules()
     {
         return [
-            'catId' => 'required|max:10|exists:categories,id',
+            'catId' => self::REQUIRE_EXISTS['categories']['id'],
             'catAlias' => self::CATEGORY_COMMON_RULES['alias'],
-            'localesInfo.*.locale_id' => 'required|max:10|exists:categories_locale,id',
+            'localesInfo.*.locale_id' => self::REQUIRE_EXISTS['categories_locale']['id'],
             'localesInfo.*.name' => self::CATEGORY_COMMON_RULES['name']
         ];
     }
