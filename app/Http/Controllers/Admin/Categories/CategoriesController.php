@@ -9,9 +9,12 @@ use App\Http\Controllers\Data\DBColumnLengthData;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\ResponsePrepareHelper;
-use App\Http\Controllers\Helpers\Validator\CategoriesValidation;
 use App\Http\Controllers\Services\Locale\LocaleSettings;
-use Illuminate\Http\Request;
+
+use App\Http\Requests\AdminSide\CategoryRequest\CreateCategoryRequest;
+use App\Http\Requests\AdminSide\CategoryRequest\DeleteCategoryRequest;
+use App\Http\Requests\AdminSide\CategoryRequest\EditCategorySaveRequest;
+use App\Http\Requests\AdminSide\CategoryRequest\EditCategorySearchRequest;
 
 class CategoriesController extends MainCategoriesController
 {
@@ -37,17 +40,9 @@ class CategoriesController extends MainCategoriesController
             -> view('admin.categories.categories.create', ['response' => $response]);
     }
 
-    protected function createCategory_post(Request $request)
+    protected function createCategory_post(CreateCategoryRequest $request)
     {
         $allRequest = $request->all();
-        $allRequest['categories_names'] = Helpers::jsonObjList2arrayList($allRequest['categories_names']);
-
-        $validationResult = CategoriesValidation::validateCategoryCreate($allRequest);
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         try {
             $alias = Helpers::removeSpaces($request->category_alias);
             $category = Category::create(['alias' => $alias]);
@@ -81,15 +76,9 @@ class CategoriesController extends MainCategoriesController
             -> view('admin.categories.categories.delete', ['response' => $response]);
     }
 
-    protected function deleteCategory_post(Request $request)
+    protected function deleteCategory_post(DeleteCategoryRequest $request)
     {
-        $requestData = json_decode($request->data);
-        $validationResult = CategoriesValidation::validateCategoryDelete($requestData);
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
+        $requestData = $request->data;
         try {
             $ids = [];
             if (!empty($requestData)) {
@@ -125,14 +114,8 @@ class CategoriesController extends MainCategoriesController
             -> view('admin.categories.categories.edit', ['response' => $response]);
     }
 
-    protected function editCategory_post(Request $request)
+    protected function editCategory_post(EditCategorySearchRequest $request)
     {
-        $validationResult = CategoriesValidation::validateEditCategorySearchValues($request->all());
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         try {
             $category = self::_categoryBySearchType($request);
 
@@ -172,18 +155,11 @@ class CategoriesController extends MainCategoriesController
         }
     }
 
-    protected function editCategorySave_post(Request $request)
+    protected function editCategorySave_post(EditCategorySaveRequest $request)
     {
-        $allRequest = $request->all();
-        $allRequest['localesInfo'] = Helpers::jsonObjList2arrayList($allRequest['localesInfo']);
-
-        $validationResult = CategoriesValidation::validateEditCategorySearchValuesSave($allRequest);
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         try {
+            $allRequest = $request->all();
+
             // Category Main update
             $updateArr = [
                 'alias' => $allRequest['catAlias']
