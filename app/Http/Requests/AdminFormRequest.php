@@ -18,6 +18,17 @@ class AdminFormRequest extends FormRequest
         'name' => 'required|unique:subcategories_locale,name|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_LOCAL_TABLE['name']
     ];
 
+    const POST_COMMON_RULES = [
+        'alias' => 'required|min:2|max:' . DBColumnLengthData::POSTS_TABLE['alias'],
+        'header' => 'required|min:2|max:' . DBColumnLengthData::POSTS_LOCALE_TABLE['header'],
+        'text' => 'required|min:2|max:' . DBColumnLengthData::POSTS_LOCALE_TABLE['text']
+    ];
+
+    const POST_PARTS_COMMON_RULES = [
+        'head' => 'required|min:2|max:' . DBColumnLengthData::POST_PARTS_TABLE['head'],
+        'foot' => 'required|min:2|max:' . DBColumnLengthData::POST_PARTS_TABLE['foot']
+    ];
+
     const HASHTAG_COMMON_RULES = [
         'alias' => 'required|min:2|max:' . DBColumnLengthData::HASHTAG_TABLE['alias'],
         'hashtag' => 'required|min:2|max:' . DBColumnLengthData::HASHTAG_LOCALE_TABLE['hashtag']
@@ -47,6 +58,12 @@ class AdminFormRequest extends FormRequest
         ],
         'locale' => [
             'id' => self::REQUIRED . '|' . self::MAX_10 . '|exists:locale,id'
+        ],
+        'posts' => [
+            'id' => self::REQUIRED . '|' . self::MAX_10 . '|exists:posts,id'
+        ],
+        'post_parts' => [
+            'id' => self::REQUIRED . '|' . self::MAX_10 . '|exists:post_parts,id'
         ],
     ];
 

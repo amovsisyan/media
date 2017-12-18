@@ -6,9 +6,16 @@ use App\Category;
 use App\Hashtag;
 use App\Http\Controllers\Helpers\DirectoryEditor;
 use App\Http\Controllers\Services\Locale\LocaleSettings;
+use App\Http\Requests\AdminSide\PostRequest\AddPostPartsRequest;
+use App\Http\Requests\AdminSide\PostRequest\CreatePostRequest;
+use App\Http\Requests\AdminSide\PostRequest\DeletePostPartRequest;
+use App\Http\Requests\AdminSide\PostRequest\DeletePostRequest;
+use App\Http\Requests\AdminSide\PostRequest\PostMainDetailsGetRequest;
+use App\Http\Requests\AdminSide\PostRequest\UpdatePostMainRequest;
+use App\Http\Requests\AdminSide\PostRequest\UpdatePostPartRequest;
+use App\Http\Requests\AdminSide\PostRequest\UpdatePostSearchRequest;
 use App\Post;
 use App\Http\Controllers\Helpers\Helpers;
-use App\Http\Controllers\Helpers\Validator\PostsValidation;
 use App\Http\Controllers\Admin\Response\ResponseController;
 use App\PostParts;
 use App\Subcategory;
@@ -56,30 +63,14 @@ class CrudController extends PostsController
 
     /**
      * Create New Post with Post Parts
-     * @param Request $request
+     * @param CreatePostRequest $request
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    protected function createPost_post(Request $request)
+    protected function createPost_post(CreatePostRequest $request)
     {
-        $requestAll = $request->all();
-        $requestAll['postHashtag'] = json_decode($requestAll['postHashtag']);
-        $requestAll['activeLocales'] = json_decode($requestAll['activeLocales']);
-
-        // Main fields Validation
-        $mainValidation = PostsValidation::createPostMainFieldsValidations($requestAll);
-
-        if ($mainValidation['error']) {
-            return ResponseController::_validationResultResponse($mainValidation);
-        }
-
-        // Part fields Validation
-        $partValidation = PostsValidation::createPostPartFieldsValidations($requestAll);
-
-        if ($partValidation['error']) {
-            return ResponseController::_validationResultResponse($partValidation);
-        }
-
         try {
+            $requestAll = $request->all();
+
             // Post Main Creation
             $createMainRes = self::_createPostMain($request);
             $post = $createMainRes['post'];
@@ -101,22 +92,14 @@ class CrudController extends PostsController
 
     /**
      * Add New Post Parts
-     * @param Request $request
+     * @param AddPostPartsRequest $request
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postAddNewPart_post(Request $request, $locale, $id)
+    protected function postAddNewPart_post(AddPostPartsRequest $request, $locale, $id)
     {
-        $requestAll = $request->all();
-
-        // Part fields Validation
-        $partValidation = PostsValidation::createPostPartFieldsValidations($requestAll);
-
-        if ($partValidation['error']) {
-            return ResponseController::_validationResultResponse($partValidation);
-        }
-
         try {
+            $requestAll = $request->all();
             $post = Post::postWithSubcategoryPostLocaleById($id, $requestAll['locale']);
             $postLocale = $post['postLocale'];
             $subcategory = $post['subcategory'];
@@ -131,7 +114,6 @@ class CrudController extends PostsController
         return response(['error' => false]);
     }
 
-    // todo rename this method and add annotation
     protected function updatePost_get()
     {
         $response = Helpers::prepareAdminNavbars();
@@ -140,21 +122,17 @@ class CrudController extends PostsController
             -> view('admin.posts.crud.update', ['response' => $response]);
     }
 
-    // todo rename this method and add annotation
-    // IMPORTANT
-    // This method calls in two places, see web.php
-    protected function updatePost_post(Request $request)
+    /**
+     * @param UpdatePostSearchRequest $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function updatePost_post(UpdatePostSearchRequest $request)
     {
-        $validationResult = PostsValidation::validateEditPostSearchValues($request->all());
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         $post = self::_postBySearchType($request);
 
         $searchResult = $post->select('id', 'alias')->get();
         $response['posts'] = [];
+
         if (!empty($searchResult)) {
             foreach ($searchResult as $item) {
                 $response['posts'][] = [
@@ -163,6 +141,7 @@ class CrudController extends PostsController
                 ];
             }
         }
+
         return response(
             [
                 'error' => false,
@@ -172,11 +151,11 @@ class CrudController extends PostsController
     }
 
     /**
-     * @param Request $request
+     * @param PostMainDetailsGetRequest $request
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postMainDetails_get(Request $request, $alias, $id)
+    protected function postMainDetails_get(PostMainDetailsGetRequest $request, $alias, $id)
     {
         $response = Helpers::prepareAdminNavbars();
 
@@ -233,23 +212,14 @@ class CrudController extends PostsController
     /**
      * Prepare Post Main Details Info by Post Id
      * Make Changes After Post Main Info Changed
-     * @param Request $request
+     * @param UpdatePostMainRequest $request
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postMainDetails_post(Request $request, $locale, $id)
+    protected function postMainDetails_post(UpdatePostMainRequest $request, $locale, $id)
     {
-        $requestAll =  $request->all();
-        $requestAll['postHashtag'] = json_decode($requestAll['postHashtag']);
-
-        // Main fields Validation
-        $mainValidation = PostsValidation::updatePostMainFieldsValidations($requestAll);
-
-        if ($mainValidation['error']) {
-            return ResponseController::_validationResultResponse($mainValidation);
-        }
-
         try {
+            $requestAll =  $request->all();
             $post = Post::postWithPostLocaleHashtagsById($id);
 
             // Post Main Edited
@@ -267,11 +237,11 @@ class CrudController extends PostsController
 
     /**
      * Prepare Post Part Details Info by Post Id
-     * @param Request $request
+     * @param PostMainDetailsGetRequest $request
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postPartsDetails_get(Request $request, $alias, $id)
+    protected function postPartsDetails_get(PostMainDetailsGetRequest $request, $alias, $id)
     {
         $response = Helpers::prepareAdminNavbars();
         // todo not sure that we need try/catch here
@@ -308,17 +278,11 @@ class CrudController extends PostsController
 
     /**
      * Update Post Part
-     * @param Request $request
+     * @param UpdatePostPartRequest $request
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postPartsDetails_post(Request $request)
+    protected function postPartsDetails_post(UpdatePostPartRequest $request)
     {
-        $validationResult = PostsValidation::validatePostPartsUpdate($request->all());
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-
         try {
             $postPart = PostParts::postPartsWithPostLocalePostSubcategoryById($request->partId);
             $updateArr = [
@@ -348,16 +312,11 @@ class CrudController extends PostsController
 
     /**
      * Delete Post Part
-     * @param Request $request
+     * @param DeletePostPartRequest $request
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postPartDelete_post(Request $request)
+    protected function postPartDelete_post(DeletePostPartRequest $request)
     {
-        $validationResult = PostsValidation::validatePostPartDelete($request->all());
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
         try {
             $postPart = PostParts::postPartsWithPostLocalePostSubcategoryById($request->partId);
             DirectoryEditor::removePostPartImage($postPart);
@@ -371,17 +330,11 @@ class CrudController extends PostsController
 
     /**
      * Delete Post
-     * @param Request $request
+     * @param DeletePostRequest $request
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    protected function postDelete_post(Request $request)
+    protected function postDelete_post(DeletePostRequest $request)
     {
-        $validationResult = PostsValidation::validatePostDelete($request->all());
-
-        if ($validationResult['error']) {
-            return ResponseController::_validationResultResponse($validationResult);
-        }
-        
         try {
             $post = Post::findOrFail($request->postId);
             $isRemoved = DirectoryEditor::removePostDir($post);
