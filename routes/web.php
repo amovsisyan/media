@@ -29,13 +29,6 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
                         Route::post('/', ['uses'=>'Admin\Posts\CrudController@updatePost_post','as'=>'postEditPost']);
                         Route::post('/delete', ['uses'=>'Admin\Posts\CrudController@postDelete_post','as'=>'postDelete']);
                     });
-                    // todo need to remove
-//                    Route::group(['prefix' => 'attach_post_part'], function () {
-//                        Route::get('/{id}', ['uses'=>'Admin\Posts\CrudController@postPartsAttach_get','as'=>'postPartsAttachGet'])->where(['id' => '^[0-9]*$']);
-//                        // this method also calls above
-//                        Route::post('/{id}', ['uses'=>'Admin\Posts\CrudController@updatePost_post','as'=>'postPartsAttachGetPostsPost'])->where(['id' => '^[0-9]*$']);
-//                        Route::post('/{id}/save', ['uses'=>'Admin\Posts\CrudController@postPartsAttachSave_post','as'=>'postPartsAttachSavePost'])->where(['id' => '^[0-9]*$']);
-//                    });
                 });
                 Route::group(['prefix' => 'hashtag'], function () {
                     Route::get('/create_hashtag', ['uses'=>'Admin\Posts\HashtagController@createHashtag_get','as'=>'hashtagCreateGet']);
@@ -103,7 +96,6 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 });
 
 
-// todo all validation should work as separate repositories
 // todo language active status changer in admin part
 // todo standardization the var names from front side and validation part standardization
 // todo response prepare helper, standardize using it

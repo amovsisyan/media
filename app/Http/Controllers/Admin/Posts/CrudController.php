@@ -350,61 +350,6 @@ class CrudController extends PostsController
     }
 
     /**
-     * // todo need to remove,
-     * Get Post Part by it's ID
-     * @param Request $request
-     * @param $id
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
-     */
-//    protected function postPartsAttach_get(Request $request, $id)
-//    {
-//        $response = Helpers::prepareAdminNavbars();
-//        // todo not sure that we need try/catch here
-//        try {
-//            $postPart = PostParts::where('id', $id)->first();
-//            $response['postpart'] = [
-//                'head' => $postPart->head,
-//            ];
-//        } catch(\Exception $e) {
-//            return ResponseController::_catchedResponse($e);
-//        }
-//
-//        return response()
-//            -> view('admin.posts.crud.attach-part', ['response' => $response]);
-//    }
-
-    /**
-     * todo need to remove
-     * Proceed post part attachment to new post
-     * @param Request $request
-     * @param $id
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
-     */
-//    protected function postPartsAttachSave_post(Request $request, $id)
-//    {
-//        $validationResult = PostsValidation::postPartsAttachSave($request->all());
-//
-//        if ($validationResult['error']) {
-//            return ResponseController::_validationResultResponse($validationResult);
-//        }
-//        try {
-//            $postPart = PostParts::findOrFail($id);
-//            $oldPost = clone $postPart->post()->first();
-//            $newPost = Post::findOrFail($request->newPostId);
-//            $dirEdited = DirectoryEditor::postPartAttachmentProcess($oldPost, $newPost, $postPart);
-//            $updateArr = [
-//                'post_id' => $request->newPostId,
-//                'body' => $dirEdited['newName']
-//            ];
-//            $postPart->update($updateArr);
-//        } catch (\Exception $e) {
-//            return ResponseController::_catchedResponse($e);
-//        }
-//
-//        return response(['error' => false]);
-//    }
-
-    /**
      * Generate post main parts (except hashtag) after post main part edit
      * @param $request
      * @param $post
