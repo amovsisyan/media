@@ -81,7 +81,7 @@ class CrudController extends PostsController
             self::_createPostParts($request, $postsLocale, $mainPath);
 
             // Hashtag Attach
-            $post->hashtags()->attach(json_decode($request->postHashtag));
+            $post->hashtags()->attach($request->postHashtag);
 
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
@@ -476,7 +476,7 @@ class CrudController extends PostsController
 
         $createPostPartArr = [];
         $mainPath = $subcategory->alias . DIRECTORY_SEPARATOR . $post->alias;
-        $activeLocales = json_decode($request->activeLocales);
+        $activeLocales = $request->activeLocales;
 
         foreach ($activeLocales as $locale) {
             $imgName = $request['postAlias'] . '.' . $request->file('mainImage')[$locale]->getClientOriginalExtension();

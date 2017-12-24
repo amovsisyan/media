@@ -162,3 +162,13 @@ function getPostMainImageStandardRatio(standards) {
         ratioTop: stdRation + diverg
     }
 }
+
+/**
+ * Check does the element have class
+ * @param element
+ * @param cls
+ * @returns {boolean}
+ */
+function hasClass(element, cls) {
+    return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
+}

@@ -31,13 +31,12 @@ class PostLocale extends Model
 
         $result = self::orderBy('created_at', 'desc')
             ->where('locale_id', $localeId)
-            ->take($recentPostCount)
             ->with(['post' => function ($query) {
                 $query->with(['subcategory' => function ($query) {
                     $query->with('category');
                 }]);
             }])
-            ->get();
+            ->paginate($recentPostCount);
 
         return $result;
     }

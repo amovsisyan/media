@@ -9,6 +9,9 @@ body{
 	color: #5e5e5e;
 	min-width: 600px;
 }
+.container.set-dimesions {
+	width: 80%;
+}
 h4{
 	margin: 0 0 .912rem 0;
 }

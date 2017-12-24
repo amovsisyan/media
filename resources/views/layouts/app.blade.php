@@ -26,7 +26,8 @@ $locale = \App::getLocale();
 	<script src="/js/lodash.js"></script>
 	<script src="/js/jquery-3.2.1.min.js"></script>
 	<script src="/js/materialize.min.js"></script>
-    <script>
+	<script src="/js/admin/helpers.js"></script>
+	<script>
         window.Laravel = <?php echo json_encode([
                 'csrfToken' => csrf_token(),
         ]); ?>
@@ -127,8 +128,12 @@ $locale = \App::getLocale();
 	@endif
 	<div class="footer-copyright">
 		<div class="container">
-			© 2017 Copyright NoCoffee Solutions
-			<a class="grey-text text-lighten-4 right" href="#!">Page Owner A. Movsisyan</a>
+			<a target="_blank" class="grey-text text-lighten-4" href="https://www.linkedin.com/in/arthur-movsisyan/">
+				© 2017 Copyright NoCoffee Solutions
+			</a>
+			<a target="_blank" class="grey-text text-lighten-4 right" href="https://www.linkedin.com/in/arthur-movsisyan/">
+				Page Owner A. Movsisyan
+			</a>
 		</div>
 	</div>
 </footer>
