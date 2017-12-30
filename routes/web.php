@@ -82,6 +82,8 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 
     Route::get('/', ['uses' => 'CategoryController@getCategory', 'as' => 'category']);
 
+    Route::get('/about', function () { return view('about'); });
+
     Route::get('/home', ['uses'=>'CategoryController@getCategory','as'=>'category'])->where('home', 'home');
 
     Route::get('/hashtag/{alias}', ['uses'=>'HashtagController@getByHashtag','as'=>'byHashtag']);
@@ -96,6 +98,7 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 });
 
 
+// todo share buttons
 // todo language active status changer in admin part
 // todo standardization the var names from front side and validation part standardization
 // todo response prepare helper, standardize using it

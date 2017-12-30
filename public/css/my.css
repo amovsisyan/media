@@ -15,6 +15,9 @@ body{
 h4{
 	margin: 0 0 .912rem 0;
 }
+.no-margin {
+	margin: 0 !important;
+}
 .row{
 	margin: 20px 0;
 }
@@ -43,7 +46,7 @@ h4{
 	text-align: center;
 	position: relative;
 	overflow: hidden;
-	height: 350px;
+	height: 360px;
 	transition: all 0.5s;
 	opacity: 0.9;
 }
@@ -70,14 +73,17 @@ h4{
 	transform: translate(-50%, -50%);
 }
 .category-post h5{
-	margin-top: 0;
+	margin-top: 5px;
+	font-size: 1.25rem;
 }
 .category-post h6{
+	font-size: 0.9rem;
 	position: absolute;
 	left: 0;
 	bottom: 10px;
 	text-align: center;
 	width: 100%;
+	padding: 0 10px;
 }
 
 /*		NAV		*/
@@ -129,6 +135,9 @@ footer .footer-navbar ul a:hover{
 footer .footer-navbar ul li:first-child{
 	margin: 0 0 10px -10px;
 	font-size: 18px;
+}
+footer h6 {
+	margin: 0;
 }
 
 /*		POST PART		*/
