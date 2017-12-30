@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Http\Controllers\Helpers\Helpers;
+use App\Http\Controllers\Services\Pagination\PaginationService;
 use Illuminate\Database\Eloquent\Model;
 
 class Subcategory extends Model
@@ -32,11 +33,10 @@ class Subcategory extends Model
         $result = self::where('alias', $alias)
             ->with(['posts' => function ($query) use ($localeId) {
                 $query->with(['postLocale'=> function ($query) use ($localeId) {
-                    $query->where('locale_id', $localeId);
+                    $query->where('locale_id', $localeId)->paginate(PaginationService::getSubcategoryPerPage());
                 }]);
             }])
-            ->get();
-
+            ->first();
         return $result;
     }
 

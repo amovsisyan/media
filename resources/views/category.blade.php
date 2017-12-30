@@ -25,4 +25,5 @@ $subcategDir = Request::segment(3);
             </div>
         </div>
     </section>
+    @include('pagination.simple-template')
 @endsection
