@@ -91,12 +91,12 @@ $locale = \App::getLocale();
 				</ul>
 			</div>
 		</nav>
-		<div id="locale-dropdown" class="fixed-action-btn horizontal click-to-toggle">
-			<a class="btn-floating">
-				<img src="/img/flags/{{$locale}}.svg" alt="">
-			</a>
-			<ul>
-				@if(!empty($response['navbar']['activeLocales']))
+		@if(!empty($response['navbar']['activeLocales']) && count($response['navbar']['activeLocales']) > 1)
+			<div id="locale-dropdown" class="fixed-action-btn horizontal click-to-toggle">
+				<a class="btn-floating">
+					<img src="/img/flags/{{$locale}}.svg" alt="">
+				</a>
+				<ul>
 					@foreach ($response['navbar']['activeLocales'] as $localeLang)
 					<li data-localename="{{$localeLang['name']}}">
 						<a class="btn-floating locale-btn">
@@ -104,9 +104,9 @@ $locale = \App::getLocale();
 						</a>
 					</li>
 					@endforeach
-				@endif
-			</ul>
-		</div>
+				</ul>
+			</div>
+		@endif
 </header>
 	@yield('content')
 <footer class="page-footer">

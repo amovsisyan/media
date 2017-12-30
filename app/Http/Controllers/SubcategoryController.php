@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Hashtag;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\ResponsePrepareHelper;
 use App\Subcategory;

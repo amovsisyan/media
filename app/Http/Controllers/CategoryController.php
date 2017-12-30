@@ -16,7 +16,7 @@ class CategoryController extends Controller
 
     protected function getCategory(Request $request)
     {
-        $postsLocale = PostLocale::getLimitedLocalizedPosts(PaginationService::getWelcomePerPage());
+        $postsLocale = PostLocale::getLimitedLocalizedPosts();
         $respPostsLocale = ResponsePrepareHelper::PR_GetCategory($postsLocale);
 
         $response = [

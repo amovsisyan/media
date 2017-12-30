@@ -43,13 +43,15 @@
     </div>
     <div class="row">
         @if(!empty($response) && !empty($response['activeLocales']))
+            <?php $hideClass = (count($response['activeLocales']) > 1) ? '' : 'hide' ?>
+
             @foreach($response['activeLocales'] as $locale)
                 <div class="main-locale-container col s{{$response['templateDivider']}}" id="main-locale-{{$locale['name']}}" data-localename="{{$locale['name']}}" data-localeid="{{$locale['id']}}">
                     <div class="col s12">
                         <div class="col s2">
                             <img src="/img/flags/{{$locale['name']}}.svg" alt="">
                         </div>
-                        <div class="col s2">
+                        <div class="col s2 {{$hideClass}}">
                             <div class="locale-switch switch">
                                 <label>
                                     Off

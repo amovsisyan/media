@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Http\Controllers\Helpers\Helpers;
+use App\Http\Controllers\Services\Pagination\PaginationService;
 use Illuminate\Database\Eloquent\Model;
 
 class PostLocale extends Model
@@ -25,7 +26,7 @@ class PostLocale extends Model
         return $this->hasMany('App\PostParts', 'posts_locale_id');
     }
 
-    public static function getLimitedLocalizedPosts($recentPostCount)
+    public static function getLimitedLocalizedPosts()
     {
         $localeId = Helpers::getLocaleIdFromSession();
 
@@ -36,7 +37,7 @@ class PostLocale extends Model
                     $query->with('category');
                 }]);
             }])
-            ->paginate($recentPostCount);
+            ->paginate(PaginationService::getWelcomePerPage());
 
         return $result;
     }

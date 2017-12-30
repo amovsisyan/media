@@ -3,7 +3,7 @@ namespace App\Http\Controllers\Services\Pagination;
 
 class PaginationService
 {
-    const PER_PAGE_WELCOME = 3;
+    const PER_PAGE_WELCOME = 9;
 
     public static function getWelcomePerPage()
     {
@@ -12,11 +12,16 @@ class PaginationService
 
     public static function makeWelcomePagination($postsLocale)
     {
-        return $pagination = [
-            'total' => $postsLocale->total(),
-            'lastPage' => $postsLocale->lastPage(),
-            'perPage' => $postsLocale->perPage(),
-            'currentPage' => $postsLocale->currentPage()
-        ];
+        $pagination = [];
+        if ($total = $postsLocale->total() > self::PER_PAGE_WELCOME) {
+            $pagination = [
+                'total' => $total,
+                'lastPage' => $postsLocale->lastPage(),
+                'perPage' => $postsLocale->perPage(),
+                'currentPage' => $postsLocale->currentPage()
+            ];
+        }
+
+        return $pagination;
     }
 }
