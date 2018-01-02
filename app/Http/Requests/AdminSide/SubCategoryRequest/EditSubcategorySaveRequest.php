@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\AdminSide\SubCategoryRequest;
 
+use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Requests\AdminFormRequest;
 
 class EditSubcategorySaveRequest extends AdminFormRequest
@@ -15,6 +16,8 @@ class EditSubcategorySaveRequest extends AdminFormRequest
     {
         // cause comes json, we need to change it to array to validate it
         $this->request->set('subcategoryNames', json_decode($this->input()['subcategoryNames'], true));
+        // clean alias from unnecessary symbols
+        $this->request->set('newAlias', Helpers::cleanToOnlyLettersNumbers($this->input()['newAlias']));
 
         return parent::getValidatorInstance();
     }

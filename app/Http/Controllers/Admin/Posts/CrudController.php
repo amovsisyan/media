@@ -226,7 +226,7 @@ class CrudController extends PostsController
             self::_postMainPartEdited($request, $post);
 
             // Hashtag Attach
-            Post::hashtagsEdited(json_decode($request->postHashtag), $post);
+            Post::hashtagsEdited($request->postHashtag, $post);
 
         } catch (\Exception $e) {
             return ResponseController::_catchedResponse($e);
@@ -390,6 +390,8 @@ class CrudController extends PostsController
                 throw new \Exception("Directory rename Error");
             }
         }
+
+        $post->update($postUpdateArr);
 
         // Localed Main information
         $newAlias = $post->alias;

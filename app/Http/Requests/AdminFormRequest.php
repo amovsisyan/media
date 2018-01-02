@@ -9,13 +9,13 @@ use Illuminate\Foundation\Http\FormRequest;
 class AdminFormRequest extends FormRequest
 {
     const CATEGORY_COMMON_RULES = [
-        'alias' => 'required|unique:categories,alias|min:2|max:' . DBColumnLengthData::CATEGORIES_TABLE['alias'],
-        'name' => 'required|unique:categories_locale,name|min:2|max:' . DBColumnLengthData::CATEGORIES_LOCALE_TABLE['name']
+        'alias' => 'required|min:2|max:' . DBColumnLengthData::CATEGORIES_TABLE['alias'],
+        'name' => 'required|min:2|max:' . DBColumnLengthData::CATEGORIES_LOCALE_TABLE['name']
     ];
 
     const SUBCATEGORY_COMMON_RULES = [
-        'alias' => 'required|unique:subcategories,alias|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_TABLE['alias'],
-        'name' => 'required|unique:subcategories_locale,name|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_LOCAL_TABLE['name']
+        'alias' => 'required|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_TABLE['alias'],
+        'name' => 'required|min:2|max:' . DBColumnLengthData::SUBCATEGORIES_LOCAL_TABLE['name']
     ];
 
     const POST_COMMON_RULES = [

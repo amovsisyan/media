@@ -68,19 +68,9 @@ class Helpers extends Controller
         return request()->segment(4);
     }
 
-    public static function removeSpaces($var)
+    public static function cleanToOnlyLettersNumbers($string)
     {
-        return preg_replace('/\s+/', '', $var);
-    }
-
-    public static function jsonObjList2arrayList($obj2array)
-    {
-        $decodedObj = json_decode($obj2array);
-
-        foreach ($decodedObj as &$item) {
-            $item = (array) $item;
-        }
-
-        return $decodedObj;
+        $cleanCode = preg_replace('/[^a-zA-Z0-9]/', '', $string);
+        return strtolower($cleanCode);
     }
 }

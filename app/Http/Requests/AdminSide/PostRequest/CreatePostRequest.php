@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\AdminSide\PostRequest;
 
+use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Requests\AdminFormRequest;
 
 class CreatePostRequest extends AdminFormRequest
@@ -16,6 +17,9 @@ class CreatePostRequest extends AdminFormRequest
         // cause comes json, we need to change it to array to validate it
         $this->request->set('postHashtag', json_decode($this->input()['postHashtag'], true));
         $this->request->set('activeLocales', json_decode($this->input()['activeLocales'], true));
+        // clean alias from unnecessary symbols
+        $this->request->set('postAlias', Helpers::cleanToOnlyLettersNumbers($this->input()['postAlias']));
+
 
         return parent::getValidatorInstance();
     }

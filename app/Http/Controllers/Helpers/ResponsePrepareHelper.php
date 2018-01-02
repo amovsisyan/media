@@ -91,18 +91,20 @@ class ResponsePrepareHelper extends Controller
     public static function PR_GetSubCategory($subcategoryPostsLocale)
     {
         $respPosts = [];
-        $posts = $subcategoryPostsLocale['posts'];
+        if ($subcategoryPostsLocale && isset($subcategoryPostsLocale['posts'])) {
+            $posts = $subcategoryPostsLocale['posts'];
 
-        foreach ($posts as $post) {
-            $postsLocale = $post['postLocale'];
+            foreach ($posts as $post) {
+                $postsLocale = $post['postLocale'];
 
-            foreach ($postsLocale as $postLocale) {
-                $respPosts[] = [
-                    'alias'  => $post->alias
-                    , 'image'  => $postLocale->image
-                    , 'header' => $postLocale->header
-                    , 'text'   => $postLocale->text
-                ];
+                foreach ($postsLocale as $postLocale) {
+                    $respPosts[] = [
+                        'alias'  => $post->alias
+                        , 'image'  => $postLocale->image
+                        , 'header' => $postLocale->header
+                        , 'text'   => $postLocale->text
+                    ];
+                }
             }
         }
 

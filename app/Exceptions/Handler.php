@@ -4,8 +4,12 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Session;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -45,6 +49,23 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        // TODO IMPORTANT OPEN IN PRODUCTION
+//        if ($exception instanceof ModelNotFoundException) {
+//            $exception = new NotFoundHttpException($exception->getMessage(), $exception);
+//        }
+//
+//        if ($exception instanceof TokenMismatchException) {
+//            return redirect()->back()->withInput($request->except('password'))->withErrors(['Validation Token was expired. Please try again']);
+//        }
+//
+//        if ($exception instanceof NotFoundHttpException) {
+//            return redirect('/');
+//        }
+//
+//        if ($exception instanceof Throwable) {
+//            return redirect('/');
+//        }
+
         return parent::render($request, $exception);
     }
 

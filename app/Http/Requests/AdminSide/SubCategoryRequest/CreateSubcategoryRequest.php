@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\AdminSide\SubCategoryRequest;
 
+use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Requests\AdminFormRequest;
 
 class CreateSubcategoryRequest extends AdminFormRequest
@@ -15,6 +16,8 @@ class CreateSubcategoryRequest extends AdminFormRequest
     {
         // cause comes json, we need to change it to array to validate it
         $this->request->set('subcategoryNames', json_decode($this->input()['subcategoryNames'], true));
+        // clean alias from unnecessary symbols
+        $this->request->set('subcategoryAlias', Helpers::cleanToOnlyLettersNumbers($this->input()['subcategoryAlias']));
 
         return parent::getValidatorInstance();
     }
@@ -28,9 +31,9 @@ class CreateSubcategoryRequest extends AdminFormRequest
     {
         return [
             'categoryId' => self::REQUIRE_EXISTS['categories']['id'],
-            'subcategoryAlias' => self::SUBCATEGORY_COMMON_RULES['alias'],
+            'subcategoryAlias' => self::SUBCATEGORY_COMMON_RULES['alias'] . '|unique:subcategories,alias',
             'subcategoryNames.*.locale_id' => self::REQUIRE_EXISTS['locale']['id'],
-            'subcategoryNames.*.name' => self::SUBCATEGORY_COMMON_RULES['name']
+            'subcategoryNames.*.name' => self::SUBCATEGORY_COMMON_RULES['name'] . '|unique:subcategories_locale,name'
         ];
     }
 }

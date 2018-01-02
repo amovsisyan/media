@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\AdminSide\HashtagRequest;
 
+use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Requests\AdminFormRequest;
 
 class CreateHashtagRequest extends AdminFormRequest
@@ -15,6 +16,8 @@ class CreateHashtagRequest extends AdminFormRequest
     {
         // cause comes json, we need to change it to array to validate it
         $this->request->set('hashtagNames', json_decode($this->input()['hashtagNames'], true));
+        // clean alias from unnecessary symbols
+        $this->request->set('hashtagAlias', Helpers::cleanToOnlyLettersNumbers($this->input()['hashtagAlias']));
 
         return parent::getValidatorInstance();
     }

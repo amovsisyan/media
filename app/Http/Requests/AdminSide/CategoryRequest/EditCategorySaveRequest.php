@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\AdminSide\CategoryRequest;
 
+use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Requests\AdminFormRequest;
 
 class EditCategorySaveRequest extends AdminFormRequest
@@ -15,6 +16,8 @@ class EditCategorySaveRequest extends AdminFormRequest
     {
         // cause comes json, we need to change it to array to validate it
         $this->request->set('localesInfo', json_decode($this->input()['localesInfo'], true));
+        // clean alias from unnecessary symbols
+        $this->request->set('catAlias', Helpers::cleanToOnlyLettersNumbers($this->input()['catAlias']));
 
         return parent::getValidatorInstance();
     }

@@ -44,7 +44,7 @@ class CategoriesController extends MainCategoriesController
     {
         $allRequest = $request->all();
         try {
-            $alias = Helpers::removeSpaces($request->category_alias);
+            $alias = $request->category_alias;
             $category = Category::create(['alias' => $alias]);
 
             $createArr = [];
