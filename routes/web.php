@@ -98,7 +98,6 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 });
 
 
-// todo share buttons
 // todo language active status changer in admin part
 // todo standardization the var names from front side and validation part standardization
 // todo response prepare helper, standardize using it

@@ -7,8 +7,9 @@ $subcategDir = Request::segment(3);
 
 @section('content')
     <section id="posts">
-        <div class="container">
+        <div class="container set-dimesions">
             <div class="row">
+                <div class="col s10">
                 @foreach ($response['posts'] as $post)
                     <div class="col s4">
                         <a href="{{url(Request::url() . '/' . $post['alias'])}}">
@@ -22,6 +23,10 @@ $subcategDir = Request::segment(3);
                         </a>
                     </div>
                 @endforeach
+                </div>
+                <div class="col s2">
+                    @include('templates.google-add')
+                </div>
             </div>
         </div>
     </section>

@@ -15,6 +15,9 @@ $locale = \App::getLocale();
 	@yield('content')
 	@include('layouts.footer')
 
+{{--<-- SHARE BUTTONS SCRIPT -->--}}
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a4ca2d937e8dd97"></script>
+
 </body>
 
 <script src="/js/my.js"></script>

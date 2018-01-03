@@ -8,7 +8,7 @@ $postDir = Request::segment(4);
 
 @section('content')
     <section id="current-post">
-        <div class="container">
+        <div class="container set-dimesions">
             <div class="row">
                 <div class="col s10">
                     <div class="col s12 current-post-header left-align">
@@ -16,6 +16,10 @@ $postDir = Request::segment(4);
                             {{$response['post_header']}}
                         </h4>
                     </div>
+
+                    {{--<-- SHARE BUTTONS -->--}}
+                    <div class="addthis_inline_share_toolbox_3soo"></div>
+
                     @foreach ($response['post_parts'] as $post_part)
                     <div class="col s12 left-align">
                         <div class="post-part">
@@ -33,6 +37,9 @@ $postDir = Request::segment(4);
                         </div>
                     </div>
                     @endforeach
+                </div>
+                <div class="col s2">
+                    @include('templates.google-add')
                 </div>
             </div>
             <div class="row">
