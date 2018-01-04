@@ -15,7 +15,9 @@ $locale = \App::getLocale();
                                 <a href="{{url('/' . $locale . '/' . $post['cat_alias'] . '/' . $post['sub_alias'] . '/' . $post['alias'])}}">
                                     <div class="category-post">
                                         <div class="category-post-img">
-                                            <img src="/img/cat/{{$post['sub_alias']}}/{{$post['alias']}}/{{$locale}}/{{$post['image']}}" alt="">
+                                            <img
+                                                    src="/img/cat/{{$post['sub_alias']}}/{{$post['alias']}}/{{$locale}}/{{$post['image']}}"
+                                                    alt="{{$post['cat_alias'] . '-' . $post['sub_alias'] . '-' . $post['image']}}">
                                         </div>
                                         <h5>{{$post['header']}}</h5>
                                         <h6>{{$post['text']}}</h6>

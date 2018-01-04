@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\ResponsePrepareHelper;
 use App\Http\Controllers\Services\Pagination\PaginationService;
+use App\Http\Controllers\Services\SEO\SEOService;
 use App\Subcategory;
 use Illuminate\Http\Request;
 
@@ -24,6 +25,7 @@ class SubcategoryController extends CategoryController
 
         $response = [
             'navbar'     => Helpers::getNavbar(),
+            'seo'        => SEOService::getSubcategorySEOKeys($respPosts),
             'posts'      => $respPosts,
             'pagination' => PaginationService::makeSubcategoryPagination($subcategoryPostsLocale)
         ];

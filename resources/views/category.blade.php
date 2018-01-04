@@ -1,5 +1,6 @@
 <?php
 $locale = \App::getLocale();
+$categDir = Request::segment(2);
 $subcategDir = Request::segment(3);
 ?>
 
@@ -15,7 +16,9 @@ $subcategDir = Request::segment(3);
                         <a href="{{url(Request::url() . '/' . $post['alias'])}}">
                             <div class="category-post">
                                 <div class="category-post-img">
-                                    <img src="/img/cat/{{$subcategDir}}/{{$post['alias']}}/{{$locale}}/{{$post['image']}}" alt="">
+                                    <img
+                                            src="/img/cat/{{$subcategDir}}/{{$post['alias']}}/{{$locale}}/{{$post['image']}}"
+                                            alt="{{$categDir . '-' . $subcategDir . '-' . $post['image']}}">
                                 </div>
                                 <h5>{{$post['header']}}</h5>
                                 <h6>{{$post['text']}}</h6>

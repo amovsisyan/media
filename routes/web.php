@@ -98,7 +98,6 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 });
 
 
-// todo seo optimization , add alt's for images
 // todo read yahoo front optimization and make them
 // Todo update materialize version, numbers under text(DONE)
 // todo language active status changer in admin part
@@ -109,3 +108,4 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 // todo testIt part for all
 // ToDo Archive posts
 // todo add main page slider capability, by default false , but configurable from Admin
+// todo seo optimization

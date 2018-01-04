@@ -3,7 +3,7 @@ $locale = \App::getLocale();
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang={{$locale}}>
 <head>
 	@include('layouts.head')
 </head>

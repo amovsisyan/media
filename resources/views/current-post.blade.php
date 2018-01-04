@@ -1,5 +1,6 @@
 <?php
 $locale = \App::getLocale();
+$categDir = Request::segment(2);
 $subcategDir = Request::segment(3);
 $postDir = Request::segment(4);
 ?>
@@ -28,7 +29,9 @@ $postDir = Request::segment(4);
                             </h5>
                             @if(!empty($post_part['body']))
                                 <div class="body">
-                                    <img src="/img/cat/{{$subcategDir}}/{{$postDir}}/{{$locale}}/parts/{{$post_part['body']}}" alt="">
+                                    <img
+                                            src="/img/cat/{{$subcategDir}}/{{$postDir}}/{{$locale}}/parts/{{$post_part['body']}}"
+                                            alt="{{$categDir . '-' . $subcategDir . '-' . $postDir . '-image'}}">
                                 </div>
                             @endif
                             <h6 class="foot">

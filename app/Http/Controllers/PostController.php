@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\Helpers;
 use App\Http\Controllers\Helpers\ResponsePrepareHelper;
+use App\Http\Controllers\Services\SEO\SEOService;
 use App\Post;
 use Illuminate\Http\Request;
 
@@ -25,6 +26,7 @@ class PostController extends SubcategoryController
 
             $response = [
                   'navbar'      => Helpers::getNavbar()
+                , 'seo'         => SEOService::getPostSEOKeys($postPartsResponse)
                 , 'post_header' => $postPartsResponse['postHeader']
                 , 'post_parts'  => $postPartsResponse['data']['postParts']
                 , 'hashtags'    => $postPartsResponse['data']['postHashtags']
