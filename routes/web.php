@@ -98,18 +98,14 @@ Route::group(['prefix' => '{locale}', 'middleware' => 'locale'], function () {
 });
 
 
+// todo seo optimization , add alt's for images
+// todo read yahoo front optimization and make them
+// Todo update materialize version, numbers under text(DONE)
 // todo language active status changer in admin part
 // todo standardization the var names from front side and validation part standardization
 // todo response prepare helper, standardize using it
-// todo reread all front classes , make some corrections if needs
-// todo not only db length, but also names should be in Settings
 // todo user registration, password dont remember, reset, email sending
 // todo users can comment under posts
-// todo add main page slider capability, by default false , but configurable from Admin
-// todo seo optimization , add alt's for images
-// todo after post Part delete update number
-// todo read yahoo front optimization and make them
-// todo reread all methods
 // todo testIt part for all
 // ToDo Archive posts
-// Todo numbers under text(DONE), but it doesn't work when we add dynamically
+// todo add main page slider capability, by default false , but configurable from Admin

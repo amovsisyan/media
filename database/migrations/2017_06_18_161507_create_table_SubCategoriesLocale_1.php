@@ -7,6 +7,8 @@ use \App\Http\Controllers\Data\DBColumnLengthData;
 
 class CreateTableSubCategoriesLocale1 extends Migration
 {
+    private $table = 'subcategories_locale';
+
     /**
      * Run the migrations.
      *
@@ -14,7 +16,7 @@ class CreateTableSubCategoriesLocale1 extends Migration
      */
     public function up()
     {
-        Schema::create('subcategories_locale', function (Blueprint $table) {
+        Schema::create($this->table, function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', DBColumnLengthData::CATEGORIES_LOCALE_TABLE['name'])->unique();
             $table->integer('subcateg_id')->unsigned();
@@ -33,6 +35,6 @@ class CreateTableSubCategoriesLocale1 extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('subcategories_locale');
+        Schema::dropIfExists($this->table);
     }
 }

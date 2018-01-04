@@ -7,6 +7,8 @@ use \App\Http\Controllers\Data\DBColumnLengthData;
 
 class CreateTablePostParts extends Migration
 {
+    private $table = 'post_parts';
+
     /**
      * Run the migrations.
      *
@@ -14,7 +16,7 @@ class CreateTablePostParts extends Migration
      */
     public function up()
     {
-        Schema::create('post_parts', function (Blueprint $table) {
+        Schema::create($this->table, function (Blueprint $table) {
             $table->increments('id');
             $table->string('head', DBColumnLengthData::POST_PARTS_TABLE['head'])->nullable();
             $table->string('body', DBColumnLengthData::POST_PARTS_TABLE['body'])->nullable();
@@ -31,6 +33,6 @@ class CreateTablePostParts extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('post_parts');
+        Schema::dropIfExists($this->table);
     }
 }

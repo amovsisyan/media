@@ -6,6 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTableAdminPanelNavbar extends Migration
 {
+    private $table = 'admin_panel_navbar';
+
     /**
      * Run the migrations.
      *
@@ -13,7 +15,7 @@ class CreateTableAdminPanelNavbar extends Migration
      */
     public function up()
     {
-        Schema::create('admin_panel_navbar', function (Blueprint $table) {
+        Schema::create($this->table, function (Blueprint $table) {
             $table->increments('id');
             $table->string('alias', 40)->unique();
             $table->string('name', 40)->unique();
@@ -30,6 +32,6 @@ class CreateTableAdminPanelNavbar extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admin_panel_navbar');
+        Schema::dropIfExists($this->table);
     }
 }

@@ -7,6 +7,8 @@ use \App\Http\Controllers\Data\DBColumnLengthData;
 
 class CreateTableCategories extends Migration
 {
+    private $table = 'categories';
+
     /**
      * Run the migrations.
      *
@@ -14,7 +16,7 @@ class CreateTableCategories extends Migration
      */
     public function up()
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create($this->table, function (Blueprint $table) {
             $table->increments('id');
             $table->string('alias', DBColumnLengthData::CATEGORIES_TABLE['alias'])->unique();
             $table->timestamps();
@@ -28,6 +30,6 @@ class CreateTableCategories extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists($this->table);
     }
 }

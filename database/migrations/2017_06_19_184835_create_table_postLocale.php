@@ -7,6 +7,8 @@ use \App\Http\Controllers\Data\DBColumnLengthData;
 
 class CreateTablePostLocale extends Migration
 {
+    private $table = 'posts_locale';
+
     /**
      * Run the migrations.
      *
@@ -14,7 +16,7 @@ class CreateTablePostLocale extends Migration
      */
     public function up()
     {
-        Schema::create('posts_locale', function (Blueprint $table) {
+        Schema::create($this->table, function (Blueprint $table) {
             $table->increments('id');
             $table->string('header', DBColumnLengthData::POSTS_LOCALE_TABLE['header']);
             $table->string('text', DBColumnLengthData::POSTS_LOCALE_TABLE['text']);
@@ -34,6 +36,6 @@ class CreateTablePostLocale extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('post_locale');
+        Schema::dropIfExists($this->table);
     }
 }

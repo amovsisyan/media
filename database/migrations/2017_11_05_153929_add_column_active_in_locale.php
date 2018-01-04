@@ -6,6 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 
 class AddColumnActiveInLocale extends Migration
 {
+    private $table = 'locale';
+
     /**
      * Run the migrations.
      *
@@ -13,7 +15,7 @@ class AddColumnActiveInLocale extends Migration
      */
     public function up()
     {
-        Schema::table('locale', function (Blueprint $table) {
+        Schema::table($this->table, function (Blueprint $table) {
             $table->tinyInteger('active')->default(0);
         });
     }
@@ -25,7 +27,7 @@ class AddColumnActiveInLocale extends Migration
      */
     public function down()
     {
-        Schema::table('locale', function (Blueprint $table) {
+        Schema::table($this->table, function (Blueprint $table) {
             //
         });
     }

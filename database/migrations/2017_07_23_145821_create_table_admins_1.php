@@ -6,6 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTableAdmins1 extends Migration
 {
+    private $table = 'admins';
+
     /**
      * Run the migrations.
      *
@@ -13,7 +15,7 @@ class CreateTableAdmins1 extends Migration
      */
     public function up()
     {
-        Schema::create('admins', function (Blueprint $table) {
+        Schema::create($this->table, function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 50);
             $table->string('email', 100)->unique();
@@ -31,6 +33,6 @@ class CreateTableAdmins1 extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admins');
+        Schema::dropIfExists($this->table);
     }
 }

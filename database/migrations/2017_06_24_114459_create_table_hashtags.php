@@ -7,6 +7,8 @@ use \App\Http\Controllers\Data\DBColumnLengthData;
 
 class CreateTableHashtags extends Migration
 {
+    private $table = 'hashtags';
+
     /**
      * Run the migrations.
      *
@@ -14,7 +16,7 @@ class CreateTableHashtags extends Migration
      */
     public function up()
     {
-        Schema::create('hashtags', function (Blueprint $table) {
+        Schema::create($this->table, function (Blueprint $table) {
             $table->increments('id');
             $table->string('alias',DBColumnLengthData::HASHTAG_TABLE['alias'])->unique();
         });
@@ -27,6 +29,6 @@ class CreateTableHashtags extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hashtags');
+        Schema::dropIfExists($this->table);
     }
 }

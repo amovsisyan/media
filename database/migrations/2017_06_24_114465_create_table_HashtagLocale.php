@@ -7,6 +7,8 @@ use \App\Http\Controllers\Data\DBColumnLengthData;
 
 class CreateTableHashtagLocale extends Migration
 {
+    private $table = 'hashtags_locale';
+
     /**
      * Run the migrations.
      *
@@ -14,7 +16,7 @@ class CreateTableHashtagLocale extends Migration
      */
     public function up()
     {
-        Schema::create('hashtags_locale', function (Blueprint $table) {
+        Schema::create($this->table, function (Blueprint $table) {
             $table->increments('id');
             $table->string('hashtag',DBColumnLengthData::HASHTAG_LOCALE_TABLE['hashtag'])->unique();
             $table->integer('hashtag_id')->unsigned();
@@ -31,6 +33,6 @@ class CreateTableHashtagLocale extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hashtags_locale');
+        Schema::dropIfExists($this->table);
     }
 }
